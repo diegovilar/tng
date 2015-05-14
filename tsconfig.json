@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "target": "ES5",
+        "module": "commonjs",
+        "noEmitOnError": true,
+        "noImplicitAny": true,
+        "emitDecoratorMetadata": true,
+        "preserveConstEnums": true,
+        "removeComments": false,
+        
+        "outDir": "./build",
+        "declaration": false,
+        "sourceMap": false
+    },
+    "files": [        
+        "./src/_references.ts",        
+        "./src/main.ts",
+        
+        "./typings/node/assert.d.ts",
+        "./src/tests.ts"
+    ]
+}
