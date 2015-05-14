@@ -1,34 +1,38 @@
-import 'reflect-metadata';
+/// <reference path="./_references" />
 
-export function makeDecorator<T extends Function>(cls:T) {
+import {Reflect, getAnnotations, addAnnotations} from './reflection';
+
+export var isDefined = angular.isDefined;
+export var isString = angular.isString;
+export var isNumber = angular.isNumber;
+export var isObject = angular.isObject;
+export var isElement = angular.isElement;
+export var isDate = angular.isDate;
+export var isArray = angular.isArray;
+export var isFunction = angular.isFunction;
+
+export function makeDecorator<T extends Function>(annotationClass:T) {
   
     return function() {
   
-        var args = arguments;
-        var annotationInstance = Object.create(cls.prototype);
-        cls.apply(annotationInstance, args);
+        var annotationInstance = Object.create(annotationClass.prototype);
+        annotationClass.apply(annotationInstance, arguments);
     
-        return function(target: T) {
-    
-            var annotations = Reflect.getMetadata('annotations', target);
-            annotations = annotations || [];
-            annotations.push(annotationInstance);
-            Reflect.defineMetadata('annotations', annotations, target);
+        return function(target:T) {
+            addAnnotations(target, annotationInstance);
             return target;
-            
         }
         
     }  
     
 }
 
-export function makeParamDecorator<T extends Function>(cls:T) {
+export function makeParamDecorator<T extends Function>(annotationClass:T) {
     
-    return function() {        
+    return function() {
     
-        var args = arguments;
-        var annotationInstance = Object.create(cls.prototype);
-        cls.apply(annotationInstance, args);
+        var annotationInstance = Object.create(annotationClass.prototype);
+        annotationClass.apply(annotationInstance, arguments);
         
         return function(target:T, unusedKey:string, index:number) {
             

@@ -9,7 +9,7 @@ Uso em construtor da classe:
 MyClass.annotations = ['injectable1', 'injectable2'];
 */
 
-import {makeDecorator} from '../utils'
+import {makeDecorator} from '../utils';
 
 interface ViewOptions {
     template?:string;
@@ -19,7 +19,7 @@ interface ViewOptions {
     //renderer?:Function;
 }
 
-class ViewAnnotation implements ViewOptions {
+class ViewAnnotation {
     
     template:string;
     templateUrl:string;
