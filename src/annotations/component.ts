@@ -1,8 +1,8 @@
 import {makeDecorator} from '../utils';
 import {ControllerOptions, ControllerAnnotation} from './controller';
 
-export interface ComponentOptions extends ControllerOptions {
-    selector: string;
+export interface ComponentOptions extends ControllerOptions {    
+    selector: string;    
 }
 
 export class ComponentAnnotation extends ControllerAnnotation {

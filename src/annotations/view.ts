@@ -11,35 +11,31 @@ MyClass.annotations = ['injectable1', 'injectable2'];
 
 import {makeDecorator} from '../utils';
 
-interface ViewOptions {
+export interface ViewOptions {
     template?:string;
 	templateUrl?:string;
 	style?:string;
 	styleUrl?:string;
-    //renderer?:Function;
+    controllerAs?:string;
 }
 
-class ViewAnnotation {
+export class ViewAnnotation {
     
     template:string;
     templateUrl:string;
     style:string;
     styleUrl:string;
+    controllerAs:string;
     
     constructor(options:ViewOptions) {
         this.templateUrl = options.templateUrl;
         this.template = options.template;
         this.style = options.style;
         this.styleUrl = options.styleUrl;
+        this.controllerAs = options.controllerAs;
     }
     
 }
 
 type ViewAnnotationConstructor = (options:ViewOptions) => ClassDecorator;
-var View = <ViewAnnotationConstructor> makeDecorator(ViewAnnotation);
-
-export {
-    ViewOptions,
-    ViewAnnotation,
-    View
-};
+export var View = <ViewAnnotationConstructor> makeDecorator(ViewAnnotation);

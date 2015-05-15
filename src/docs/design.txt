@@ -1,0 +1,8 @@
+Components (@Component)
+- São diretivas
+- Necessita de uma view (@View) ou factory to template
+- Podem se tornar roteáveis usando @Route
+    - Registra controller (para compatibilidade com implementação do Router do Angular 2)
+
+Application
+- É um módulo, mas com uma notação de seletor que indica o elemento base de aplicação

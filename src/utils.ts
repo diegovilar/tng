@@ -11,31 +11,39 @@ export var isDate = angular.isDate;
 export var isArray = angular.isArray;
 export var isFunction = angular.isFunction;
 
-export function makeDecorator<T extends Function>(annotationClass:T) {
-  
+export type FunctionReturningSomething = (...args: any[]) => string;
+export type FunctionReturningString = (...args: any[]) => string;
+export type FunctionReturningNumber = (...args: any[]) => number;
+
+export interface Map<TValue> {
+    [key: string]: TValue;
+}
+
+export function makeDecorator<T extends Function>(annotationClass: T) {
+
     return function() {
-  
+
         var annotationInstance = Object.create(annotationClass.prototype);
         annotationClass.apply(annotationInstance, arguments);
-    
-        return function(target:T) {
+
+        return function(target: T) {
             addAnnotations(target, annotationInstance);
             return target;
         }
-        
-    }  
-    
+
+    }
+
 }
 
-export function makeParamDecorator<T extends Function>(annotationClass:T) {
-    
+export function makeParamDecorator<T extends Function>(annotationClass: T) {
+
     return function() {
-    
+
         var annotationInstance = Object.create(annotationClass.prototype);
         annotationClass.apply(annotationInstance, arguments);
-        
-        return function(target:T, unusedKey:string, index:number) {
-            
+
+        return function(target: T, unusedKey: string, index: number) {
+
             var parameters = Reflect.getMetadata('parameters', target);
             parameters = parameters || [];
     
@@ -44,13 +52,13 @@ export function makeParamDecorator<T extends Function>(annotationClass:T) {
             while (parameters.length <= index) {
                 parameters.push(null);
             }
-            
+
             parameters[index] = annotationInstance;
             Reflect.defineMetadata('parameters', parameters, target);
             return target;
-            
+
         }
-        
+
     }
-    
+
 }

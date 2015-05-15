@@ -1,36 +1,52 @@
-import {makeDecorator} from '../utils';
+/// <reference path="../_references" />
 
-interface ServiceOptions {
-    name:string;
-    provider?:ng.IServiceProvider|ng.IServiceProviderFactory|ng.IServiceProviderClass;
-    factory?:Function;
-}
+/*
+@Service({
+    name: 'translator'
+})
+class Translator {
 
-class ServiceAnnotation {
-    
-    name:string;
-    provider:ng.IServiceProvider|ng.IServiceProviderFactory|ng.IServiceProviderClass;
-    factory:Function;
-    
-    constructor(options:ServiceOptions) {
-        this.name = options.name;
-        this.provider = options.provider;
-        this.factory = options.factory;
+    constructor(@Inject('$scope') private $scope, @Inject('$element') private $element,
+                @Inject('$attrs') private $attrs, @Inject('$transclude') private $transclude) {        
     }
     
+    static provider():string {
+    }
+    
+    static factory():Translator {
+    }
+
+}
+*/
+
+import {makeDecorator, FunctionReturningSomething} from '../utils';
+
+export interface ServiceOptions {
+    name: string;
+    //provider?: ng.IServiceProvider|ng.IServiceProviderFactory|ng.IServiceProviderClass;
+    //factory?: FunctionReturningSomething;
 }
 
-//interface ServiceConstructorInterface extends Function {
-//    provider?:(...args:any[]) => ng.IServiceProvider;
-//    factory?:(...args:any[]) => any;
-//}
+// @internal
+export class ServiceAnnotation {
 
-type ServiceAnnotationConstructor = (options:ServiceOptions) => ClassDecorator;
-var Service = <ServiceAnnotationConstructor> makeDecorator(ServiceAnnotation);
+    name: string;
+    //provider: ng.IServiceProvider|ng.IServiceProviderFactory|ng.IServiceProviderClass;
+    //factory: Function;
 
-export {
-    ServiceOptions,
-    ServiceAnnotation,
-    //ServiceConstructorInterface,
-    Service
-};
+    constructor(options: ServiceOptions) {
+        this.name = options.name;
+        //this.provider = options.provider;
+        //this.factory = options.factory;
+    }
+
+}
+
+type ServiceDecorator = (options: ServiceOptions) => ClassDecorator;
+export var Service = <ServiceDecorator> makeDecorator(ServiceAnnotation);
+
+// @internal
+export interface ServiceClass extends Function {
+    provider?: ng.IServiceProviderClass;
+    factory?: FunctionReturningSomething;
+}
