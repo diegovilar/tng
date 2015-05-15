@@ -1,22 +1,18 @@
-/*
-Resultdo esperado:
+import {makeDecorator, FunctionReturningString} from '../utils';
 
-Uso em construtor da classe:
-	@View({})
-    class MyClass {
-	}
-
-MyClass.annotations = ['injectable1', 'injectable2'];
-*/
-
-import {makeDecorator} from '../utils';
+export const enum TemplateNamespace {
+    HTML,
+    SVG,
+    MathML
+}
 
 export interface ViewOptions {
+    controllerAs:string;
     template?:string;
 	templateUrl?:string;
 	style?:string;
 	styleUrl?:string;
-    controllerAs?:string;
+    templateNamespace?: string;
 }
 
 export class ViewAnnotation {
@@ -26,16 +22,18 @@ export class ViewAnnotation {
     style:string;
     styleUrl:string;
     controllerAs:string;
+    templateNamespace: string; // TemplateNamespace.HTML
     
     constructor(options:ViewOptions) {
-        this.templateUrl = options.templateUrl;
         this.template = options.template;
+        this.templateUrl = options.templateUrl;
         this.style = options.style;
         this.styleUrl = options.styleUrl;
         this.controllerAs = options.controllerAs;
+        this.templateNamespace = options.templateNamespace;
     }
     
 }
 
-type ViewAnnotationConstructor = (options:ViewOptions) => ClassDecorator;
-export var View = <ViewAnnotationConstructor> makeDecorator(ViewAnnotation);
+type ViewDecorator = (options:ViewOptions) => ClassDecorator;
+export var View = <ViewDecorator> makeDecorator(ViewAnnotation);
