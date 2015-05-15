@@ -1,24 +1,20 @@
 import {makeDecorator} from '../utils';
+import {ControllerOptions, ControllerAnnotation} from './controller';
 
-interface ComponentOptions {
-    selector:string;
+export interface ComponentOptions extends ControllerOptions {
+    selector: string;
 }
 
-class ComponentAnnotation {
-    
-    selector:string;
-    
-    constructor(options:ComponentOptions) {
+export class ComponentAnnotation extends ControllerAnnotation {
+
+    selector: string;
+
+    constructor(options: ComponentOptions) {
+        super(options);
         this.selector = options.selector;
     }
-    
+
 }
 
-type ComponentAnnotationConstructor = (options:ComponentOptions) => ClassDecorator;
-var Component = <ComponentAnnotationConstructor> makeDecorator(ComponentAnnotation);
-
-export {
-    ComponentOptions,
-    ComponentAnnotation,
-    Component
-};
+type ComponentDecorator = (options: ComponentOptions) => ClassDecorator;
+export var Component = <ComponentDecorator> makeDecorator(ComponentAnnotation);

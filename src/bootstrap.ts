@@ -55,7 +55,7 @@ export function bootstrap(appClass:Function, selectorOrElement?:string|Element):
 		element = angular.element(selector);
 	}
 	
-	var aux;
+	var aux:any;
 	
 	var appNote:ApplicationAnnotation;
 	aux = getAnnotations(appClass, ApplicationAnnotation);
@@ -77,9 +77,6 @@ export function bootstrap(appClass:Function, selectorOrElement?:string|Element):
 	
 }
 
-//export function registerModule(moduleClass:Function);
-//export function registerModule(moduleClass:Function, name:string);
-//export function registerModule(moduleClass:Function, name?:string) {
 export function registerModule(moduleClass:Function):ng.IModule {
 	
 	var notes = getAnnotations(moduleClass, ModuleAnnotation);
@@ -91,7 +88,7 @@ export function registerModule(moduleClass:Function):ng.IModule {
 	var note = mergeAnnotations(notes, create(ModuleAnnotation));
 	
 	// Recurse through modules this one depends on
-	var deps = [];
+	var deps:string[] = [];
 	if (note.modules) for (let module of note.modules) {
 		deps.push(isString(module) ? module : registerModule(module).name);
 	}
@@ -131,6 +128,10 @@ export function registerModule(moduleClass:Function):ng.IModule {
 	
 }
 
+
+
+// -- Private --
+
 function registerService(ngModule:ng.IModule, ServiceClass:Function) {	
 
 	var aux = getAnnotations(ServiceClass, ServiceAnnotation);
@@ -140,21 +141,19 @@ function registerService(ngModule:ng.IModule, ServiceClass:Function) {
 	}
 	
 	var note = mergeAnnotations(aux, create(ServiceAnnotation));
+    var name = note.name;
 	
 	if (isDefined(note.provider)) {
-		ngModule.provider(note.name, <any> note.provider);
+		ngModule.provider(name, <any> note.provider);
 	}
 	else if (isDefined(note.factory)) {
-		ngModule.factory(note.name, note.factory);
+		ngModule.factory(name, note.factory);
 	}
 	else {
 									// Invoked later with $injector.invoke()?
-		ngModule.service(note.name, ServiceClass);
+		ngModule.service(name, ServiceClass);
 	}
 
-}
-
-function registerDirective(ngModule:ng.IModule, DirectiveClass:Function) {	
 }
 
 function registerComponent(ngModule:ng.IModule, ComponentClass:Function) {
@@ -166,6 +165,9 @@ function registerComponent(ngModule:ng.IModule, ComponentClass:Function) {
 	
 	var note = mergeAnnotations(aux, create(ComponentAnnotation));
 	
+}
+
+function registerDirective(ngModule:ng.IModule, DirectiveClass:Function) {	
 }
 
 

@@ -3,21 +3,23 @@
 
 import {makeDecorator} from '../utils';
 
-interface ModuleOptions {
+export interface ModuleOptions {
 	name:string;
 	modules?:any[];
 	components?:Function[];
 	services?:Function[];
 	directives?:Function[];
+	controllers?:Function[];
 }
 
-class ModuleAnnotation {
+export class ModuleAnnotation {
 	
 	name:string;
 	modules:any[];
 	components:Function[];
 	services:Function[];
 	directives:Function[];
+    controllers:Function[];
 	
 	constructor(options:ModuleOptions) {
 		this.name = options.name;
@@ -25,15 +27,10 @@ class ModuleAnnotation {
 		this.components = options.components;
 		this.services = options.services;
 		this.directives = options.directives;
+		this.controllers = options.controllers;
 	}
 	
 }
 	
-type ModuleAnnotationConstructor = (options:ModuleOptions) => ClassDecorator;
-var Module = <ModuleAnnotationConstructor> makeDecorator(ModuleAnnotation);
-
-export {
-    ModuleOptions,
-    ModuleAnnotation,
-    Module
-};
+type ModuleAnnotationDecorator = (options:ModuleOptions) => ClassDecorator;
+export  var Module = <ModuleAnnotationDecorator> makeDecorator(ModuleAnnotation);
