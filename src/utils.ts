@@ -2,6 +2,8 @@
 
 import {Reflect, getAnnotations, addAnnotations} from './reflection';
 
+type extendSignature = <T>(dest: T, ...args: any[]) => T;
+
 export var isDefined = angular.isDefined;
 export var isString = angular.isString;
 export var isNumber = angular.isNumber;
@@ -10,6 +12,9 @@ export var isElement = angular.isElement;
 export var isDate = angular.isDate;
 export var isArray = angular.isArray;
 export var isFunction = angular.isFunction;
+export var extend = <extendSignature> angular.extend;
+export var copy = <extendSignature> angular.copy;
+export var merge = <extendSignature> (<any> angular).merge;
 
 export type FunctionReturningNothing = (...args: any[]) => void;
 export type FunctionReturningSomething = (...args: any[]) => string;
@@ -18,6 +23,12 @@ export type FunctionReturningNumber = (...args: any[]) => number;
 
 export interface Map<TValue> {
     [key: string]: TValue;
+}
+
+export function create<T>(constructor: { prototype: T }): T {
+
+    return Object.create(constructor.prototype);
+
 }
 
 export function setIf(target:any, source:any) {

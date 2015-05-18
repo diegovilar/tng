@@ -1,4 +1,4 @@
 import './globals'; //for side-effects
 
-export * from './annotations';
+export {Inject} from './annotations';
 export * from './bootstrap';

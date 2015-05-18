@@ -175,7 +175,7 @@ function mergeAnnotations(annotations: any[], target?: any): any {
 
 }
 
-function create<T, U>(constructor: { prototype: U }): U {
+function create<T>(constructor: { prototype: T }): T {
 
     return Object.create(constructor.prototype);
 

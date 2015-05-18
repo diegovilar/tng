@@ -1,30 +1,3 @@
-/*
-Resultdo esperado:
-
-Uso em construtor da classe:
-	class MyClass {
-		constructor(@Inject('injectable1') servico1:any, @Inject('injectable2') servico2:any) {
-		}
-	}
-
-MyClass.$inject = ['injectable1', 'injectable2'];
-
-Uso em metodo:
-	class MyClass {
-		metodo(@Inject('injectable1') servico1:any, @Inject('injectable2') servico2:any) {
-		}
-	}
-
-MyClass.metodo.$inject = ['injectable1', 'injectable2'];
-
-Uso em função:
-	function funcao(@Inject('injectable1') servico1:any, @Inject('injectable2') servico2:any) {
-	}
-
-funcao.$inject = ['injectable1', 'injectable2'];
-
-*/
-
 export function Inject<T extends Function>(injectablesNames:string[], target:T):T;
 
 export function Inject(injectableName:string):ParameterDecorator;
