@@ -1,52 +1,27 @@
-/// <reference path="../_references" />
-
-/*
-@Service({
-    name: 'translator'
-})
-class Translator {
-
-    constructor(@Inject('$scope') private $scope, @Inject('$element') private $element,
-                @Inject('$attrs') private $attrs, @Inject('$transclude') private $transclude) {        
-    }
-    
-    static provider():string {
-    }
-    
-    static factory():Translator {
-    }
-
-}
-*/
-
-import {makeDecorator, FunctionReturningSomething} from '../utils';
+import {makeDecorator, FunctionReturningSomething, setIfInterface} from '../utils';
 
 export interface ServiceOptions {
     name: string;
-    //provider?: ng.IServiceProvider|ng.IServiceProviderFactory|ng.IServiceProviderClass;
-    //factory?: FunctionReturningSomething;
+    provider?: ng.IServiceProvider|ng.IServiceProviderClass;
+    factory?: FunctionReturningSomething;
 }
 
 // @internal
 export class ServiceAnnotation {
 
-    name: string;
-    //provider: ng.IServiceProvider|ng.IServiceProviderFactory|ng.IServiceProviderClass;
-    //factory: Function;
+    name: string = '';
+    provider: ng.IServiceProvider|ng.IServiceProviderClass = null;
+    factory: FunctionReturningSomething = null;
 
     constructor(options: ServiceOptions) {
-        this.name = options.name;
-        //this.provider = options.provider;
-        //this.factory = options.factory;
+        setIfInterface(this, options);
     }
 
 }
 
-type ServiceDecorator = (options: ServiceOptions) => ClassDecorator;
-export var Service = <ServiceDecorator> makeDecorator(ServiceAnnotation);
+export interface Service {
 
-// @internal
-export interface ServiceClass extends Function {
-    provider?: ng.IServiceProviderClass;
-    factory?: FunctionReturningSomething;
 }
+
+type ServiceSignature = (options: ServiceOptions) => ClassDecorator;
+export var Service = <ServiceSignature> makeDecorator(ServiceAnnotation);

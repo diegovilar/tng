@@ -1,36 +1,47 @@
-/*
-*/
-
-import {makeDecorator} from '../utils';
+import {makeDecorator, setIfInterface, FunctionReturningNothing} from '../utils';
 
 export interface ModuleOptions {
-	name:string;
-	modules?:any[];
-	components?:Function[];
-	services?:Function[];
-	directives?:Function[];
-	controllers?:Function[];
+	dependencies?: (string|Function)[];
+	config?: Function|Function[];
+	run?: Function|Function[];
+	
+	name?: string;
+	modules?: (string|Function)[];
+	components?: Function[];
+	services?: Function[];
+	filters?: Function[];
+	decorators?: Function[];
+	animations?: Function[];
+	values?: Function[];
+	constants?: Function[];
 }
 
 export class ModuleAnnotation {
-	
-	name:string;
-	modules:any[];
-	components:Function[];
-	services:Function[];
-	directives:Function[];
-    controllers:Function[];
-	
-	constructor(options:ModuleOptions) {
-		this.name = options.name;
-		this.modules = options.modules;
-		this.components = options.components;
-		this.services = options.services;
-		this.directives = options.directives;
-		this.controllers = options.controllers;
+
+	dependencies: (string|Function)[] = null;
+	config: Function|Function[] = null;
+	run: Function|Function[] = null;
+
+	name: string = '';
+	modules: (string|Function)[] = null;
+	components: Function[] = null;
+	services: Function[] = null;
+	filters: Function[] = null;
+	decorators: Function[] = null;
+	animations: Function[] = null;
+	values: Function[] = null;
+	constants: Function[] = null;
+
+	constructor(options: ModuleOptions) {
+		setIfInterface(this, options);
 	}
-	
+
 }
-	
-type ModuleAnnotationDecorator = (options:ModuleOptions) => ClassDecorator;
-export  var Module = <ModuleAnnotationDecorator> makeDecorator(ModuleAnnotation);
+
+export interface Module {
+	onConfig?: FunctionReturningNothing;
+	onRun?: FunctionReturningNothing;
+}
+
+type ModuleSignature = (options: ModuleOptions) => ClassDecorator;
+export var Module = <ModuleSignature> makeDecorator(ModuleAnnotation);

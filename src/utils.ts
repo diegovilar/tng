@@ -11,12 +11,39 @@ export var isDate = angular.isDate;
 export var isArray = angular.isArray;
 export var isFunction = angular.isFunction;
 
+export type FunctionReturningNothing = (...args: any[]) => void;
 export type FunctionReturningSomething = (...args: any[]) => string;
 export type FunctionReturningString = (...args: any[]) => string;
 export type FunctionReturningNumber = (...args: any[]) => number;
 
 export interface Map<TValue> {
     [key: string]: TValue;
+}
+
+export function setIf(target:any, source:any) {
+    
+    if (target == null || source == null) {
+        return;
+    }
+	
+	for (let key in source) if (source.hasOwnProperty(key)) {
+        target[key] = source[key];
+    }
+	
+}
+
+export function setIfInterface(target:any, source:any) {
+    
+    if (target == null || source == null) {
+        return;
+    }
+	
+	for (let key in source) if (source.hasOwnProperty(key)) {
+        if (target.hasOwnProperty(key)) {
+            target[key] = source[key];
+        }
+    }
+	
 }
 
 export function makeDecorator<T extends Function>(annotationClass: T) {

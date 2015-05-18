@@ -1,29 +1,24 @@
-/*
-*/
+import {makeDecorator, setIfInterface} from '../utils';
+import {ModuleOptions, ModuleAnnotation, Module} from './module';
 
-import {makeDecorator} from '../utils';
-import {ModuleOptions, ModuleAnnotation} from './module';
-
-interface ApplicationOptions extends ModuleAnnotation {
-	selector?:string;
+export interface ApplicationOptions extends ModuleAnnotation {
+	selector: string;
 }
 
-class ApplicationAnnotation extends ModuleAnnotation {
-	
-	selector:string;
-	
-	constructor(options:ApplicationOptions) {
+export class ApplicationAnnotation extends ModuleAnnotation {
+
+	selector: string = '';
+
+	constructor(options: ApplicationOptions) {
 		super(options);
-		this.selector = options.selector;
+		setIfInterface(this, options);
 	}
-	
-}
-	
-type ApplicationAnnotationConstructor = (options:ApplicationOptions) => ClassDecorator;
-var Application = <ApplicationAnnotationConstructor> makeDecorator(ApplicationAnnotation);
 
-export {
-    ApplicationOptions,
-    ApplicationAnnotation,
-    Application
-};
+}
+
+export interface Application extends Module {
+
+}
+
+type ApplicationSignature = (options: ApplicationOptions) => ClassDecorator;
+export var Application = <ApplicationSignature> makeDecorator(ApplicationAnnotation);

@@ -1,4 +1,4 @@
-import {makeDecorator, FunctionReturningString} from '../utils';
+import {makeDecorator, FunctionReturningString, setIfInterface} from '../utils';
 
 export const enum TemplateNamespace {
     HTML,
@@ -7,33 +7,29 @@ export const enum TemplateNamespace {
 }
 
 export interface ViewOptions {
-    controllerAs:string;
-    template?:string;
-	templateUrl?:string;
-	style?:string;
-	styleUrl?:string;
-    templateNamespace?: string;
+    controllerAs: string;
+    template?: string|FunctionReturningString;
+    templateUrl?: string|FunctionReturningString;
+    style?: string;
+    styleUrl?: string;
+    templateNamespace?: TemplateNamespace;
 }
 
+// @internal
 export class ViewAnnotation {
-    
-    template:string;
-    templateUrl:string;
-    style:string;
-    styleUrl:string;
-    controllerAs:string;
-    templateNamespace: string; // TemplateNamespace.HTML
-    
-    constructor(options:ViewOptions) {
-        this.template = options.template;
-        this.templateUrl = options.templateUrl;
-        this.style = options.style;
-        this.styleUrl = options.styleUrl;
-        this.controllerAs = options.controllerAs;
-        this.templateNamespace = options.templateNamespace;
+
+    template: string|FunctionReturningString = '';
+    templateUrl: string|FunctionReturningString = '';
+    style = '';
+    styleUrl = '';
+    controllerAs = '';
+    templateNamespace = TemplateNamespace.HTML;
+
+    constructor(options: ViewOptions) {
+        setIfInterface(this, options);
     }
-    
+
 }
 
-type ViewDecorator = (options:ViewOptions) => ClassDecorator;
+type ViewDecorator = (options: ViewOptions) => ClassDecorator;
 export var View = <ViewDecorator> makeDecorator(ViewAnnotation);

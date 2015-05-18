@@ -1,42 +1,6 @@
-/// <reference path="../_references" />
-
-/*
-@Component({
-    selector: 'card',
-    restrict: Restriction.Element
-    scope:{},
-    bindToController: {
-        title: '@'
-    }
-})
-@View({
-    controllerAs: 'card'
-    template: "<div>I'm a card</div>",
-    styleUrl: 'card.css'
-})
-class Card {
-
-    constructor(@Inject('$scope') private $scope, @Inject('$element') private $element,
-                @Inject('$attrs') private $attrs, @Inject('$transclude') private $transclude) {        
-    }
-    
-    static template():string {
-    }
-    
-    static templateUrl():string {
-    }
-
-    static compile() {
-    }
-    
-    static link() {
-    }
-
-}
-*/
-
 import {Inject} from './inject';
-import {makeDecorator, Map, FunctionReturningString} from '../utils';
+import {makeDecorator, Map, setIfInterface} from '../utils';
+import {FunctionReturningString, FunctionReturningNothing} from '../utils';
 
 //export const enum Restriction {
 //    Attribute,
@@ -60,9 +24,21 @@ const transclusionMap = {
     [Transclusion.Element]: 'element'
 };
 
-export interface Component {
+type PrePost = {
+    pre : FunctionReturningNothing,
+    post: FunctionReturningNothing
+};
+type CompileFunction = (...args: any[]) => FunctionReturningNothing;
+type FunctionReturningPrePost = (...args: any[]) => PrePost;
 
+export interface ComponentOptions {
+
+    // name = element
+    // .name = class
+    // [name] = attribute
+    // //name = comment
     selector: string;
+    
     multiElement?: boolean;
     priority?: number;
     terminal?: boolean;
@@ -82,10 +58,9 @@ export interface Component {
     
     // needs mapping
     transclude?: Transclusion; // Transclusion.Content
-    
-    // Metodos estático?
-    compile?: any;
-    link?: any;
+        
+    compile?: CompileFunction|FunctionReturningPrePost;
+    link?: FunctionReturningNothing|PrePost;
     
     // deprecated
     replace?: boolean;
@@ -95,22 +70,18 @@ export interface Component {
 // @internal
 export class ComponentAnnotation {
 
-    constructor(options: Component) {
+    constructor(options: ComponentOptions) {
+        setIfInterface(this, options);
     }
 
 }
 
-type ComponentDecorator = (options: Component) => ClassDecorator;
+type ComponentDecorator = (options: ComponentOptions) => ClassDecorator;
 export var Component = <ComponentDecorator> makeDecorator(ComponentAnnotation);
 
+// TODO extract?
 // @internal
-export interface DirectiveClass extends Function {
-    templateFactory?: FunctionReturningString;
-    templateUrlFactory?: FunctionReturningString;
-}
-
-// @internal
-export function makeDirectiveFactory(DirectiveClass: DirectiveClass):Function {
+export function makeDirectiveFactory(DirectiveClass: Function):Function {
 
     return Inject(['$injector'], function directiveFactory($injector: ng.auto.IInjectorService): ng.IDirective {
 

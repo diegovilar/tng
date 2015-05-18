@@ -5,7 +5,7 @@ ___
 
 ### Application
 
-* Classe decorada com `@Application`
+* Decorador: `@Application`
 * É um `Module`, mas com uma notação de seletor que indica o elemento base da aplicação
   
 Exemplo:
@@ -23,7 +23,7 @@ Exemplo:
         selector: 'html',
         dependencies: ['ngRoute', Components, Services, version]
     })
-    class TodoApp {
+    class TodoApp implements Application {
         
         onRun(@Inject('storage') storage:Storage) {
             storage.clean();
@@ -35,11 +35,21 @@ Exemplo:
 ```
 
 
+
 ### Module
 
-* Classe decorada com `@Module`
+* Dacorador: `@Module`
 * Equivalente a um módulo do Angular, agregando submódulos, serviços e componentes
-* Permite configuração através...
+* Permite fornecer funções de configuração:
+  * através da anotação `config` em `@Module`
+  * através de método `onConfig()` implementado na classe do módulo
+* Permite fornecer funções de inicializaão:
+  * através da anotação `run` em `@Module`
+  * através de método `onRun()` implementado na classe do módulo
+* Informa-se outros módulos, serviços, componentes, decoradores, filtros, animacoes,
+  valores e constantes através da anotação `dependencies` me `@Module`
+* Pode-se depender de outros módulos regulares, não implementados usando TNG, bastando apenas
+  informar seus nomes em `dependencies`
 
 Exemplos:
 
@@ -50,7 +60,8 @@ Exemplos:
     import {TodoItem} from './components/todo-item';
     
     @Module({
-        dependencies: ['ui.bootstrap', Todo, TodoItem]
+        dependencies: ['ui.bootstrap', Todo, TodoItem],
+        config: [...]
     })
     export class Components {}
 ```
@@ -63,7 +74,7 @@ Exemplos:
     @Module({
         dependencies: ['ngCookies', Storage]
     })
-    export class Services {
+    export class Services implements Module {
                 
         onConfig(@Inject('$cookiesProvider') $cookiesProvider: ng.cookies.ICookiesServiceProvider) {
             ...
@@ -71,6 +82,8 @@ Exemplos:
         
     }
 ``` 
+
+
 
 ### Services
 
@@ -116,6 +129,8 @@ Exemplos:
     }
 ```
 
+
+
 ### Components
 
 * Decorator: `@Component`
@@ -128,23 +143,24 @@ Exemplos:
   * através da anotação `templateUrl`, podendo ser:
     * uma string contendo URL para o arquivo do template
     * uma função a ser invocada com `$injector.invoke()` e que retorna uma string contendo a URL
-* Uma função de compilação, invocada com `$inject.invoke()`, pode ser fornecida por um método estático
-  `compile()` na classe do componente
-* Para a função de compílação `compile()` e as funções referenciadas a `template` ou `templateUrl`,
+* Uma função de compilação, invocada com `$inject.invoke()`, pode ser referenciada na anotação
+  `compile` em `@Component`
+* Para a função as funções referenciadas em `compile`, `template` e `templateUrl`,
   há injeções locais disponíveis:
   * `element`: elemento template onde a diretiva foi declarada
   * `attributes`: lista normalizada de atributos nesse elemento template, compartilhada com as demais
     diretivas do elemento
-* Uma função de ligação, invocada com `$inject.invoke()`, pode ser fornecida por um método estático
-  `link()` na classe do componente. Para esta função, estão disponíveis as seguintes injeções locais:
+* Uma função de ligação, invocada com `$inject.invoke()`, pode ser referenciada na anotação
+  `link` em `@Component`. Para esta função, estão disponíveis as seguintes injeções locais:
   * `element`: instancia do elemento, onde a diretiva será usada
   * `attributes`: lista normalizada de atributos nesse elemento, compartilhada com as demais diretivas
      do elemento
   * `scope`: escopo a ser usado pela diretiva
   * `controller`: TODO
   * `transclude`: TODO
-* Com exceção de `controller`, as injeções locais acima também estão disponíveis ao construtor do componente
+* Com exceção de `controller`, as injeções locais disponíveis a `link` também estão disponíveis ao construtor do componente
   (ViewModel)
+* ??? Tornar PrePost injetáveis tb?
 
 `Arquivo: app/concrete/components/todo.ts`
 ```javascript
@@ -198,17 +214,126 @@ Exemplos:
     }
 ```
 
+
+
 ### Decorator
+
+* Decorator: `@Decorator`
+* Instanciado com `$injector.instantiate()`
+
+```js
+    import {Decorator, Inject} from 'tng';
+    
+    @Decorator({
+        name: 'storage'
+    })
+    class StorageDecorator implements Decorator {
+        
+        // Injectable
+        constructor() {
+            ...
+        }
+                
+        // Injectable
+        decorate(@Inject('$delegate') $delegate: any): any {
+            ...
+        }
+        
+    }
+```
+
+
 
 ### Animation
 
+* Decorator: `@Animation`
+* Singleton
+* Instanciado com `$injector.instantiate()`
+
+```js
+    import {Animation} from 'tng';
+    
+    @Animation({
+        name: 'fade'
+    })
+    class FadeAnimation implements Animation {
+        
+        // Injectable
+        constructor() {
+            ...
+        }
+        
+        ...
+    }    
+```
+
+
+
 ### Filter
+
+* Decorator: `@Filter`
+* Singleton
+* Instanciado com `$injector.instantiate()`
+
+```js
+    import {Filter, Inject} from 'tng';
+    
+    @Filter({
+        name: 'orderBy'
+    })
+    class OrderByFilter implements Filter {
+        
+        // Injectable
+        constructor() {
+            ...
+        }
+        
+        // Not injectable
+        filter(input: any, ...args: any[]): any {
+            ...
+        }
+        
+    }
+```
+
+
 
 ### Controller??
 
+TODO necessário? Acho que não...
+
+
+
 ## Extensão de anotações
 
-TODO anotações são herdadas?
+* Anotações são herdadas quando se extende uma classe
+* Pode-se extrair as anotações manualmente:
+  * `var annotations = Component.inheritsFrom(sourceClass)`
+    * Extracts annotations made with `Component` for imperative use
+  * `@Component.inheritsFrom(sourceClass)`
+    * Extracts annotations made with `Component` and applies them to the target class
+
+Automatic inheriting annotations:
+
+```js
+    import {Component} from 'tng';
+    import {TodoItem} from './todo-item';
+
+    // GoldenTodoItem automaticly inherits annotations from TodoItem
+    // Adds new annotations do override inherited ones  
+    @Component({
+        selector: 'golden-todo-item'
+    })
+    @View({
+        controllerAs: 'item',
+        template: '<div class="golden-todo-item"></div>'
+    })
+    export class GoldenTodoItem extends TodoItem {
+        ...
+    }
+```
+
+Manualy inherting annotations:
 
 ```js
     import {Component} from 'tng';
@@ -216,14 +341,27 @@ TODO anotações são herdadas?
 
     @Component.inheritsFrom(TodoItem)
     @Component({
-        selector: 'todo-item',
-        require: ['^todo']
+        selector: 'golden-todo-item'
     })
     @View({
         controllerAs: 'item',
-        template: '<div class="todo-item"></div>'
+        template: '<div class="golden-todo-item"></div>'
     })
-    export class GoldenTodoItem extends TodoItem {
+    export class GoldenTodoItem {
         ...
     }
+```
+
+
+
+### Obtendo versão crua de um módulo para uso da API Angular
+
+```js
+    import {Module} from 'tng';
+    import {Services} from './concrete/services';
+    
+    var rawModule = Module.unwrap(Services, 'services');
+    rawModule.controller(...);
+    rawModule.service(...);
+    rawModule.directive(...);
 ```
