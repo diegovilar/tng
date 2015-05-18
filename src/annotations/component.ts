@@ -38,18 +38,18 @@ class Card {
 import {Inject} from './inject';
 import {makeDecorator, Map, FunctionReturningString} from '../utils';
 
-export const enum Restriction {
-    Attribute,
-    Element,
-    Class,
-    Comment
-}
-const restrictionMap = {
-    [Restriction.Attribute]: 'A',
-    [Restriction.Element]: 'E',
-    [Restriction.Class]: 'C',
-    [Restriction.Comment]: 'M'
-};
+//export const enum Restriction {
+//    Attribute,
+//    Element,
+//    Class,
+//    Comment
+//}
+//const restrictionMap = {
+//    [Restriction.Attribute]: 'A',
+//    [Restriction.Element]: 'E',
+//    [Restriction.Class]: 'C',
+//    [Restriction.Comment]: 'M'
+//};
 
 export const enum Transclusion {
     Content,
@@ -76,8 +76,9 @@ export interface Component {
 
     require?: string[];
     
+    // TODO inferir pelo seletor
     // needs mapping
-    restrict?: Restriction|Restriction[]; // [Restriction.Element, Restriction.Element]
+    //restrict?: Restriction|Restriction[]; // [Restriction.Element, Restriction.Element]
     
     // needs mapping
     transclude?: Transclusion; // Transclusion.Content
