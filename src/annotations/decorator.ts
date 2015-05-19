@@ -16,7 +16,11 @@ export class DecoratorAnnotation {
 }
 
 export interface Decorator {
-    decorate:FunctionReturningSomething;
+    decorate: FunctionReturningSomething;
+}
+
+export interface DecoratorConstructor extends Function {
+    new (): Decorator;
 }
 
 type DecoratorSignature = (options: DecoratorOptions) => ClassDecorator;

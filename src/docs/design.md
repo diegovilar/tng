@@ -85,6 +85,40 @@ Exemplos:
 
 
 
+### Constants
+
+* Decorador: `@Constant`
+
+```js
+    import {Constant, Module} from 'tng';
+    
+    var version = Constant('version', '1.2.3');
+    
+    @Module({
+        dependencies: [version]
+    })
+    ...
+```
+
+
+
+### Values
+
+* Decorador: `@Value`
+
+```js
+    import {Value, Module} from 'tng';
+    
+    var state = Value('state', {current: 'stoped', next: 'moving'});
+    
+    @Module({
+        dependencies: [state]
+    })
+    ...
+```
+
+
+
 ### Services
 
 * Decorator: `@Service`

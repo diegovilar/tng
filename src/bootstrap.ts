@@ -4,126 +4,169 @@
 Applications must have:
     - Module annotation
 
-Applications may have
-    - Component annotation
-    - view annotation 
-
 Steps to bootstrap:
 
-    - Iterate through submodules (recursively)
-        - Register modules on Angular
-            - Register config and run functions
+    - Process submodules (recursively)
+    - Process the application module
+    - Bootstrap
+    
+To process a module is to:
+    - Iterate through it's submodules and process them (recurse)
+        - Register the module on Angular            
         - Register services on Angular
-            - Register config and run functions
         - Register directives on Angular
-            - Register config and run functions
         - Register components on Angular
-            - Register config and run functions
             - Gather route annotations
-    - Register application module on Angular
-    - Register config and run functions
-    - Bootstrap    
-
+        - Register config and run functions
 */
-import {getAnnotations} from './reflection';
-import {isFunction, isString, isDefined} from './utils';
-import {ApplicationAnnotation, ModuleAnnotation, ViewAnnotation} from './annotations';
-import {ComponentAnnotation} from './annotations/component';
-import {ServiceAnnotation, ServiceClass} from './annotations/service';
 
-export function bootstrap(appClass: Function): void;
-export function bootstrap(appClass: Function, selector: string): void;
-export function bootstrap(appClass: Function, element: Element): void;
-export function bootstrap(appClass: Function, selectorOrElement?: string|Element): void {
+import {getAnnotations, hasAnnotation} from './reflection';
+import {isFunction, isString, isDefined, merge, create, parseSelector} from './utils';
+import {Inject} from './annotations';
+//import {View, ViewAnnotation} from './annotations';
+import {Module, ModuleConstructor, ModuleAnnotation} from './annotations';
+import {Application, ApplicationAnnotation} from './annotations';
+import {Component, ComponentConstructor, ComponentAnnotation, makeDirectiveFactory} from './annotations';
+import {Service, ServiceConstructor, ServiceAnnotation} from './annotations';
+import {Filter, FilterConstructor, FilterAnnotation} from './annotations';
+import {Decorator, DecoratorConstructor, DecoratorAnnotation} from './annotations';
+import {Value, ValueAnnotation} from './annotations';
+import {Constant, ConstantAnnotation} from './annotations';
 
-    var selector = 'html';
+/**
+ * 
+ */
+export function bootstrap(ModuleClass: ModuleConstructor, selector?: string): void {
+
     var element: ng.IAugmentedJQuery;
 
-    if (typeof selectorOrElement == 'string') {
-        selector = <string> selectorOrElement;
-    }
-    else {
-        element = angular.element(<Element> selectorOrElement);
-    }
+    var aux: ModuleAnnotation[];
+    var appNotes: ApplicationAnnotation;
 
-    if (!element) {
-        element = angular.element(selector);
-    }
+    aux = getAnnotations(ModuleClass, ModuleAnnotation);
 
-    var aux: any;
-
-    var appNote: ApplicationAnnotation;
-    aux = getAnnotations(appClass, ApplicationAnnotation);
-    if (aux.length) {
-        appNote = mergeAnnotations(aux, create(ApplicationAnnotation));
-    }
-
-    var viewNote: ViewAnnotation;
-    aux = getAnnotations(appClass, ViewAnnotation);
-    if (aux.length) {
-        viewNote = mergeAnnotations(aux, create(ViewAnnotation));
-    }
-
-    var compNote: ComponentAnnotation;
-    aux = getAnnotations(appClass, ComponentAnnotation);
-    if (aux.length) {
-        compNote = mergeAnnotations(aux, create(ComponentAnnotation));
-    }
-
-}
-
-function registerModule(moduleClass: Function): ng.IModule {
-
-    var notes = getAnnotations(moduleClass, ModuleAnnotation);
-
-    if (!notes.length) {
+    if (!aux.length) {
         throw new Error('No module annotation found');
     }
 
-    var note = mergeAnnotations(notes, create(ModuleAnnotation));
-    
-    // Recurse through modules this one depends on
-    var deps: string[] = [];
-    if (note.modules) for (let module of note.modules) {
-        deps.push(isString(module) ? module : registerModule(module).name);
+    appNotes = merge(create(ApplicationAnnotation), ...aux);
+    selector = !selector ? appNotes.selector : selector;
+
+    if (!selector) {
+        throw new Error('No selector specified');
     }
     
-    // Create this angular module
-    var ngModule = angular.module(note.name, deps);
+    var selectorData = parseSelector(selector);
     
-    // Register services
-    if (note.services) for (let serviceClass of note.services) {
-        registerService(ngModule, serviceClass);
+    // TODO get element    
+    
+    var ngModule = registerModule(ModuleClass);
+    
+    // TODO wait for dom ready?
+    angular.bootstrap(element, [ngModule.name]);
+
+}
+
+/**
+ * 
+ */
+function registerModule(moduleClass: ModuleConstructor, name?: string): ng.IModule {
+
+    var aux: any[];
+    var moduleNotes: ModuleAnnotation;
+
+    aux = getAnnotations(moduleClass, ModuleAnnotation);
+
+    if (!aux.length) {
+        throw new Error('No module annotation found');
     }
-    
-    // Register directives
-    if (note.directives) for (let directiveClass of note.directives) {
-        registerDirective(ngModule, directiveClass);
+
+    moduleNotes = merge(create(ModuleAnnotation), ...aux);
+
+    var modules: any[] = [];
+    var services: any[] = [];
+    var components: any[] = [];
+    var values: any[] = [];
+    var constants: any[] = [];
+    var filters: any[] = [];
+    var decorators: any[] = [];
+
+    // TODO optimize this.. to much reflection queries
+    for (let dep of moduleNotes.dependencies) {
+        // Regular angular module
+        if (isString(dep)) {
+            modules.push(dep);
+        }
+        else if (hasAnnotation(dep, ModuleAnnotation)) {
+            modules.push(registerModule(<ModuleConstructor> dep).name);
+        }
+        else if (hasAnnotation(dep, ServiceAnnotation)) {
+            services.push(dep);
+        }
+        else if (hasAnnotation(dep, ComponentAnnotation)) {
+            components.push(dep);
+        }
+        else if (hasAnnotation(dep, DecoratorAnnotation)) {
+            decorators.push(dep);
+        }
+        else if (hasAnnotation(dep, FilterAnnotation)) {
+            filters.push(dep);
+        }
+        else if (hasAnnotation(dep, ConstantAnnotation, 'constant')) {
+            constants.push(dep);
+        }
+        else if (hasAnnotation(dep, ValueAnnotation, 'value')) {
+            values.push(dep);
+        }
+        else {
+            // TODO WTF?
+            throw new TypeError(`I don't recognize what kind of dependency is this: ${dep}`);
+        }
     }
+
+    name = name || moduleNotes.name || 'TODO RANDOM';
     
-    // Register components
-    if (note.components) for (let componentClass of note.components) {
-        registerComponent(ngModule, componentClass);
+    // Register the module on Angular
+    var ngModule = angular.module(name, modules);    
+        
+    // Instantiate the module
+    var module = new moduleClass(ngModule);
+    
+    // Register config functions
+    var configFns: Function[] = [];
+    if (isFunction(module.onConfig)) configFns.push(module.onConfig.bind(module));
+    if (moduleNotes.config) {
+        if (isFunction(moduleNotes.config)) configFns.push(<Function> moduleNotes.config);
+        else configFns = configFns.concat(<Function[]> moduleNotes.config)
     }
+    for (let fn of configFns) ngModule.config(fn);
     
-    // Instantiate the module class
-    var module = new (<any> moduleClass)();
-    
-    // Register config function
-    if (isFunction(module.config)) {
-        ngModule.config(module.config);
+    // Register config functions
+    var runFns: Function[] = [];
+    if (isFunction(module.onRun)) runFns.push(module.onRun.bind(module));
+    if (moduleNotes.run) {
+        if (isFunction(moduleNotes.run)) runFns.push(<Function> moduleNotes.run);
+        else runFns = runFns.concat(<Function[]> moduleNotes.run)
     }
-    
-    // Register run function
-    if (isFunction(module.run)) {
-        ngModule.run(module.run);
-    }
+    for (let fn of runFns) ngModule.run(fn);
+
+    for (let item of services) registerService(item, ngModule);
+    for (let item of components) registerComponent(item, ngModule);
+    for (let item of decorators) registerDecorator(item, ngModule);
+    for (let item of filters) registerFilter(item, ngModule);
+    for (let item of values) registerValue(item, ngModule);
+    for (let item of constants) registerConstant(item, ngModule);
 
     return ngModule;
 
 }
 
-function registerService<TFunction extends ServiceClass>(ngModule: ng.IModule, serviceClass: TFunction) {
+export {registerModule as unwrap};
+
+/**
+ * 
+ */
+function registerService(serviceClass: ServiceConstructor, ngModule: ng.IModule) {
 
     var aux = getAnnotations(serviceClass, ServiceAnnotation);
 
@@ -131,76 +174,119 @@ function registerService<TFunction extends ServiceClass>(ngModule: ng.IModule, s
         throw new Error("Service annotation not found");
     }
 
-    var note = mergeAnnotations(aux, create(ServiceAnnotation));
-    var name = note.name;
+    var annotation = merge(create(ServiceAnnotation), aux);
+    var name = annotation.name;
 
-    if (isFunction(serviceClass.provider)) {
-		ngModule.provider(name, serviceClass.provider);
+    if (annotation.provider) {
+        ngModule.provider(name, <any> annotation.provider);
     }
-    else if (isFunction(serviceClass.factory)) {
-        ngModule.factory(name, serviceClass.factory);
+    else if (isFunction(annotation.factory)) {
+        ngModule.factory(name, annotation.factory);
     }
     else {
-		// TODO Invoked later with $injector.invoke()?
+        // TODO Invoked later with $injector.invoke()?
         ngModule.service(name, serviceClass);
     }
 
 }
 
-function registerComponent(ngModule: ng.IModule, ComponentClass: Function) {
+function registerComponent(componentClass: ComponentConstructor, ngModule: ng.IModule) {
 
-    var aux = getAnnotations(ComponentClass, ComponentAnnotation);
+    var aux = getAnnotations(componentClass, ComponentAnnotation);
+
     if (!aux.length) {
         throw new Error("Component annotation not found");
     }
 
-    var note = mergeAnnotations(aux, create(ComponentAnnotation));
+    var {name, factory} = makeDirectiveFactory(componentClass);
+    ngModule.directive(name, factory);
+    
+    // TODO register routes
 
 }
 
-function registerDirective(ngModule: ng.IModule, DirectiveClass: Function) {
-}
+function registerDecorator(decoratorClass: DecoratorConstructor, ngModule: ng.IModule) {
 
+    var aux = getAnnotations(decoratorClass, DecoratorAnnotation);
 
+    if (!aux.length) {
+        throw new Error("Decorator annotation not found");
+    }
 
-// -- Utils --
+    var annotation = merge(create(DecoratorAnnotation), aux);
+    var name = annotation.name;
+    
+    // TODO catch missing decorate method?
 
-function mergeAnnotations<T extends Array<any>>(annotations: T): any;
-function mergeAnnotations<TArray extends Array<any>, TTarget>(annotations: TArray, target: TTarget): TTarget;
-function mergeAnnotations(annotations: any[], target?: any): any {
+    ngModule.config(Inject(['$provide'], function($provide: ng.auto.IProvideService) {
+        $provide.decorator(name, Inject(['$delegate', '$injector'], function($delegate: any, $injector: ng.auto.IInjectorService) {
 
-    var args = annotations.slice(0);
-    args.unshift(target ? target : {});
-    return angular.extend.apply(angular, args);
+            var instance = <Decorator> $injector.instantiate(decoratorClass, {
+                $delegate: $delegate
+            });
 
-}
+            return $injector.invoke(instance.decorate, instance, {
+                $delegate: $delegate
+            });
 
-function create<T>(constructor: { prototype: T }): T {
-
-    return Object.create(constructor.prototype);
-
-}
-
-function getApplicationAnnotations(target: any): ApplicationAnnotation[] {
-
-    return <ApplicationAnnotation[]> getAnnotations(target, ApplicationAnnotation);
-
-}
-
-function getModuleAnnotations(target: any): ModuleAnnotation[] {
-
-    return <ModuleAnnotation[]> getAnnotations(target, ModuleAnnotation);
+        }));
+    }));
 
 }
 
-function getViewAnnotations(target: any): ViewAnnotation[] {
+/**
+ * 
+ */
+function registerFilter(filterClass: FilterConstructor, ngModule: ng.IModule) {
 
-    return <ViewAnnotation[]> getAnnotations(target, ViewAnnotation);
+    var aux = getAnnotations(filterClass, FilterAnnotation);
+
+    if (!aux.length) {
+        throw new Error("Filter annotation not found");
+    }
+
+    var annotation = merge(create(FilterAnnotation), aux);
+    var name = annotation.name;
+    
+    // TODO catch missing filter method?
+    
+    ngModule.filter(name, Inject(['$injector'], function($injector: ng.auto.IInjectorService) {
+
+        var filterSingleton = <Filter> $injector.instantiate(filterClass);
+        return filterSingleton.filter.bind(filterSingleton);
+
+    }));
 
 }
 
-function getComponentAnnotations(target: any): ComponentAnnotation[] {
+/**
+ * 
+ */
+function registerValue(value: Value, ngModule: ng.IModule) {
 
-    return <ComponentAnnotation[]> getAnnotations(target, ComponentAnnotation);
+    var aux = getAnnotations(value, ValueAnnotation, 'value');
+
+    if (!aux.length) {
+        throw new Error("Value annotation not found");
+    }
+
+    var annotation = <ValueAnnotation<any>> aux[0];
+    ngModule.value(annotation.name, annotation.value);
+
+}
+
+/**
+ * 
+ */
+function registerConstant(constant: Constant, ngModule: ng.IModule) {
+
+    var aux = getAnnotations(constant, ConstantAnnotation, 'value');
+
+    if (!aux.length) {
+        throw new Error("Constant annotation not found");
+    }
+
+    var annotation = <ConstantAnnotation<any>> aux[0];
+    ngModule.constant(annotation.name, annotation.constant);
 
 }

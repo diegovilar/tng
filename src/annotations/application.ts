@@ -1,5 +1,5 @@
 import {makeDecorator, setIfInterface} from '../utils';
-import {ModuleOptions, ModuleAnnotation, Module} from './module';
+import {ModuleOptions, ModuleAnnotation, Module, ModuleConstructor} from './module';
 
 export interface ApplicationOptions extends ModuleAnnotation {
 	selector: string;
@@ -17,6 +17,10 @@ export class ApplicationAnnotation extends ModuleAnnotation {
 }
 
 export interface Application extends Module {
+
+}
+
+export interface ApplicationConstructor extends ModuleConstructor {
 
 }
 

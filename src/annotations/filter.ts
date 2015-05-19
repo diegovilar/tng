@@ -1,4 +1,4 @@
-import {makeDecorator, FunctionReturningSomething, setIfInterface} from '../utils';
+import {makeDecorator, setIfInterface} from '../utils';
 
 export interface FilterOptions {
     name: string;
@@ -15,8 +15,15 @@ export class FilterAnnotation {
 
 }
 
+// constructor is injectable
 export interface Filter {
-    filter:(input: any, ...args: any[]) => any;
+    
+    // not injectable
+    filter: (input: any, ...args: any[]) => any;
+}
+
+export interface FilterConstructor extends Function {
+    new (): Filter;
 }
 
 type FilterSignature = (options: FilterOptions) => ClassDecorator;

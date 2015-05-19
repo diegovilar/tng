@@ -9,7 +9,7 @@ export interface ServiceOptions {
 // @internal
 export class ServiceAnnotation {
 
-    name: string = '';
+    name = '';
     provider: ng.IServiceProvider|ng.IServiceProviderClass = null;
     factory: FunctionReturningSomething = null;
 
@@ -20,6 +20,10 @@ export class ServiceAnnotation {
 }
 
 export interface Service {
+
+}
+
+export interface ServiceConstructor extends Function {
 
 }
 

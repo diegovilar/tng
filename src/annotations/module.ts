@@ -1,10 +1,12 @@
+/// <reference path="../_references" />
+
 import {makeDecorator, setIfInterface, FunctionReturningNothing} from '../utils';
 
 export interface ModuleOptions {
 	dependencies?: (string|Function)[];
 	config?: Function|Function[];
 	run?: Function|Function[];
-	
+
 	name?: string;
 	modules?: (string|Function)[];
 	components?: Function[];
@@ -41,6 +43,11 @@ export class ModuleAnnotation {
 export interface Module {
 	onConfig?: FunctionReturningNothing;
 	onRun?: FunctionReturningNothing;
+}
+
+export interface ModuleConstructor extends Function {
+	new (): Module;
+	new (ngModule: ng.IModule): Module;
 }
 
 type ModuleSignature = (options: ModuleOptions) => ClassDecorator;

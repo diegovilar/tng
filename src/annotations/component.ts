@@ -1,27 +1,21 @@
-import {Inject} from './inject';
+import {Inject, hasInjectAnnotation} from './inject';
 import {makeDecorator, Map, setIfInterface, merge, create, isFunction} from '../utils';
-import {FunctionReturningString, FunctionReturningNothing} from '../utils';
+import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from '../utils';
 import {getAnnotations} from '../reflection';
 import {ViewAnnotation} from './view';
 
-//export const enum Restriction {
-//    Attribute,
-//    Element,
-//    Class,
-//    Comment
-//}
-//const restrictionMap = {
-//    [Restriction.Attribute]: 'A',
-//    [Restriction.Element]: 'E',
-//    [Restriction.Class]: 'C',
-//    [Restriction.Comment]: 'M'
-//};
+const RESTRICTION_MAP: Map<string> = {
+    [SelectorType.Attribute]: 'A',
+    [SelectorType.Tag]: 'E',
+    [SelectorType.Class]: 'C'
+    //[SelectorType.Comment]: 'M'
+};
 
 export const enum Transclusion {
     Content,
     Element
-}
-const transclusionMap = [true, 'element'];
+};
+const TRANSCLUSION_MAP = [true, 'element'];
 
 type PrePost = {
     pre: FunctionReturningNothing,
@@ -35,7 +29,7 @@ export interface ComponentOptions {
     // name = element
     // .name = class
     // [name] = attribute
-    // //name = comment
+    // //name = comment (unavailable)
     selector: string;
 
     multiElement?: boolean;
@@ -89,6 +83,14 @@ export class ComponentAnnotation {
 
 }
 
+export interface Component {
+
+}
+
+export interface ComponentConstructor extends Function {
+    new (): Component;
+}
+
 type ComponentDecorator = (options: ComponentOptions) => ClassDecorator;
 export var Component = <ComponentDecorator> makeDecorator(ComponentAnnotation);
 
@@ -111,31 +113,38 @@ interface DDO {
     transclude?: boolean|string;
 }
 
-// TODO extract?
 // @internal
-export function makeDirectiveFactory(DirectiveClass: Function) {
+export function makeDirectiveFactory(ComponentClass: ComponentConstructor) {
 
-    return Inject(['$injector'], function directiveFactory($injector: ng.auto.IInjectorService): ng.IDirective {
+    var view = merge(create(ViewAnnotation), getAnnotations(ComponentClass, ViewAnnotation));
+    var comp = merge(create(ComponentAnnotation), getAnnotations(ComponentClass, ComponentAnnotation));
 
-        var ddo: DDO = {};
-        var view = merge(create(ViewAnnotation), getAnnotations(DirectiveClass, ViewAnnotation));
-        var comp = merge(create(ComponentAnnotation), getAnnotations(DirectiveClass, ComponentAnnotation));
+    // From Component
+    var {name, type} = parseSelector(comp.selector);
+    var ddo: DDO = {
+        restrict: RESTRICTION_MAP[type],
+        controller: ComponentClass,
+        multiElement: comp.multiElement,
+        priority: comp.priority,
+        terminal: comp.terminal,
+        replace: comp.replace
+    };    
+    
+    if (comp.scope) ddo.scope = comp.scope;
+    if (comp.bindToController) ddo.bindToController = comp.bindToController;
+    if (comp.transclude) ddo.transclude = TRANSCLUSION_MAP[comp.transclude];
+    if (comp.compile) ddo.compile = comp.compile;
+    if (comp.link) ddo.link = comp.link;
+    
+    // From View
+    if (view.controllerAs) ddo.controllerAs = view.controllerAs;
+    if (view.template) ddo.template = view.template;
+    if (view.templateUrl) ddo.templateUrl = view.templateUrl;
+    // TODO style
+    // TODO styleUrl
+    
+    var factory = Inject(['$injector'], function directiveFactory($injector: ng.auto.IInjectorService): ng.IDirective {
 
-        ddo.controller = DirectiveClass;
-        
-        ddo.multiElement = comp.multiElement;
-        ddo.priority = comp.priority;
-        ddo.terminal = comp.terminal;
-        ddo.replace = comp.replace;
-        if (comp.scope) ddo.scope = comp.scope;
-        if (comp.bindToController) ddo.bindToController = comp.bindToController;
-        if (comp.transclude) ddo.transclude = transclusionMap[comp.transclude];
-        
-        var {name, restrict} = parseSelector(comp.selector);
-        ddo.name = name;
-        ddo.restrict = restrict;
-        
-        if (comp.compile) ddo.compile = comp.compile;
         if (isFunction(ddo.compile)) {
             ddo.compile = !hasInjectAnnotation(ddo.compile) ? ddo.compile :
                 (tElement: any, tAttrs: any, transclude: any) => {
@@ -146,8 +155,7 @@ export function makeDirectiveFactory(DirectiveClass: Function) {
                     });
                 }
         }
-                
-        if (comp.link) ddo.link = comp.link;
+
         if (isFunction(ddo.link)) {
             ddo.link = !hasInjectAnnotation(ddo.link) ? ddo.link :
                 (scope: any, iElement: any, iAttrs: any, controllers: any, transclude: any) => {
@@ -159,11 +167,8 @@ export function makeDirectiveFactory(DirectiveClass: Function) {
                         transclude: transclude
                     });
                 }
-        }        
-        
-        if (view.controllerAs) ddo.controllerAs = view.controllerAs;
-        
-        if (view.template) ddo.template = view.template;        
+        }
+
         if (isFunction(ddo.template)) {
             ddo.template = !hasInjectAnnotation(ddo.template) ? ddo.template : (tElement: any, tAttrs: any) => {
                 return $injector.invoke(<any> ddo.template, null, {
@@ -172,8 +177,7 @@ export function makeDirectiveFactory(DirectiveClass: Function) {
                 });
             };
         }
-        
-        if (view.templateUrl) ddo.templateUrl = view.templateUrl;
+
         if (isFunction(ddo.templateUrl)) {
             ddo.templateUrl = !hasInjectAnnotation(ddo.templateUrl) ? ddo.templateUrl : (tElement: any, tAttrs: any) => {
                 return $injector.invoke(<any> ddo.templateUrl, null, {
@@ -182,31 +186,14 @@ export function makeDirectiveFactory(DirectiveClass: Function) {
                 });
             };
         }
-        
-        // TODO style
-        // TODO styleUrl
 
         return <any> ddo;
 
     });
 
-}
-
-interface NameRestrict {
-    name: string, restrict: string
-}
-
-// TODO extract?
-function parseSelector(selector: string):NameRestrict {
-    // TODO
     return {
-        name: '',
-        restrict: ''
+        name: name,
+        factory: factory
     };
-}
 
-
-// TODO extract?
-function hasInjectAnnotation(target: any): boolean {
-    return !target ? false : target.hasOwnProperty('$inject');
 }
