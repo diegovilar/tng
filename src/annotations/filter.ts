@@ -1,10 +1,27 @@
 import {makeDecorator, setIfInterface} from '../utils';
 
+/**
+ * Options available when decorating a class as a filter
+ */
 export interface FilterOptions {
+    
+    /**
+     * The name with which the filter will be invoked in templates
+     * 
+     * Must be valid angular Expressions identifiers, such as "uppercase",
+     * "upperCase" or "upper_case". Special charaters such as hyphens and dots
+     * are not allowed.
+     * 
+     * To get a hold of the filter delegate through dependency injection,
+     * ask the injector for this name plus the suffix "Filter". 
+     */
     name: string;
+
 }
 
-// @internal
+/**
+ * @internal
+ */
 export class FilterAnnotation {
 
     name: string = '';
@@ -15,17 +32,38 @@ export class FilterAnnotation {
 
 }
 
-// constructor is injectable
+/**
+ * Interface filter classes MUST implement
+ * 
+ * * It's a singleton, instantiated the first time it is needed
+ * * The constructor can receive dependency injections
+ * * When asked for, what is provided is actually the method filter() bound the it's instance
+ */
 export interface Filter {
     
-    // not injectable
-    filter: (input: any, ...args: any[]) => any;
+    /**
+     * The method that does the actual filtering
+     * 
+     * When asked for, what is provided is actually this method
+     * bound the it's instance
+     * 
+     * * Cannot receive dependency injections (use the constructor)
+     */
+    filter(input: any, ...rest: any[]): any;
+
 }
 
+/**
+ * @internal
+ */
 export interface FilterConstructor extends Function {
-    new (): Filter;
+    new (...args: any[]): Filter;
     prototype: Filter;
 }
 
-type FilterSignature = (options: FilterOptions) => ClassDecorator;
-export var Filter = <FilterSignature> makeDecorator(FilterAnnotation);
+type DecoratorSignature = (options: FilterOptions) => ClassDecorator;
+
+/**
+ * A decorator to annotate a class as being a filter
+ */
+export var Filter = <DecoratorSignature> makeDecorator(FilterAnnotation);

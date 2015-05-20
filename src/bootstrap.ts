@@ -29,9 +29,9 @@ import {Application, ApplicationAnnotation} from './annotations';
 import {Component, ComponentConstructor, ComponentAnnotation, makeDirectiveFactory} from './annotations';
 import {Service, ServiceConstructor, ServiceAnnotation} from './annotations';
 import {Filter, FilterConstructor, FilterAnnotation} from './annotations';
-import {Decorator, DecoratorConstructor, DecoratorAnnotation} from './annotations';
+import {ServiceDecorator, DecoratorConstructor, ServiceDecoratorAnnotation} from './annotations';
 import {Value, ValueAnnotation} from './annotations';
-import {Constant, ConstantAnnotation} from './annotations';
+import {ConstantWrapper, ConstantAnnotation} from './annotations';
 
 /**
  * 
@@ -113,7 +113,7 @@ function registerModule(moduleClass: ModuleConstructor, name?: string): ng.IModu
         else if (hasAnnotation(dep, ComponentAnnotation)) {
             components.push(dep);
         }
-        else if (hasAnnotation(dep, DecoratorAnnotation)) {
+        else if (hasAnnotation(dep, ServiceDecoratorAnnotation)) {
             decorators.push(dep);
         }
         else if (hasAnnotation(dep, FilterAnnotation)) {
@@ -214,13 +214,13 @@ function registerComponent(componentClass: ComponentConstructor, ngModule: ng.IM
 
 function registerDecorator(decoratorClass: DecoratorConstructor, ngModule: ng.IModule) {
 
-    var aux = getAnnotations(decoratorClass, DecoratorAnnotation);
+    var aux = getAnnotations(decoratorClass, ServiceDecoratorAnnotation);
 
     if (!aux.length) {
         throw new Error("Decorator annotation not found");
     }
 
-    var {name} = merge(create(DecoratorAnnotation), aux);
+    var {name} = merge(create(ServiceDecoratorAnnotation), aux);
 
     if (!isFunction(decoratorClass.prototype.decorate)) {
         throw new Error(`Decorator "${name}" does not implement a decorate method`);
@@ -229,7 +229,7 @@ function registerDecorator(decoratorClass: DecoratorConstructor, ngModule: ng.IM
     ngModule.config(Inject(['$provide'], function($provide: ng.auto.IProvideService) {
         $provide.decorator(name, Inject(['$delegate', '$injector'], function($delegate: any, $injector: ng.auto.IInjectorService) {
 
-            var instance = <Decorator> $injector.instantiate(decoratorClass, {
+            var instance = <ServiceDecorator> $injector.instantiate(decoratorClass, {
                 $delegate: $delegate
             });
 
@@ -287,7 +287,7 @@ function registerValue(value: Value, ngModule: ng.IModule) {
 /**
  * 
  */
-function registerConstant(constant: Constant, ngModule: ng.IModule) {
+function registerConstant(constant: ConstantWrapper, ngModule: ng.IModule) {
 
     var aux = getAnnotations(constant, ConstantAnnotation, 'value');
 

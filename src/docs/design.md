@@ -195,6 +195,7 @@ Exemplos:
 * Com exceção de `controller`, as injeções locais disponíveis a `link` também estão disponíveis ao construtor do componente
   (ViewModel)
 * ??? Tornar PrePost injetáveis tb?
+* ??? Lifecycle? Poderíamos permiter onDestroy (notificar se nao tiver escopo próprio)
 
 `Arquivo: app/concrete/components/todo.ts`
 ```javascript

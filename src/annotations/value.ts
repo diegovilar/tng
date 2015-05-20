@@ -1,11 +1,26 @@
 import {setIfInterface} from '../utils';
 import {setAnnotations} from '../reflection';
 
-export function Value<Type>(name: string, value: Type): Value {
+/**
+ * A framework envelope for the value
+ */
+export interface ValueWrapper {	
 
-    var wrapper = {};
+}
 
-    setAnnotations(wrapper, [new ValueAnnotation<Type>({
+/**
+ * Wraps a value to be made available for dependency injection
+ * 
+ * @param name The name of the value through which it will made available
+ * @param value The value to be injected, as is
+ * 
+ * @return A wrapper instance, to be used as a module dependency
+ */
+export function Value(name: string, value: any): ValueWrapper {
+
+    var wrapper: ValueWrapper = {};
+
+    setAnnotations(wrapper, [new ValueAnnotation<any>({
         name: name,
         value: value
     })], 'value');
@@ -14,11 +29,17 @@ export function Value<Type>(name: string, value: Type): Value {
 
 }
 
+/**
+ * @internal
+ */
 export interface ValueOptions {
     name: string;
     value: any;
 }
 
+/**
+ * @internal
+ */
 export class ValueAnnotation<Type> {
 
     name = '';
@@ -27,10 +48,5 @@ export class ValueAnnotation<Type> {
     constructor(options: ValueOptions) {
         setIfInterface(this, options);
     }
-
-}
-
-export interface Value {
-
 
 }

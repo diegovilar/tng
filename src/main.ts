@@ -6,9 +6,9 @@ export {
 	Application,
 	Module,
 	Value,
-	Constant,
+	ConstantWrapper,
 	Service,
-	Decorator,
+	ServiceDecorator,
 	Filter,
 	Component,
 	View

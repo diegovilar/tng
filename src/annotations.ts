@@ -1,5 +1,4 @@
-export * from './annotations/inject';
-
+export * from './annotations/di';
 export * from './annotations/application';
 export * from './annotations/module';
 export * from './annotations/service';
