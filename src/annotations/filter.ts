@@ -24,6 +24,7 @@ export interface Filter {
 
 export interface FilterConstructor extends Function {
     new (): Filter;
+    prototype: Filter;
 }
 
 type FilterSignature = (options: FilterOptions) => ClassDecorator;

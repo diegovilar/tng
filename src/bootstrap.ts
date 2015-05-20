@@ -21,7 +21,7 @@ To process a module is to:
 */
 
 import {getAnnotations, hasAnnotation} from './reflection';
-import {isFunction, isString, isDefined, merge, create, parseSelector} from './utils';
+import {isFunction, isString, isDefined, merge, create, parseSelector, SelectorType} from './utils';
 import {Inject} from './annotations';
 //import {View, ViewAnnotation} from './annotations';
 import {Module, ModuleConstructor, ModuleAnnotation} from './annotations';
@@ -36,36 +36,43 @@ import {Constant, ConstantAnnotation} from './annotations';
 /**
  * 
  */
-export function bootstrap(ModuleClass: ModuleConstructor, selector?: string): void {
-
-    var element: ng.IAugmentedJQuery;
+export function bootstrap(moduleClass: ModuleConstructor): ng.auto.IInjectorService;
+export function bootstrap(moduleClass: ModuleConstructor, element: Element): ng.auto.IInjectorService;
+export function bootstrap(moduleClass: ModuleConstructor, selector: string): ng.auto.IInjectorService;
+export function bootstrap(moduleClass: ModuleConstructor, selectorOrElement?: any): ng.auto.IInjectorService {
 
     var aux: ModuleAnnotation[];
     var appNotes: ApplicationAnnotation;
 
-    aux = getAnnotations(ModuleClass, ModuleAnnotation);
-
+    aux = getAnnotations(moduleClass, ModuleAnnotation);
     if (!aux.length) {
         throw new Error('No module annotation found');
     }
-
     appNotes = merge(create(ApplicationAnnotation), ...aux);
-    selector = !selector ? appNotes.selector : selector;
 
-    if (!selector) {
+    selectorOrElement = selectorOrElement || appNotes.selector;
+    if (!selectorOrElement) {
         throw new Error('No selector specified');
     }
-    
-    var selectorData = parseSelector(selector);
-    
-    // TODO get element    
-    
-    var ngModule = registerModule(ModuleClass);
-    
-    // TODO wait for dom ready?
-    angular.bootstrap(element, [ngModule.name]);
+
+    var ngModule = registerModule(moduleClass);
+
+    return angular.bootstrap(selectorOrElement, [ngModule.name]);
 
 }
+
+//export function bootstrapWhenReady(moduleClass: ModuleConstructor): Promise<ng.auto.IInjectorService>;
+//export function bootstrapWhenReady(moduleClass: ModuleConstructor, element: Element): Promise<ng.auto.IInjectorService>;
+//export function bootstrapWhenReady(moduleClass: ModuleConstructor, selector: string): Promise<ng.auto.IInjectorService>;
+//export function bootstrapWhenReady(moduleClass: ModuleConstructor, selectorOrElement?: any): Promise<ng.auto.IInjectorService> {
+//    
+//    var promise = new Promise<ng.auto.IInjectorService>((resolve, reject) => {
+//        // TODO
+//    });
+//    
+//    return promise;
+//    
+//}
 
 /**
  * 
@@ -120,7 +127,7 @@ function registerModule(moduleClass: ModuleConstructor, name?: string): ng.IModu
         }
         else {
             // TODO WTF?
-            throw new TypeError(`I don't recognize what kind of dependency is this: ${dep}`);
+            throw new Error(`I don't recognize what kind of dependency is this: ${dep}`);
         }
     }
 
@@ -184,7 +191,7 @@ function registerService(serviceClass: ServiceConstructor, ngModule: ng.IModule)
         ngModule.factory(name, annotation.factory);
     }
     else {
-        // TODO Invoked later with $injector.invoke()?
+        // TODO Is it invoked later with $injector.invoke()?
         ngModule.service(name, serviceClass);
     }
 
@@ -213,10 +220,11 @@ function registerDecorator(decoratorClass: DecoratorConstructor, ngModule: ng.IM
         throw new Error("Decorator annotation not found");
     }
 
-    var annotation = merge(create(DecoratorAnnotation), aux);
-    var name = annotation.name;
-    
-    // TODO catch missing decorate method?
+    var {name} = merge(create(DecoratorAnnotation), aux);
+
+    if (!isFunction(decoratorClass.prototype.decorate)) {
+        throw new Error(`Decorator "${name}" does not implement a decorate method`);
+    }
 
     ngModule.config(Inject(['$provide'], function($provide: ng.auto.IProvideService) {
         $provide.decorator(name, Inject(['$delegate', '$injector'], function($delegate: any, $injector: ng.auto.IInjectorService) {
@@ -245,11 +253,12 @@ function registerFilter(filterClass: FilterConstructor, ngModule: ng.IModule) {
         throw new Error("Filter annotation not found");
     }
 
-    var annotation = merge(create(FilterAnnotation), aux);
-    var name = annotation.name;
-    
-    // TODO catch missing filter method?
-    
+    var {name} = merge(create(FilterAnnotation), aux);
+
+    if (!isFunction(filterClass.prototype.filter)) {
+        throw new Error(`Filter "${name}" does not implement a filter method`);
+    }
+
     ngModule.filter(name, Inject(['$injector'], function($injector: ng.auto.IInjectorService) {
 
         var filterSingleton = <Filter> $injector.instantiate(filterClass);

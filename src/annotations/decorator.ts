@@ -21,6 +21,7 @@ export interface Decorator {
 
 export interface DecoratorConstructor extends Function {
     new (): Decorator;
+    prototype: Decorator;
 }
 
 type DecoratorSignature = (options: DecoratorOptions) => ClassDecorator;

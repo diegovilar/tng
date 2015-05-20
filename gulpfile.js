@@ -159,7 +159,9 @@ function bundle(entryFilePath, destPath, destFileName, watch) {
     var bundler;
     
     var bundlerOptions = {
-        debug: true
+        debug: true,
+        bundleExternal: false
+        //standalone: 'tng'
     };
     
     if (watch) {

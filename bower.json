@@ -1,0 +1,31 @@
+{
+  "name": "tng",
+  "version": "0.0.8",
+  "homepage": "https://github.com/diegovilar/tng",
+  "authors": [
+    "Diego Vilar <diegovilar@gmail.com>"
+  ],
+  "description": "Angular 1.x on TypeScript",
+  "main": "build-browser/tng.js",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "angular",
+    "typescript"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "angular": "1.4.0-rc.2",
+    "reflect-metadata": "~0.1.0"
+  }
+}

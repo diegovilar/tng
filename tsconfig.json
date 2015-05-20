@@ -15,8 +15,6 @@
     "files": [        
         "./src/_references.ts",        
         "./src/main.ts",
-        
-        "./typings/node/assert.d.ts",
-        "./src/tests.ts"
+        "./src/main-browser.ts"
     ]
 }

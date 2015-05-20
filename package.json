@@ -1,15 +1,14 @@
 {
   "name": "tng",
-  "version": "0.0.1",
+  "version": "0.0.8",
   "description": "Angular 1.x on TypeScript",
   "main": "build/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
-    "puts": "https://github.com/diegovilar/puts.git#commonjs",
     "browserify": "10.1.3",
     "del": "1.1.1",
     "gulp": "3.8.11",

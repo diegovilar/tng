@@ -109,7 +109,7 @@ type Selector = {
 export const enum SelectorType {
     Attribute,
     Class,
-    Comment,
+    //Comment,
     Tag
 };
 
