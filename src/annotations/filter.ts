@@ -1,4 +1,8 @@
-import {makeDecorator, setIfInterface} from '../utils';
+/// <reference path="../_references" />
+
+import {getAnnotations} from '../reflection';
+import {makeDecorator, setIfInterface, merge, create, isFunction} from '../utils';
+import {bind} from './di';
 
 /**
  * Options available when decorating a class as a filter
@@ -67,3 +71,27 @@ type DecoratorSignature = (options: FilterOptions) => ClassDecorator;
  * A decorator to annotate a class as being a filter
  */
 export var Filter = <DecoratorSignature> makeDecorator(FilterAnnotation);
+
+/**
+ * @internal
+ */
+export function registerFilter(filterClass: FilterConstructor, ngModule: ng.IModule) {
+
+    var aux = getAnnotations(filterClass, FilterAnnotation);
+
+    if (!aux.length) {
+        throw new Error("Filter annotation not found");
+    }
+
+    var {name} = merge(create(FilterAnnotation), aux);
+
+    if (!isFunction(filterClass.prototype.filter)) {
+        throw new Error(`Filter "${name}" does not implement a filter method`);
+    }
+
+    ngModule.filter(name, bind(['$injector'], function($injector: ng.auto.IInjectorService) {
+        var filterSingleton = <Filter> $injector.instantiate(filterClass);
+        return filterSingleton.filter.bind(filterSingleton);
+    }));
+
+}

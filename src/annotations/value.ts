@@ -1,5 +1,7 @@
+/// <reference path="../_references" />
+
 import {setIfInterface} from '../utils';
-import {setAnnotations} from '../reflection';
+import {getAnnotations, setAnnotations} from '../reflection';
 
 /**
  * A framework envelope for the value
@@ -48,5 +50,21 @@ export class ValueAnnotation<Type> {
     constructor(options: ValueOptions) {
         setIfInterface(this, options);
     }
+
+}
+
+/**
+ * @intenal
+ */
+export function registerValue(value: ValueWrapper, ngModule: ng.IModule) {
+
+    var aux = getAnnotations(value, ValueAnnotation, 'value');
+
+    if (!aux.length) {
+        throw new Error("Value annotation not found");
+    }
+
+    var annotation = <ValueAnnotation<any>> aux[0];
+    ngModule.value(annotation.name, annotation.value);
 
 }

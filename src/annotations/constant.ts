@@ -1,5 +1,7 @@
+/// <reference path="../_references" />
+
 import {setIfInterface} from '../utils';
-import {setAnnotations} from '../reflection';
+import {setAnnotations, getAnnotations} from '../reflection';
 
 /**
  * A framework envelope for the constant
@@ -48,5 +50,21 @@ export class ConstantAnnotation<Type> {
     constructor(options: ConstantOptions) {
         setIfInterface(this, options);
     }
+
+}
+
+/**
+ * @internal
+ */
+export function registerConstant(constant: ConstantWrapper, ngModule: ng.IModule) {
+
+    var aux = getAnnotations(constant, ConstantAnnotation, 'value');
+
+    if (!aux.length) {
+        throw new Error("Constant annotation not found");
+    }
+
+    var annotation = <ConstantAnnotation<any>> aux[0];
+    ngModule.constant(annotation.name, annotation.constant);
 
 }

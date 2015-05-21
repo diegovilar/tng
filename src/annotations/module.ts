@@ -1,6 +1,15 @@
 /// <reference path="../_references" />
 
+import {getAnnotations, hasAnnotation} from '../reflection';
 import {makeDecorator, setIfInterface, FunctionReturningNothing} from '../utils';
+import {merge, create, isString, isFunction} from '../utils';
+import {ValueAnnotation, registerValue} from './value';
+import {ConstantAnnotation, registerConstant} from './constant';
+import {ServiceAnnotation, registerService} from './service';
+import {DecoratorAnnotation, registerDecorator} from './decorator';
+import {FilterAnnotation, registerFilter} from './filter';
+import {DirectiveAnnotation, registerDirective} from './directive';
+import {ComponentAnnotation, registerComponent} from './component';
 
 export interface ModuleOptions {
 	dependencies?: (string|Function)[];
@@ -52,3 +61,107 @@ export interface ModuleConstructor extends Function {
 
 type ModuleSignature = (options: ModuleOptions) => ClassDecorator;
 export var Module = <ModuleSignature> makeDecorator(ModuleAnnotation);
+
+/**
+ * @internal
+ */
+export function registerModule(moduleClass: ModuleConstructor, name?: string): ng.IModule {
+
+    var aux: any[];
+    var moduleNotes: ModuleAnnotation;
+
+    aux = getAnnotations(moduleClass, ModuleAnnotation);
+
+    if (!aux.length) {
+        throw new Error('No module annotation found');
+    }
+
+    moduleNotes = merge(create(ModuleAnnotation), ...aux);
+
+    var constants: any[] = [];
+    var values: any[] = [];
+    var services: any[] = [];
+    var decorators: any[] = [];
+    var filters: any[] = [];
+    var components: any[] = [];
+    var directives: any[] = [];
+    var modules: any[] = [];
+
+    // TODO optimize this.. to much reflection queries
+    for (let dep of moduleNotes.dependencies) {
+        // Regular angular module
+        if (isString(dep)) {
+            modules.push(dep);
+        }
+        else if (hasAnnotation(dep, ModuleAnnotation)) {
+            modules.push(registerModule(<ModuleConstructor> dep).name);
+        }
+        else if (hasAnnotation(dep, ConstantAnnotation, 'constant')) {
+            constants.push(dep);
+        }
+        else if (hasAnnotation(dep, ValueAnnotation, 'value')) {
+            values.push(dep);
+        }
+        else if (hasAnnotation(dep, ServiceAnnotation)) {
+            services.push(dep);
+        }
+        else if (hasAnnotation(dep, DecoratorAnnotation)) {
+            decorators.push(dep);
+        }
+        else if (hasAnnotation(dep, FilterAnnotation)) {
+            filters.push(dep);
+        }
+        else if (hasAnnotation(dep, ComponentAnnotation)) {
+            components.push(dep);
+        }
+        else if (hasAnnotation(dep, DirectiveAnnotation)) {
+            directives.push(dep);
+        }
+        else {
+            // TODO WTF?
+            throw new Error(`I don't recognize what kind of dependency is this: ${dep}`);
+        }
+    }
+
+    name = name || moduleNotes.name || 'TODO RANDOM';
+    
+    // Register the module on Angular
+    var ngModule = angular.module(name, modules);    
+        
+    // Instantiate the module
+    var module = new moduleClass(ngModule);
+    
+    // Register config functions
+    var configFns: Function[] = [];
+    if (isFunction(module.onConfig)) configFns.push(module.onConfig.bind(module));
+    if (moduleNotes.config) {
+        if (isFunction(moduleNotes.config)) configFns.push(<Function> moduleNotes.config);
+        else configFns = configFns.concat(<Function[]> moduleNotes.config)
+    }
+    for (let fn of configFns) ngModule.config(fn);
+    
+    // Register config functions
+    var runFns: Function[] = [];
+    if (isFunction(module.onRun)) runFns.push(module.onRun.bind(module));
+    if (moduleNotes.run) {
+        if (isFunction(moduleNotes.run)) runFns.push(<Function> moduleNotes.run);
+        else runFns = runFns.concat(<Function[]> moduleNotes.run)
+    }
+    for (let fn of runFns) ngModule.run(fn);
+
+    for (let item of values) registerValue(item, ngModule);
+    for (let item of constants) registerConstant(item, ngModule);
+    for (let item of filters) registerFilter(item, ngModule);
+    for (let item of services) registerService(item, ngModule);
+    for (let item of decorators) registerDecorator(item, ngModule);
+    for (let item of components) registerComponent(item, ngModule);
+    for (let item of directives) registerDirective(item, ngModule);
+
+    return ngModule;
+
+}
+
+/**
+ * 
+ */
+export {registerModule as unwrap};

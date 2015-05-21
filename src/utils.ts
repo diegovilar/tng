@@ -101,16 +101,17 @@ export function makeParamDecorator<T extends Function>(annotationClass: T) {
 
 }
 
-type Selector = {
-    name: string,
-    type: SelectorType
-};
-
 export const enum SelectorType {
     Attribute,
     Class,
     //Comment,
     Tag
+};
+
+type Selector = {
+    semanticeName: string,
+    imperativeName: string,
+    type: SelectorType
 };
 
 const RE_SELECTOR_ATTRIBUTE = /^\[([a-z\-_]+)\]$/i;
@@ -120,7 +121,7 @@ const RE_SELECTOR_TAG = /^([a-z\-_]+)$/i;
 
 export function parseSelector(selector: string): Selector {
     
-    var name: string;
+    var semanticeName: string;
     var type: SelectorType;
     var m: RegExpMatchArray;
     
@@ -141,7 +142,8 @@ export function parseSelector(selector: string): Selector {
     }
 
     return {
-        name: m[1],
+        semanticeName: m[1],
+        imperativeName: 'TODO',
         type: type
     };
 }

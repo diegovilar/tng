@@ -165,10 +165,21 @@ Exemplos:
 
 
 
+### Directive
+
+* Decorador: `@Directive`
+* Não possui `@View` (use `@Component`)
+* Não podem ser roteadas (`@Route`)
+
 ### Components
 
 * Decorator: `@Component`
-* São diretivas
+* São diretivas que possuem templates, e têm algumas opções forçadas:
+  * Para `@Component`:
+    * scope é orbigatório, ou `true` ou `{}`, sendo `true` o padrão
+    * ??? bindToController 
+  * Exige `@View` e algum template informado 
+* Podem ser roteadas (`@Route`)  
 * A classe do component é o ViewModel (controller) do component
 * Templates, se necessários, podem ser fornecidos pelo decorador `@View`:
   * através da anotação `template`, podendo ser:
@@ -253,8 +264,10 @@ Exemplos:
 
 ### Decorator
 
-* Decorator: `@Decorator`
+* Decorador: `@Decorator`
 * Instanciado com `$injector.instantiate()`
+* Tanto o construtor quanto `decorate()` recebem injeções
+* `decorate()` deve retornar o serviço decorado
 
 ```js
     import {Decorator, Inject} from 'tng';

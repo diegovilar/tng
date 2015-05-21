@@ -13,6 +13,9 @@ export interface ViewOptions {
     style?: string;
     styleUrl?: string;
     templateNamespace?: TemplateNamespace;
+    
+    // @deprecated
+    replace?: boolean;
 }
 
 // @internal
@@ -24,6 +27,7 @@ export class ViewAnnotation {
     styleUrl = '';
     controllerAs = '';
     templateNamespace = TemplateNamespace.HTML;
+    replace = false;
 
     constructor(options: ViewOptions) {
         setIfInterface(this, options);
