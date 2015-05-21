@@ -2,7 +2,7 @@
 
 import {Reflect, getAnnotations, addAnnotation} from './reflection';
 
-type extendSignature = <Type>(dest: Type, ...args: any[]) => Type;
+type extendSignature = <Type>(dest: Type, ...rest: any[]) => Type;
 
 export var isDefined = angular.isDefined;
 export var isString = angular.isString;
@@ -146,4 +146,23 @@ export function parseSelector(selector: string): Selector {
         imperativeName: 'TODO',
         type: type
     };
+}
+
+/**
+ * @internal
+ */
+export function bindAll<T>(host: T): T {
+    
+    var aux = <any> host;
+    
+    if (aux) {
+        for (let key in aux) {
+            if (isFunction(aux[key])) {
+                aux[key] = aux[key].bind(aux);
+            }
+        }
+    }
+    
+    return host;
+    
 }

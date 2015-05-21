@@ -1,15 +1,17 @@
+/// <reference path="./_references" />
+
 import {Inject, bind, hasInjectAnnotation} from './di';
-import {makeDecorator, Map, setIfInterface, merge, create, isFunction} from '../utils';
-import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from '../utils';
-import {getAnnotations} from '../reflection';
+import {makeDecorator, Map, setIfInterface, merge, create, isFunction} from './utils';
+import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils';
+import {getAnnotations} from './reflection';
 
 /**
- * 
+ * TODO document
  */
 export const enum Transclusion {
     Content,
     Element
-};
+}
 const TRANSCLUSION_MAP = [true, 'element'];
 
 type PrePost = {
@@ -20,7 +22,7 @@ type CompileFunction = (...args: any[]) => FunctionReturningNothing;
 type FunctionReturningPrePost = (...args: any[]) => PrePost;
 
 /**
- * 
+ * TODO document
  */
 export interface CommonDirectiveOptions {
 
@@ -70,7 +72,7 @@ export class CommonDirectiveAnnotation {
 }
 
 /**
- * 
+ * TODO document
  */
 export interface DirectiveOptions extends CommonDirectiveOptions {
 
@@ -96,6 +98,9 @@ export class DirectiveAnnotation extends CommonDirectiveAnnotation {
 
 }
 
+/**
+ * TODO document
+ */
 export interface Directive {
 
 }
@@ -131,7 +136,7 @@ export interface DirectiveDefinitionObject {
     scope?: boolean|Map<string>;
     terminal?: boolean;
     transclude?: boolean|string;
-    
+
     semanticName: string;
     imperativeName: string;
 }
@@ -147,35 +152,35 @@ const RESTRICTION_MAP: Map<string> = {
  * @internal
  */
 export function makeDirectiveDO(directiveClass: DirectiveConstructor): DirectiveDefinitionObject {
-    
-    var directive = merge(create(DirectiveAnnotation), getAnnotations(directiveClass, DirectiveAnnotation));
+
+    var directive = merge(create(DirectiveAnnotation), ...getAnnotations(directiveClass, DirectiveAnnotation));
 
     var selectorData = parseSelector(directive.selector);
     var ddo: DirectiveDefinitionObject = {
         semanticName: selectorData.semanticeName,
-        imperativeName: selectorData.imperativeName,        
+        imperativeName: selectorData.imperativeName,
         restrict: RESTRICTION_MAP[selectorData.type],
         controller: directiveClass,
         multiElement: directive.multiElement,
         priority: directive.priority,
         terminal: directive.terminal,
-    };    
-    
+    };
+
     if (directive.scope) ddo.scope = directive.scope;
     if (directive.bind) ddo.bindToController = directive.bind;
     if (directive.transclude) ddo.transclude = TRANSCLUSION_MAP[directive.transclude];
     if (directive.compile) ddo.compile = directive.compile;
     if (directive.link) ddo.link = directive.link;
-    
+
     return ddo;
-    
+
 }
 
 /**
  * @internal
  */
 export function inFactory(ddo: DirectiveDefinitionObject, $injector: ng.auto.IInjectorService): DirectiveDefinitionObject {
-    
+
     if (isFunction(ddo.compile)) {
         ddo.compile = !hasInjectAnnotation(ddo.compile) ? ddo.compile :
             (tElement: any, tAttrs: any, transclude: any) => {
@@ -199,9 +204,9 @@ export function inFactory(ddo: DirectiveDefinitionObject, $injector: ng.auto.IIn
                 });
             }
     }
-    
+
     return ddo;
-    
+
 }
 
 /**
@@ -210,7 +215,7 @@ export function inFactory(ddo: DirectiveDefinitionObject, $injector: ng.auto.IIn
 export function makeDirectiveFactory(directiveClass: DirectiveConstructor) {
 
     var ddo = makeDirectiveDO(directiveClass);
-    
+
     var factory = bind(['$injector'], function directiveFactory($injector: ng.auto.IInjectorService): ng.IDirective {
         return <any> inFactory(ddo, $injector);
     });

@@ -1,4 +1,4 @@
-//import 'reflect-metadata'; // for it's side-effects
+/// <reference path="./_references" />
 
 export const ANNOTATIONS_METADATA_KEY = 'tng';
 

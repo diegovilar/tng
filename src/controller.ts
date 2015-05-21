@@ -1,4 +1,6 @@
-import {makeDecorator} from '../utils';
+/// <reference path="./_references" />
+
+import {makeDecorator} from './utils';
 
 export interface ControllerOptions {
     

@@ -1,7 +1,7 @@
-/// <reference path="../_references" />
+/// <reference path="./_references" />
 
-import {setIfInterface} from '../utils';
-import {getAnnotations, setAnnotations} from '../reflection';
+import {setIfInterface} from './utils';
+import {getAnnotations, setAnnotations} from './reflection';
 
 /**
  * A framework envelope for the value

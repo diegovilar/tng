@@ -1,4 +1,4 @@
-/// <reference path="../_references" />
+/// <reference path="./_references" />
 
 /**
  * Annotates a function with information of dependencies to be injected as parameters

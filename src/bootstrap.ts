@@ -22,8 +22,8 @@ To process a module is to:
 
 import {getAnnotations} from './reflection';
 import {merge, create} from './utils';
-import {ApplicationConstructor, ApplicationAnnotation} from './annotations/application';
-import {ModuleConstructor, ModuleAnnotation, registerModule} from './annotations/module';
+import {ApplicationConstructor, ApplicationAnnotation} from './application';
+import {ModuleConstructor, ModuleAnnotation, registerModule} from './module';
 
 /**
  * 

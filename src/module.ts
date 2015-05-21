@@ -1,16 +1,21 @@
-/// <reference path="../_references" />
+/// <reference path="./_references" />
 
-import {getAnnotations, hasAnnotation} from '../reflection';
-import {makeDecorator, setIfInterface, FunctionReturningNothing} from '../utils';
-import {merge, create, isString, isFunction} from '../utils';
+import {getAnnotations, hasAnnotation} from './reflection';
+import {makeDecorator, setIfInterface, FunctionReturningNothing} from './utils';
+import {merge, create, isString, isFunction} from './utils';
 import {ValueAnnotation, registerValue} from './value';
 import {ConstantAnnotation, registerConstant} from './constant';
+import {FilterAnnotation, registerFilter} from './filter';
+import {AnimationAnnotation, registerAnimation} from './animation';
 import {ServiceAnnotation, registerService} from './service';
 import {DecoratorAnnotation, registerDecorator} from './decorator';
-import {FilterAnnotation, registerFilter} from './filter';
 import {DirectiveAnnotation, registerDirective} from './directive';
 import {ComponentAnnotation, registerComponent} from './component';
 
+/**
+ * Options available when decorating a class as a module
+ * TODO document
+ */
 export interface ModuleOptions {
 	dependencies?: (string|Function)[];
 	config?: Function|Function[];
@@ -27,6 +32,9 @@ export interface ModuleOptions {
 	constants?: Function[];
 }
 
+/**
+ * @internal
+ */
 export class ModuleAnnotation {
 
 	dependencies: (string|Function)[] = null;
@@ -49,17 +57,28 @@ export class ModuleAnnotation {
 
 }
 
+/**
+ * Interface modules MAY implement
+ * TODO document
+ */
 export interface Module {
 	onConfig?: FunctionReturningNothing;
 	onRun?: FunctionReturningNothing;
 }
 
+/**
+ * @internal
+ */
 export interface ModuleConstructor extends Function {
 	new (): Module;
 	new (ngModule: ng.IModule): Module;
 }
 
 type ModuleSignature = (options: ModuleOptions) => ClassDecorator;
+
+/**
+ * A decorator to annotate a class as being a module
+ */
 export var Module = <ModuleSignature> makeDecorator(ModuleAnnotation);
 
 /**
@@ -83,6 +102,7 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
     var services: any[] = [];
     var decorators: any[] = [];
     var filters: any[] = [];
+    var animations: any[] = [];
     var components: any[] = [];
     var directives: any[] = [];
     var modules: any[] = [];
@@ -110,6 +130,9 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
         }
         else if (hasAnnotation(dep, FilterAnnotation)) {
             filters.push(dep);
+        }
+        else if (hasAnnotation(dep, AnimationAnnotation)) {
+            animations.push(dep);
         }
         else if (hasAnnotation(dep, ComponentAnnotation)) {
             components.push(dep);
@@ -152,6 +175,7 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
     for (let item of values) registerValue(item, ngModule);
     for (let item of constants) registerConstant(item, ngModule);
     for (let item of filters) registerFilter(item, ngModule);
+    for (let item of animations) registerAnimation(item, ngModule);
     for (let item of services) registerService(item, ngModule);
     for (let item of decorators) registerDecorator(item, ngModule);
     for (let item of components) registerComponent(item, ngModule);

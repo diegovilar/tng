@@ -1,19 +1,24 @@
-import {Inject, bind, hasInjectAnnotation} from './di';
-import {makeDecorator, Map, setIfInterface, merge, create, isFunction} from '../utils';
-import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from '../utils';
-import {getAnnotations} from '../reflection';
-import {ViewAnnotation} from './view';
+/// <reference path="./_references" />
 
+import {Inject, bind, hasInjectAnnotation} from './di';
+import {makeDecorator, Map, setIfInterface, merge, create, isFunction} from './utils';
+import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils';
+import {getAnnotations} from './reflection';
+import {ViewAnnotation} from './view';
 import {CommonDirectiveOptions, CommonDirectiveAnnotation} from './directive'
 import {Directive, DirectiveAnnotation, DirectiveConstructor, Transclusion} from './directive'
 import {makeDirectiveDO, DirectiveDefinitionObject, inFactory as inFactoryDirective} from './directive'
 
+/**
+ * TODO document
+ */
 export interface ComponentOptions extends CommonDirectiveOptions {
-
 
 }
 
-// @internal
+/**
+ * @internal
+ */
 export class ComponentAnnotation extends CommonDirectiveAnnotation {
 
     constructor(options: ComponentOptions) {
@@ -23,15 +28,25 @@ export class ComponentAnnotation extends CommonDirectiveAnnotation {
 
 }
 
+/**
+ * Interface components MAY implement
+ */
 export interface Component extends Directive {
 
 }
 
+/**
+ * @internal
+ */
 export interface ComponentConstructor extends DirectiveConstructor {
     new (): Component;
 }
 
 type ComponentDecorator = (options: ComponentOptions) => ClassDecorator;
+
+/**
+ * A decorator to annotate a class as being a component controller
+ */
 export var Component = <ComponentDecorator> makeDecorator(ComponentAnnotation);
 
 /**
@@ -50,8 +65,8 @@ export function makeComponentDO(componentClass: ComponentConstructor): Component
 
     var cdo = <ComponentDefinitionObject> makeDirectiveDO(<DirectiveConstructor> componentClass);
 
-    var component = merge(create(ComponentAnnotation), getAnnotations(componentClass, ComponentAnnotation));
-    var view = merge(create(ViewAnnotation), getAnnotations(componentClass, ViewAnnotation));
+    var component = merge(create(ComponentAnnotation), ...getAnnotations(componentClass, ComponentAnnotation));
+    var view = merge(create(ViewAnnotation), ...getAnnotations(componentClass, ViewAnnotation));
     
     // TODO must have view
     
