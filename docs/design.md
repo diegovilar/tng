@@ -413,3 +413,97 @@ Manualy inherting annotations:
     rawModule.service(...);
     rawModule.directive(...);
 ```
+
+
+
+# Router
+
+## Exemplo Básico
+
+- Nome da rota: `greetings`
+- URL: `/greetings/:nome`
+- Parâmetros:
+  - `nome`
+
+```html
+    <div ng-outlet="main"></div>
+```
+
+```js
+    @Route({
+        name: 'greetings',
+        path: '/greetings/:name',
+        outlet: 'main'
+    })
+    @Component({
+        selector: 'greetings'
+    })
+    @View({
+        controllerAs: 'greetings',
+        template: '{{ greetings.message }}'
+    })    
+    class Greetings {
+        message = 'Hello, {name}!';
+        constructor($routeParams) {
+            this.message = this.message.replace('{name}', $routeParams['name']);
+        }
+    }
+```
+
+Acesso a `/greetings/Diego`, renderiza...
+
+```html
+    <div ng-outlet="main">
+        <greetings>Hello, Diego!</greetings>
+    </div>    
+```
+## Exemplo com Aninhamento
+
+- Nome da rota: `dashboard`
+- URL: `/dashboard`
+
+```html
+    <div ng-outlet="main"></div>
+```
+
+```js
+    import {Greetings} from  './greetings';
+    
+    @Route({
+        name: 'dashboard',
+        path: '/dashboard',
+        outlet: 'main',
+        components: {
+            content: Greetings, // Greetings é um componente 
+            aside: 'search'     // 'search' = seletor de um component 
+        }
+    })
+    @Component({
+        selector: 'dashboard'
+    })
+    @View({
+        controllerAs: 'dashboard',
+        template: '<div ng-outlet="content"></div><div ng-outlet="aside"></div>'
+    })    
+    class Dashboard {
+        message = 'Hello, {name}!';
+        constructor($routeParams) {
+            this.message = this.message.replace('{name}', $routeParams['name']);
+        }
+    }
+```
+
+Acesso a `/dashboard`, renderiza...
+
+```html
+    <div ng-outlet="main">
+        <dashboard>
+            <div ng-outlet="content">
+                <greetings>Hello, Diego!</greetings>
+            </div>
+            <div ng-outlet="aside">
+                <search></search>
+            </div>
+        </dashboard>
+    </div>    
+```
