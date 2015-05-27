@@ -418,22 +418,21 @@ Manualy inherting annotations:
 
 # Router
 
-## Exemplo Básico
+## Exemplos
 
-- Nome da rota: `greetings`
-- URL: `/greetings/:nome`
-- Parâmetros:
-  - `nome`
+### 1) Rota definida estaticamente no componente
 
+`index.html`
 ```html
     <div ng-outlet="main"></div>
 ```
 
+`greetings.ts`
 ```js
-    @Route({
-        name: 'greetings',
-        path: '/greetings/:name',
-        outlet: 'main'
+    @RouteConfig({
+        name: 'greetings',              // state.name
+        path: '/greetings/:name',       // state.url
+        outlet: 'main'                  // state.views = { 'main' : {controller: ...} }
     })
     @Component({
         selector: 'greetings'
@@ -442,12 +441,24 @@ Manualy inherting annotations:
         controllerAs: 'greetings',
         template: '{{ greetings.message }}'
     })    
-    class Greetings {
+    export class Greetings {
         message = 'Hello, {name}!';
         constructor($routeParams) {
             this.message = this.message.replace('{name}', $routeParams['name']);
         }
     }
+```
+
+`app.ts`
+```js
+    import {Greetings} from './greetings.ts';
+    
+    @Application({
+        selector: 'html',
+        dependencies: [Greetings]
+    })
+    export class App {
+    }    
 ```
 
 Acesso a `/greetings/Diego`, renderiza...
@@ -457,6 +468,66 @@ Acesso a `/greetings/Diego`, renderiza...
         <greetings>Hello, Diego!</greetings>
     </div>    
 ```
+
+
+### 2) Rota definida na configuração do módulo
+
+`index.html`
+```html
+    <div ng-outlet></div>
+```
+
+`greetings.ts`
+```js
+    @View
+    @Template({
+        controllerAs: 'greetings',
+        inline: '{{ greetings.message }}'
+    })
+    export class Greetings {
+        message = 'Hello, {name}!';
+        constructor($routeParams) {
+            this.message = this.message.replace('{name}', $routeParams['name']);
+        }
+    }
+```
+
+`app.ts`
+```js
+    import {Greetings} from './greetings.ts';
+    import {Dashboard} from './dashboard.ts';
+    import {Logout} from './dashboard.ts';
+    
+    @Application({
+        selector: 'html',
+        dependencies: [Greetings]
+    })
+    @States([
+        {name: 'greetings', path: '/greetings/:name', component: Greetings},
+        // state = {name: 'greetings', url: '/greetings/:name', views: {'@' : {controller: Greetings...}}}
+        
+        {name: 'logout', path: '/logout', components: {'@' : Logout}},
+        // state = {name: 'logout', url: '/logout', views: {'@' : {controller: Logout...}}}
+        
+        {name: 'dashboard', path: '/dashboard', component: Dashboard, states: [
+            {name: 'config', path: '/config', component: 'config'},
+            {name: '', path: '', component: ''}
+        ]}
+        // state = {name: 'dashboard', url: '/dashboard', views: {'@' : {controller: Dashboard...}}}
+        
+    ])
+    export class App {
+    }    
+```
+
+Acesso a `/greetings/Diego`, renderiza...
+
+```html
+    <div ng-outlet>
+        <greetings>Hello, Diego!</greetings>
+    </div>    
+```
+
 ## Exemplo com Aninhamento
 
 - Nome da rota: `dashboard`
