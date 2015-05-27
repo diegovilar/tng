@@ -1,56 +1,12 @@
 /// <reference path="./_references" />
 
-import {makeDecorator, FunctionReturningString, setIfInterface} from './utils';
+import {makeDecorator} from './utils';
 
 /**
- * TODO document
- */
-export const enum TemplateNamespace {
-    HTML,
-    SVG,
-    MathML
-}
-
-/**
- * Options available when decorating a class with view information
+ * Options available when decorating a class as a ViewModel
  * TODO document
  */
 export interface ViewOptions {
-    
-    /**
-     * 
-     */
-    controllerAs: string;
-    
-    /**
-     * 
-     */
-    template?: string|FunctionReturningString;
-    
-    /**
-     * 
-     */
-    templateUrl?: string|FunctionReturningString;
-    
-    /**
-     * 
-     */
-    style?: string;
-    
-    /**
-     * 
-     */
-    styleUrl?: string;
-    
-    /**
-     * 
-     */
-    templateNamespace?: TemplateNamespace;
-    
-    /**
-     * @deprecated
-     */
-    replace?: boolean;
 }
 
 /**
@@ -58,21 +14,9 @@ export interface ViewOptions {
  */
 export class ViewAnnotation {
 
-    template: string|FunctionReturningString = '';
-    templateUrl: string|FunctionReturningString = '';
-    style = '';
-    styleUrl = '';
-    controllerAs = '';
-    templateNamespace = TemplateNamespace.HTML;
-    replace = false;
-
-    constructor(options: ViewOptions) {
-        setIfInterface(this, options);
-    }
-
 }
 
-type ViewDecorator = (options: ViewOptions) => ClassDecorator;
+type ViewDecorator = () => ClassDecorator;
 
 /**
  * A decorator to annotate a class with view information

@@ -5,6 +5,7 @@ import {makeDecorator, Map, setIfInterface, merge, create, isFunction} from './u
 import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils';
 import {getAnnotations} from './reflection';
 import {ViewAnnotation} from './view';
+import {TemplateAnnotation, NAMESPACE_MAP} from './template';
 import {CommonDirectiveOptions, CommonDirectiveAnnotation} from './directive'
 import {Directive, DirectiveAnnotation, DirectiveConstructor, Transclusion} from './directive'
 import {makeDirectiveDO, DirectiveDefinitionObject, inFactory as inFactoryDirective} from './directive'
@@ -56,6 +57,7 @@ export interface ComponentDefinitionObject extends DirectiveDefinitionObject {
     controllerAs?: string;
     template?: string|FunctionReturningString;
     templateUrl?: string|FunctionReturningString;
+    templateNamespace?: string;
 }
 
 /**
@@ -66,18 +68,17 @@ export function makeComponentDO(componentClass: ComponentConstructor): Component
     var cdo = <ComponentDefinitionObject> makeDirectiveDO(<DirectiveConstructor> componentClass);
 
     var component = merge(create(ComponentAnnotation), ...getAnnotations(componentClass, ComponentAnnotation));
-    var view = merge(create(ViewAnnotation), ...getAnnotations(componentClass, ViewAnnotation));
+    var template = merge(create(TemplateAnnotation), ...getAnnotations(componentClass, TemplateAnnotation));
     
-    // TODO must have view
-    
-    // Component restrictions
-    
-    // View
-    if (view.controllerAs) cdo.controllerAs = view.controllerAs;
-    if (view.template) cdo.template = view.template;
-    if (view.templateUrl) cdo.templateUrl = view.templateUrl;
-    // TODO style
+    // TODO Component restrictions
+        
+    if (template.controllerAs) cdo.controllerAs = template.controllerAs;
+    if (template.namespace) cdo.templateNamespace = NAMESPACE_MAP[template.namespace];
     // TODO styleUrl
+    
+    if (template.inline) cdo.template = template.inline;
+    else if (template.url) cdo.templateUrl = template.url;
+    else throw new Error('Components must have an inline or remote template');    
         
     return cdo;
 
@@ -106,7 +107,6 @@ export function inFactory(cdo: ComponentDefinitionObject, $injector: ng.auto.IIn
         };
     }
     
-    // TODO style
     // TODO styleUrl
     
     return cdo;

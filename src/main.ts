@@ -9,6 +9,7 @@ export {Service} from './service';
 export {Decorator} from './decorator';
 export {Directive, Transclusion} from './directive';
 export {Component} from './component';
-export {View, TemplateNamespace} from './view';
+export {View} from './view';
+export {Template, TemplateNamespace} from './template';
 export {Module, unwrap} from './module';
 export {Application} from './application';
