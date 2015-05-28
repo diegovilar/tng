@@ -7,22 +7,22 @@ ___
 * São `Directvies` com algumas opções forçadas:
   * `scope` é orbigatório, ou `true` ou `{}`, sendo `true` o padrão
   * ??? bindToController 
-  * Exige um `Template`
-* As injeções locais disponíveis a `compile` também estão disponíveis a `inline` e `url`
-  de `Template`
+  * Requer `View`
+* As injeções locais disponíveis a `compile` também estão disponíveis a `template` e `templateUrl`
+  de `View`
 
 `Arquivo: app/concrete/components/todo.ts`
 ```js
-    import {Component, Template, Inject} from 'tng';
+    import {Component, View, Inject} from 'tng';
     import {Storage} from './abstract/services/storage';
     
     @Component({
         selector: 'todo',
         link: Todo.link
     })
-    @Template({
+    @View({
         controllerAs: 'todo',
-        inline: '<div class="todo"></div>'
+        template: '<div class="todo"></div>'
     })
     export class Todo {
         
@@ -49,15 +49,15 @@ ___
 
 `Arquivo: app/concrete/components/todo-item.ts`
 ```js
-    import {Component, Template} from 'tng';
+    import {Component, View} from 'tng';
     
     @Component({
         selector: 'todo-item',
         require: ['^todo']
     })
-    @Template({
+    @View({
         controllerAs: 'item',
-        inline: '<div class="todo-item"></div>'
+        template: '<div class="todo-item"></div>'
     })
     export class TodoItem {
         ...

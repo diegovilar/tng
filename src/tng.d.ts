@@ -8,7 +8,8 @@ declare module "tng" {
 	export {Animation} from "tng/animation";
 	export {Service} from "tng/service";
 	export {Decorator} from "tng/decorator";
-	export {View, TemplateNamespace} from "tng/view";
+	export {View} from "tng/view";
+	export {ComponentView, ComponentTemplateNamespace} from "tng/component-view";
 	export {Directive, Transclusion} from "tng/directive";
 	export {Component} from "tng/component";
 	export {Module} from "tng/module";
@@ -250,33 +251,77 @@ declare module "tng/decorator" {
 
 declare module "tng/view" {
 	
-	/**
-	 * TODO document
-	 */
-	export const enum TemplateNamespace {
-	    HTML,
-	    SVG,
-	    MathML
-	}
-	
+	type FunctionReturningString = {(...args: any[]): string};
+		
 	/**
 	 * Options available when decorating a class with view information
 	 * TODO document
 	 */
 	export interface ViewOptions {
+	    
+	    /**
+	     * 
+	     */
 	    controllerAs: string;
-	    template?: string|{(...args: any[]): string};
-	    templateUrl?: string|{(...args: any[]): string};
-	    style?: string;
+	    
+	    /**
+	     * 
+	     */
+	    template?: string|FunctionReturningString;
+	    
+	    /**
+	     * 
+	     */
+	    templateUrl?: string|FunctionReturningString;
+	    
+	    /**
+	     * 
+	     */
 	    styleUrl?: string;
-	    templateNamespace?: TemplateNamespace;
+	        
+	}
+
+	/**
+	 * A decorator to annotate a controller with view information
+	 */
+	function View(options: ViewOptions): ClassDecorator;
+	
+}
+
+declare module "tng/component-view" {
+	
+	import {ViewOptions} from 'tng/view';
+	
+	/**
+	 * TODO document
+	 */
+	export const enum ComponentTemplateNamespace {
+	    HTML,
+	    SVG,
+	    MathML
+	}
+		
+	/**
+	 * Options available when decorating a component with view information
+	 * TODO document
+	 */
+	export interface ComponentViewOptions extends ViewOptions {
+	    
+	    /**
+	     * 
+	     */
+	    namespace?: ComponentTemplateNamespace;
+	    
+	    /**
+	     * @deprecated
+	     */
 	    replace?: boolean;
 	}
 
 	/**
-	 * A decorator to annotate a class with view information
+	 * A decorator to annotate a component with view information
 	 */
-	function View(options: ViewOptions): ClassDecorator;
+	function ComponentView(options: ComponentViewOptions): ClassDecorator;
 	
 }
 
@@ -397,6 +442,11 @@ declare module "tng/module" {
 		onConfig?: {(...args: any[]): void};
 		onRun?: {(...args: any[]): void};
 	}
+	
+	/**
+	 * Unwraps a TNG module, registering it and its dependencies on Angular.
+	 */
+	export function unwrapModule(moduleController: Function, name?: string): ng.IModule;
 		
 }
 
@@ -442,5 +492,52 @@ declare module "tng/bootstrap" {
 	 * TODO document
 	 */
 	export function bootstrap(moduleClass: Function, selector: string): ng.auto.IInjectorService;
+	
+}
+
+
+
+// ----------------------------------------------------------------------------
+
+// UI-Router
+
+declare module "tng/ui-router" {
+	
+	export {States, StateConfig} from "tng/ui-router/states";
+	export {Routes} from "tng/ui-router/routes";
+	
+}
+
+declare module "tng/ui-router/states" {
+	
+	type StateConfigMap = {[name:string]:StateConfig};
+	
+	/**
+	 * Options available when decorating an application controller with states
+	 * TODO document
+	 */
+	export interface StateConfig {
+	    path: string;
+	    abstract?: boolean;
+	    view?: Function;
+	    views?: {[outlet:string]: Function};
+	    parent?: StateConfig|string;
+	}
+	
+	/**
+	 * A decorator to annotate a class with states
+	 */
+	function States(states: StateConfigMap): ClassDecorator;
+	
+}
+
+declare module "tng/ui-router/routes" {
+	
+	type RoutesMap = {[route:string]:string|Function};
+	
+	/**
+	 * A decorator to annotate with routes
+	 */
+	function Routes(routes: RoutesMap): ClassDecorator;
 	
 }

@@ -1,13 +1,12 @@
 # TNG
 ___
 
-## UIStates
+## States
 
-Configura.
+Configura estados no UI-Router em um controller de aplicação.
 
-* Decorador: `@UIStates`
-* Requer `Template`
-* A classe é o seu controller (ou `ViewModel`)
+* Decorador: `@States`
+* Requer `View`
 
 ### Exemplos de uso
 
@@ -17,30 +16,31 @@ Configura.
 ```html
 	<html>
 		<body>
-			<div view-outlet></div>
+			<div ui-view></div>
 		</body>		
 	</html>
 ```
 
 `app.js`
 ```js
-	import {View, Template, Application, States} from 'tng';
+	import {View, Application, States} from 'tng';
+	import {States, Routes} from 'tng/ui-router';
 
-	@View
-	@Template({
+	@View({
 		controllerAs: 'home',
-		inline: '<div>{{ home.greetings }}</div>'
+		template: '<div>{{ home.greetings }}</div>'
 	})
 	export class Home {
 		greetings = 'Hello World!'
 	}
 	
 	@Application({
-		selector: 'html'
+		selector: 'html',
+		dependencies: ['ui.router']
 	})
-	@States([
-		{name: 'home', path: '/', view: Home}
-	])
+	@States({
+		'home': {path: '/', view: Home}
+	})
 	class MyApp {
 	}
 ```
@@ -52,40 +52,40 @@ Configura.
 ```html
 	<html>
 		<body>
-			<div view-outlet="content"></div>
-			<div view-outlet="aside"></div>
+			<div ui-view="content"></div>
+			<div ui-view="aside"></div>
 		</body>		
 	</html>
 ```
 
 `app.js`
 ```js
-	import {View, Template, Application, States} from 'tng';
+	import {View, View, Application} from 'tng';
+	import {States, Routes} from 'tng/ui-router';
 
-	@View
-	@Template({
+	@View({
 		controllerAs: 'home',
-		url: 'home.html'
+		templateUrl: 'home.html'
 	})
 	export class Home {
 		...
 	}
 	
-	@View
-	@Template({
+	@View({
 		controllerAs: 'menu',
-		url: 'menu.html'
+		templateUrl: 'menu.html'
 	})
 	export class Menu {
 		...
 	}
 	
 	@Application({
-		selector: 'html'
+		selector: 'html',
+		dependencies: ['ui.router']
 	})
-	@States([
-		{name: 'home', path: '/', views: {'content': Home, 'aside': Menu}}
-	])
+	@States({
+		'home': {path: '/', views: {'content': Home, 'aside': Menu}}
+	})
 	class MyApp {
 	}
 ```
@@ -97,49 +97,44 @@ Configura.
 ```html
 	<html>
 		<body>
-			<div view-outlet></div>
+			<div ui-view></div>
 		</body>		
 	</html>
 ```
 
 `app.js`
 ```js
-	import {View, Template, Application, States} from 'tng';
+	import {View, Application, States} from 'tng';
+	import {States, Routes} from 'tng/ui-router';
 	import {Welcome} from './welcome';
 	import {Search} from './search';
 	import {Config} from './config';
 
-	@View
-	@Template({
+	@View({
 		controllerAs: 'dashboard',
-		inline: '<h1>Your Dashboard</h1>' +
-		        '<div view-outlet="content"></div>' +
-		        '<div view-outlet="aside"></div>'
+		template: '<h1>Your Dashboard</h1>' +
+		          '<div ui-view="content"></div>' +
+		          '<div ui-view="aside"></div>'
 	})
 	export class Dashboard {
 		...
 	}
 	
-	@View
-	@Template({
+	@View({
 		controllerAs: 'menu',
-		inline: 'menu.html'
+		templateUrl: 'menu.html'
 	})
 	export class Menu {
 		...
 	}
 	
-	@Application({
-		selector: 'html'
-	})
-	
-	@UIStates({
+	@States({
 		'dashboard':        {path: '/dashboard', abstract: true, view: Dashboard}
 		'dashboard.start':  {path: '/', views: {'content': Welcome, 'aside': Search}},
 		'dashboard.config': {path: '/config', views: {'content': Config}}
 	}}
-	// or
-	@UIStates({
+	// OR
+	@States({
 		'dashboard': {path: '/dashboard', abstract: true, view: Dashboard}
 		'start':     {parent: 'dashboard', path: '/', views: {'content': Welcome, 'aside': Search}},
 		'config':    {parent: 'dashboard', path: '/config', views: {'content': Config}}
@@ -149,6 +144,13 @@ Configura.
 		''  : '/index',
 		'?' : '/not-found'
 	})
-	class MyApp {
+	
+	@Application({
+		selector: 'html',
+		dependencies: ['ui.router']
+	})
+	
+	class AppController {
+		...
 	}
 ```

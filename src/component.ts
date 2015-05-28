@@ -5,7 +5,7 @@ import {makeDecorator, Map, setIfInterface, merge, create, isFunction} from './u
 import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils';
 import {getAnnotations} from './reflection';
 import {ViewAnnotation} from './view';
-import {TemplateAnnotation, NAMESPACE_MAP} from './template';
+import {ComponentViewAnnotation, NAMESPACE_MAP} from './component-view';
 import {CommonDirectiveOptions, CommonDirectiveAnnotation} from './directive'
 import {Directive, DirectiveAnnotation, DirectiveConstructor, Transclusion} from './directive'
 import {makeDirectiveDO, DirectiveDefinitionObject, inFactory as inFactoryDirective} from './directive'
@@ -22,10 +22,10 @@ export interface ComponentOptions extends CommonDirectiveOptions {
  */
 export class ComponentAnnotation extends CommonDirectiveAnnotation {
 
-    constructor(options: ComponentOptions) {
+    /*constructor(options: ComponentOptions) {
         super(<any> options); // TODO WTF needs casting?
         //setIfInterface(this, options); nothing to do so far
-    }
+    }*/
 
 }
 
@@ -63,12 +63,28 @@ export interface ComponentDefinitionObject extends DirectiveDefinitionObject {
 /**
  * @internal
  */
+export function registerComponent(componentClass: ComponentConstructor, ngModule: ng.IModule) {
+
+    var aux = getAnnotations(componentClass, ComponentAnnotation);
+
+    if (!aux.length) {
+        throw new Error("Component annotation not found");
+    }
+
+    var {name, factory} = makeComponentFactory(componentClass);
+    ngModule.directive(name, factory);
+    
+}
+
+/**
+ * @internal
+ */
 export function makeComponentDO(componentClass: ComponentConstructor): ComponentDefinitionObject {
 
     var cdo = <ComponentDefinitionObject> makeDirectiveDO(<DirectiveConstructor> componentClass);
 
-    var component = merge(create(ComponentAnnotation), ...getAnnotations(componentClass, ComponentAnnotation));
-    var template = merge(create(TemplateAnnotation), ...getAnnotations(componentClass, TemplateAnnotation));
+    // var component = merge(create(ComponentAnnotation), ...getAnnotations(componentClass, ComponentAnnotation));
+    var template = merge(create(ComponentViewAnnotation), ...getAnnotations(componentClass, ComponentViewAnnotation));
     
     // TODO Component restrictions
         
@@ -76,8 +92,8 @@ export function makeComponentDO(componentClass: ComponentConstructor): Component
     if (template.namespace) cdo.templateNamespace = NAMESPACE_MAP[template.namespace];
     // TODO styleUrl
     
-    if (template.inline) cdo.template = template.inline;
-    else if (template.url) cdo.templateUrl = template.url;
+    if (template.template) cdo.template = template.template;
+    else if (template.templateUrl) cdo.templateUrl = template.templateUrl;
     else throw new Error('Components must have an inline or remote template');    
         
     return cdo;
@@ -128,23 +144,5 @@ export function makeComponentFactory(componentClass: ComponentConstructor) {
         name: cdo.imperativeName,
         factory: factory
     };
-
-}
-
-/**
- * @internal
- */
-export function registerComponent(componentClass: ComponentConstructor, ngModule: ng.IModule) {
-
-    var aux = getAnnotations(componentClass, ComponentAnnotation);
-
-    if (!aux.length) {
-        throw new Error("Component annotation not found");
-    }
-
-    var {name, factory} = makeComponentFactory(componentClass);
-    ngModule.directive(name, factory);
-    
-    // TODO register routes
 
 }

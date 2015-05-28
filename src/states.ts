@@ -3,19 +3,19 @@
 import {bind} from './di';
 import {makeDecorator, create, merge, isString, isFunction, Map, isArray, forEach} from './utils';
 import {getAnnotations} from './reflection';
-import {TemplateAnnotation} from './template';
+import {ViewAnnotation} from './view';
 
 /**
- * Options available when decorating a class with template information
+ * Options available when decorating an application controller with states
  * TODO document
  */
-export interface UIStateConfig {
+export interface StateConfig {
     
     path: string;
     abstract?: boolean;
     view?: Function;
     views?: {[outlet:string]: Function};
-    parent?: UIStateConfig|string;
+    parent?: StateConfig|string;
     
     // TODO
     // params
@@ -30,18 +30,18 @@ export interface UIStateConfig {
 /**
  * @internal
  */
-export interface InternalUIStateConfig extends UIStateConfig {
+export interface InternalStateConfig extends StateConfig {
     name: string;
 }
 
 /**
  * @internal
  */
-export class UIStatesAnnotation {
+export class StatesAnnotation {
     
-    states: Map<InternalUIStateConfig>;
+    states: Map<InternalStateConfig>;
 
-    constructor(states: Map<InternalUIStateConfig>) {
+    constructor(states: Map<InternalStateConfig>) {
         
         forEach(states, (state, name) => state.name = name);
         this.states = states;
@@ -50,23 +50,23 @@ export class UIStatesAnnotation {
 
 }
 
-type UIStatesDecorator = (states: Map<UIStateConfig>) => ClassDecorator;
+type StatesDecorator = (states: Map<StateConfig>) => ClassDecorator;
 
 /**
  * A decorator to annotate a class with states
  */
-export var UIStates = <UIStatesDecorator> makeDecorator(UIStatesAnnotation);
+export var States = <StatesDecorator> makeDecorator(StatesAnnotation);
 
 /**
  * @internal
  */
 export function registerStates(moduleController: Function, ngModule: ng.IModule) {
     
-    var notes = <UIStatesAnnotation[]> getAnnotations(moduleController, UIStatesAnnotation);
+    var notes = <StatesAnnotation[]> getAnnotations(moduleController, StatesAnnotation);
         
     if (!notes.length) return;
     
-    var states:InternalUIStateConfig[] = [];
+    var states:InternalStateConfig[] = [];
     
     forEach(notes, (note) =>
         forEach(note.states, (state) =>
@@ -82,7 +82,7 @@ export function registerStates(moduleController: Function, ngModule: ng.IModule)
     
 }
 
-function translateToUiState(state: InternalUIStateConfig): ng.ui.IState {
+function translateToUiState(state: InternalStateConfig): ng.ui.IState {
     
     var translatedState:ng.ui.IState = {};
     
@@ -95,7 +95,7 @@ function translateToUiState(state: InternalUIStateConfig): ng.ui.IState {
     if (state.parent) {
         let parent = state.parent;
         if (!isString(parent)) {
-            parent = (<InternalUIStateConfig> parent).name;
+            parent = (<InternalStateConfig> parent).name;
         }
         // ng.ui.IState is missing parent
         (<any> translatedState).parent = parent;
@@ -126,19 +126,19 @@ function translateToUiState(state: InternalUIStateConfig): ng.ui.IState {
 
 function extractViewData(viewModel: Function) {
     
-    let notes = getAnnotations(viewModel, TemplateAnnotation);
+    let notes = getAnnotations(viewModel, ViewAnnotation);
     
     if (!notes.length) {
         throw new Error('Template not defined');
     }
     
-    let template = merge(create(TemplateAnnotation), ...notes);
+    let template = merge(create(ViewAnnotation), ...notes);
     let data:any = {};
     
     data.controller = viewModel;
     data.controller = template.controllerAs;   
-    data.template = template.inline;   
-    data.templateUrl = template.url;
+    data.template = template.template;   
+    data.templateUrl = template.templateUrl;
     // TODO style?
     
     return data;

@@ -11,7 +11,7 @@ import {ServiceAnnotation, registerService} from './service';
 import {DecoratorAnnotation, registerDecorator} from './decorator';
 import {DirectiveAnnotation, registerDirective} from './directive';
 import {ComponentAnnotation, registerComponent} from './component';
-import {registerStates} from './uistates';
+import {registerStates} from './states';
 import {registerRoutes} from './routes';
 
 /**
@@ -191,6 +191,6 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
 }
 
 /**
- * 
+ * Unwraps a TNG module, registering it and its dependencies on Angular.
  */
-export {registerModule as unwrap};
+export {registerModule as unwrapModule};

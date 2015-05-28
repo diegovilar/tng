@@ -1,17 +1,17 @@
 # TNG
 ___
 
-## Template
+## View
 
-Descreve um template a ser aplicado a uma `View` ou `Component`.
+Anota um controller com informações sobre uma view, podendo ser usado em states ou components.
 
-* Decorador: `@Template`
+* Decorador: `@View`
 * Opções:
   * `controllerAs:string`: Identificador pelo qual o controller será referenciado no template
-  * `inline:string|function`
+  * `template:string|function`
     * Quando string, representando é próprio template
     * Quando função, será invocada com `$injector.invoke()` e deve retorna uma string representando o template
-  * `url:string|function`
+  * `templateUrl:string|function`
     * Quando string, representando a URL do template
     * Quando função, será invocada com `$injector.invoke()` e deve retorna a URL do template
   * `stylesheetUrl:string|function`
@@ -26,24 +26,32 @@ Descreve um template a ser aplicado a uma `View` ou `Component`.
 	@Component({
 		selector: 'panel'
 	})
-	@Template({
+	@View({
 		controllerAs: 'panel',
-		url: 'panel.html'
+		templateUrl: 'panel.html'
 	})
 	export class Panel {
 	}
 ```
 
 
-#### 2) View
+#### 2) State
 
 ```js
-	@View
-	@Template({
+	@View({
 		controllerAs: 'home',
-		inline: '<div>{{ home.greetings }}</div>'
+		template: '<div>{{ home.greetings }}</div>'
 	})
 	export class Home {
 		greetings = 'Hello World!'
+	}
+	
+	@Application({
+		selector: 'html'
+	})
+	@States({
+		'home': {path: '/', view: Home}
+	})
+	export class AppController {
 	}
 ```
