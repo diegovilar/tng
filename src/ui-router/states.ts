@@ -1,9 +1,9 @@
-/// <reference path="./_references" />
+/// <reference path="../_references" />
 
-import {bind} from './di';
-import {makeDecorator, create, merge, isString, isFunction, Map, isArray, forEach} from './utils';
-import {getAnnotations} from './reflection';
-import {ViewAnnotation} from './view';
+import {bind} from '../di';
+import {makeDecorator, create, merge, isString, isFunction, Map, isArray, forEach} from '../utils';
+import {getAnnotations} from '../reflection';
+import {ViewAnnotation} from '../view';
 
 /**
  * Options available when decorating an application controller with states

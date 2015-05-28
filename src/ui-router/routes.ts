@@ -1,8 +1,8 @@
-/// <reference path="./_references" />
+/// <reference path="../_references" />
 
-import {bind} from './di';
-import {makeDecorator, create, merge, Map, forEach} from './utils';
-import {getAnnotations} from './reflection';
+import {bind} from '../di';
+import {makeDecorator, create, merge, Map, forEach} from '../utils';
+import {getAnnotations} from '../reflection';
 
 /**
  * @internal

@@ -11,8 +11,8 @@ import {ServiceAnnotation, registerService} from './service';
 import {DecoratorAnnotation, registerDecorator} from './decorator';
 import {DirectiveAnnotation, registerDirective} from './directive';
 import {ComponentAnnotation, registerComponent} from './component';
-import {registerStates} from './states';
-import {registerRoutes} from './routes';
+import {registerStates} from './ui-router/states';
+import {registerRoutes} from './ui-router/routes';
 
 /**
  * Options available when decorating a class as a module
