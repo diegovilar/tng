@@ -12,6 +12,7 @@ export var isElement = angular.isElement;
 export var isDate = angular.isDate;
 export var isArray = angular.isArray;
 export var isFunction = angular.isFunction;
+export var forEach = angular.forEach;
 export var extend = <extendSignature> angular.extend;
 export var copy = <extendSignature> angular.copy;
 export var merge = <extendSignature> (<any> angular).merge;

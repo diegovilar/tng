@@ -11,6 +11,8 @@ import {ServiceAnnotation, registerService} from './service';
 import {DecoratorAnnotation, registerDecorator} from './decorator';
 import {DirectiveAnnotation, registerDirective} from './directive';
 import {ComponentAnnotation, registerComponent} from './component';
+import {registerStates} from './uistates';
+import {registerRoutes} from './routes';
 
 /**
  * Options available when decorating a class as a module
@@ -163,7 +165,7 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
     }
     for (let fn of configFns) ngModule.config(fn);
     
-    // Register config functions
+    // Register initialization functions
     var runFns: Function[] = [];
     if (isFunction(module.onRun)) runFns.push(module.onRun.bind(module));
     if (moduleNotes.run) {
@@ -171,6 +173,9 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
         else runFns = runFns.concat(<Function[]> moduleNotes.run)
     }
     for (let fn of runFns) ngModule.run(fn);
+    
+    registerStates(moduleClass, ngModule);
+    registerRoutes(moduleClass, ngModule);
 
     for (let item of values) registerValue(item, ngModule);
     for (let item of constants) registerConstant(item, ngModule);

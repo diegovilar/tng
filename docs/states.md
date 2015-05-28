@@ -1,11 +1,11 @@
 # TNG
 ___
 
-## States
+## UIStates
 
 Configura.
 
-* Decorador: `@View`
+* Decorador: `@UIStates`
 * Requer `Template`
 * A classe é o seu controller (ou `ViewModel`)
 
@@ -132,12 +132,23 @@ Configura.
 	@Application({
 		selector: 'html'
 	})
-	@States([
-		{name: 'dashboard', path: '/dashboard', abstract: true, view: Dashboard, states: {
-			{name: 'start', path: '/', views: {'content': Welcome, 'aside': Search}},
-			{name: 'config', path: '/config', views: {'content': Config}}
-		}}
-	])
+	
+	@UIStates({
+		'dashboard':        {path: '/dashboard', abstract: true, view: Dashboard}
+		'dashboard.start':  {path: '/', views: {'content': Welcome, 'aside': Search}},
+		'dashboard.config': {path: '/config', views: {'content': Config}}
+	}}
+	// or
+	@UIStates({
+		'dashboard': {path: '/dashboard', abstract: true, view: Dashboard}
+		'start':     {parent: 'dashboard', path: '/', views: {'content': Welcome, 'aside': Search}},
+		'config':    {parent: 'dashboard', path: '/config', views: {'content': Config}}
+	}}
+	
+	@Routes({
+		''  : '/index',
+		'?' : '/not-found'
+	})
 	class MyApp {
 	}
 ```
