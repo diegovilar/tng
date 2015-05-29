@@ -88,8 +88,7 @@ function translateToUiState(state: InternalStateConfig): ng.ui.IState {
     
     translatedState.name = state.name;
     translatedState.url = state.path;
-    translatedState.abstract = state.abstract;
-    translatedState.name = state.name;
+    translatedState.abstract = !!state.abstract;
     
     // If the state has a parent, we force the string way
     if (state.parent) {
@@ -136,7 +135,7 @@ function extractViewData(viewModel: Function) {
     let data:any = {};
     
     data.controller = viewModel;
-    data.controller = template.controllerAs;   
+    data.controllerAs = template.controllerAs;   
     data.template = template.template;   
     data.templateUrl = template.templateUrl;
     // TODO style?

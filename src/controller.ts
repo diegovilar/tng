@@ -1,18 +1,18 @@
 /// <reference path="./_references" />
 
-import {makeDecorator} from './utils';
+// import {makeDecorator} from './utils';
 
-export interface ControllerOptions {
+// export interface ControllerOptions {
     
-}
+// }
 
-export class ControllerAnnotation {
+// export class ControllerAnnotation {
     
-    constructor(options:ControllerOptions) {
+//     constructor(options:ControllerOptions) {
         
-    }
+//     }
     
-}
+// }
 
-type ControllerAnnotationDecorator = (options:ControllerOptions) => ClassDecorator;
-export var Controller = <ControllerAnnotationDecorator> makeDecorator(ControllerAnnotation);
+// type ControllerAnnotationDecorator = (options:ControllerOptions) => ClassDecorator;
+// export var Controller = <ControllerAnnotationDecorator> makeDecorator(ControllerAnnotation);

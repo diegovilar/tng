@@ -1,6 +1,6 @@
 /// <reference path="./_references" />
 
-import {getAnnotations, hasAnnotation} from './reflection';
+import {getAnnotations, hasAnnotation, Reflect} from './reflection';
 import {makeDecorator, setIfInterface, FunctionReturningNothing} from './utils';
 import {merge, create, isString, isFunction} from './utils';
 import {ValueAnnotation, registerValue} from './value';
@@ -13,6 +13,8 @@ import {DirectiveAnnotation, registerDirective} from './directive';
 import {ComponentAnnotation, registerComponent} from './component';
 import {registerStates} from './ui-router/states';
 import {registerRoutes} from './ui-router/routes';
+
+const PUBLISHED_ANNOTATION_KEY = 'tng:module-published-as';
 
 /**
  * Options available when decorating a class as a module
@@ -83,6 +85,14 @@ type ModuleSignature = (options: ModuleOptions) => ClassDecorator;
  */
 export var Module = <ModuleSignature> makeDecorator(ModuleAnnotation);
 
+var moduleCount = 0;
+
+function getNewModuleName() {
+    
+    return `tng_generated_module#${++moduleCount}`;
+    
+}
+
 /**
  * @internal
  */
@@ -116,7 +126,12 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
             modules.push(dep);
         }
         else if (hasAnnotation(dep, ModuleAnnotation)) {
-            modules.push(registerModule(<ModuleConstructor> dep).name);
+            if (Reflect.hasOwnMetadata(PUBLISHED_ANNOTATION_KEY, dep)) {
+                modules.push(Reflect.getOwnMetadata(PUBLISHED_ANNOTATION_KEY, dep));
+            }
+            else {
+                modules.push(registerModule(<ModuleConstructor> dep).name);
+            }
         }
         else if (hasAnnotation(dep, ConstantAnnotation, 'constant')) {
             constants.push(dep);
@@ -148,7 +163,7 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
         }
     }
 
-    name = name || moduleNotes.name || 'TODO RANDOM';
+    name = name || moduleNotes.name || getNewModuleName();
     
     // Register the module on Angular
     var ngModule = angular.module(name, modules);    
@@ -186,6 +201,8 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
     for (let item of components) registerComponent(item, ngModule);
     for (let item of directives) registerDirective(item, ngModule);
 
+    Reflect.defineMetadata(PUBLISHED_ANNOTATION_KEY, name, moduleClass);
+    
     return ngModule;
 
 }

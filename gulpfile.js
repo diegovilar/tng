@@ -124,7 +124,7 @@ function test(cb) {
 function buildBrowser() {
     
     bundle(
-        srcDir + '/main-browser.ts',
+        srcDir + '/main.ts',
         buildBrowserDir,
         'tng.js',
         false
@@ -135,7 +135,7 @@ function buildBrowser() {
 function watchBrowser() {
     
      bundle(
-        srcDir + '/main-browser.ts',
+        srcDir + '/main.ts',
         buildBrowserDir,
         'tng.js',
         true
@@ -161,7 +161,6 @@ function bundle(entryFilePath, destPath, destFileName, watch) {
     var bundlerOptions = {
         debug: true,
         bundleExternal: false
-        //standalone: 'tng'
     };
     
     if (watch) {
@@ -179,7 +178,32 @@ function bundle(entryFilePath, destPath, destFileName, watch) {
         bundler = browserify(entryFilePath, bundlerOptions); 
     }    
     
-    bundler.plugin('tsify', parseTypescriptConfig().compilerOptions);        
+    bundler.plugin('tsify', parseTypescriptConfig().compilerOptions);
+    
+    bundler.require([
+        {file: './src/main.ts', expose: 'tng'},
+        {file: './src/animation.ts', expose: 'tng/animation'},
+        {file: './src/application.ts', expose: 'tng/application'},
+        {file: './src/bootstrap.ts', expose: 'tng/bootstrap'},
+        {file: './src/component.ts', expose: 'tng/component'},
+        {file: './src/component-view.ts', expose: 'tng/component-view'},
+        {file: './src/constant.ts', expose: 'tng/constant'},
+        {file: './src/controller.ts', expose: 'tng/controller'},
+        {file: './src/decorator.ts', expose: 'tng/decorator'},
+        {file: './src/di.ts', expose: 'tng/di'},
+        {file: './src/directive.ts', expose: 'tng/directive'},
+        {file: './src/filter.ts', expose: 'tng/filter'},
+        {file: './src/module.ts', expose: 'tng/module'},
+        {file: './src/reflection.ts', expose: 'tng/reflection'},
+        {file: './src/service.ts', expose: 'tng/service'},
+        {file: './src/utils.ts', expose: 'tng/utils'},
+        {file: './src/value.ts', expose: 'tng/value'},
+        {file: './src/view.ts', expose: 'tng/view'},
+        
+        {file: './src/ui-router.ts', expose: 'tng/ui-router'},
+        {file: './src/ui-router/routes.ts', expose: 'tng/ui-router/routes'},
+        {file: './src/ui-router/states.ts', expose: 'tng/ui-router/states'}
+    ]);
     
     function run() {
         mkdir(destPath);
