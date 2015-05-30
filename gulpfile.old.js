@@ -18,6 +18,7 @@ var path = require('path');
 var del = require('del');
 var mkdir = require('mkdir-p').sync;
 var util = require('util');
+var vm = require('vm');
 var uglifyjs = require('uglifyjs');
 
 
@@ -31,37 +32,9 @@ var tsconfigPath = './tsconfig.json';
 
 
 
-// -- Exported modules --
-
-var exportedModules = [
-    { expose: 'tng',                file: './src/main.ts' },
-    { expose: 'tng/animation',      file: './src/animation.ts' },
-    { expose: 'tng/application',    file: './src/application.ts' },
-    { expose: 'tng/bootstrap',      file: './src/bootstrap.ts' },
-    { expose: 'tng/component',      file: './src/component.ts' },
-    { expose: 'tng/component-view', file: './src/component-view.ts' },
-    { expose: 'tng/constant',       file: './src/constant.ts' },
-    { expose: 'tng/controller',     file: './src/controller.ts' },
-    { expose: 'tng/decorator',      file: './src/decorator.ts' },
-    { expose: 'tng/di',             file: './src/di.ts' },
-    { expose: 'tng/directive',      file: './src/directive.ts' },
-    { expose: 'tng/filter',         file: './src/filter.ts' },
-    { expose: 'tng/module',         file: './src/module.ts' },
-    { expose: 'tng/reflection',     file: './src/reflection.ts' },
-    { expose: 'tng/service',        file: './src/service.ts' },
-    { expose: 'tng/utils',          file: './src/utils.ts' },
-    { expose: 'tng/value',          file: './src/value.ts' },
-    { expose: 'tng/view',           file: './src/view.ts' },
-
-    // TODO extract to different bundle
-    { expose: 'tng/ui-router',          file: './src/ui-router.ts' },
-    { expose: 'tng/ui-router/routes',   file: './src/ui-router/routes.ts' },
-    { expose: 'tng/ui-router/states',   file: './src/ui-router/states.ts' }
-];
-
-
-
 // -- Tasks --
+
+// gulp.task('default', ['build', 'build:browser']);
 
 gulp.task('clean:build', cleanBuild);
 gulp.task('clean:browser', cleanBuildBrowser);
@@ -77,8 +50,6 @@ gulp.task('build', ['clean:browser'], buildBrowser);
 gulp.task('watch:browser', ['clean:browser'], watchBrowser);
 gulp.task('watch', ['clean:browser'], watchBrowser);
 // gulp.task('build:browser:tests', ['clean:browser', 'build:browser'], buildBrowserTests);
-
-gulp.task('minify', ['build'], minifyBrowser);
 
 gulp.task('default', ['build']);
 
@@ -136,14 +107,34 @@ function watch() {
     
 }
 
+function test(cb) {
+      
+    var context = {
+        require: require
+    };    
+    
+    var code = "require('./build/tests')";    
+    
+    try {
+        vm.runInNewContext(code, context, {displayErrors:false});
+        log(colors.green('All tests passed!'));
+    }
+    catch (e) {
+        log(colors.red('TEST ERROR:'));
+        log(e.stack);
+    }
+        
+    cb();
+    
+}
+
 /**
  * Compiles a bundled version of the library for the browser
  */
 function buildBrowser() {
     
-    return bundle(
-        null,
-        exportedModules,
+    bundle(
+        srcDir + '/main.ts',
         buildBrowserDir,
         'tng.js',
         false
@@ -151,11 +142,10 @@ function buildBrowser() {
   
 }
 
-function watchBrowser(cb) {
+function watchBrowser() {
     
-     return bundle(
-        null,
-        exportedModules,
+     bundle(
+        srcDir + '/main.ts',
         buildBrowserDir,
         'tng.js',
         true
@@ -163,7 +153,18 @@ function watchBrowser(cb) {
     
 }
 
-function bundle(entryFilePath, requires, destPath, destFileName, watch) {
+function buildBrowserTests() {
+    
+    bundle(
+        srcDir + '/tests.ts',
+        buildBrowserDir,
+        'tests.js',
+        false
+    );
+  
+}
+
+function bundle(entryFilePath, destPath, destFileName, watch) {
     
     var bundler;
     
@@ -189,9 +190,30 @@ function bundle(entryFilePath, requires, destPath, destFileName, watch) {
     
     bundler.plugin('tsify', parseTypescriptConfig().compilerOptions);
     
-    if (requires) {
-        bundler.require(requires);
-    }
+    bundler.require([
+        {file: './src/main.ts', expose: 'tng'},
+        {file: './src/animation.ts', expose: 'tng/animation'},
+        {file: './src/application.ts', expose: 'tng/application'},
+        {file: './src/bootstrap.ts', expose: 'tng/bootstrap'},
+        {file: './src/component.ts', expose: 'tng/component'},
+        {file: './src/component-view.ts', expose: 'tng/component-view'},
+        {file: './src/constant.ts', expose: 'tng/constant'},
+        {file: './src/controller.ts', expose: 'tng/controller'},
+        {file: './src/decorator.ts', expose: 'tng/decorator'},
+        {file: './src/di.ts', expose: 'tng/di'},
+        {file: './src/directive.ts', expose: 'tng/directive'},
+        {file: './src/filter.ts', expose: 'tng/filter'},
+        {file: './src/module.ts', expose: 'tng/module'},
+        {file: './src/reflection.ts', expose: 'tng/reflection'},
+        {file: './src/service.ts', expose: 'tng/service'},
+        {file: './src/utils.ts', expose: 'tng/utils'},
+        {file: './src/value.ts', expose: 'tng/value'},
+        {file: './src/view.ts', expose: 'tng/view'},
+        
+        {file: './src/ui-router.ts', expose: 'tng/ui-router'},
+        {file: './src/ui-router/routes.ts', expose: 'tng/ui-router/routes'},
+        {file: './src/ui-router/states.ts', expose: 'tng/ui-router/states'}
+    ]);
     
     function run() {
         mkdir(destPath);
@@ -200,6 +222,8 @@ function bundle(entryFilePath, requires, destPath, destFileName, watch) {
             .pipe(output(destFileName))
             .pipe(buffer())
             .pipe(sourcemaps.init({loadMaps: true}))
+                //.pipe(uglify())
+                //.pipe(rename(destFileName.replace(/\.js$/, '-min.js')))
             .pipe(sourcemaps.write('./'))
             .pipe(gulp.dest(destPath))
             .on('error', log.bind(gutil, colors.red('Browserify Error')));
@@ -209,20 +233,7 @@ function bundle(entryFilePath, requires, destPath, destFileName, watch) {
     
 }
 
-function minifyBrowser(cb) {
-        
-    var result = uglifyjs.minify(buildBrowserDir + '/tng.js', {
-        inSourceMap: buildBrowserDir + '/tng.js.map',
-        outSourceMap: 'tng.js.map',        
-        mangle: true,
-        compress: {}
-    });
-    
-    fs.writeFileSync(buildBrowserDir + '/tng-min.js', result.code);
-    fs.writeFileSync(buildBrowserDir + '/tng-min.js.map', result.map);
-    
-    cb();
-}
+
 
 // -----
 

@@ -159,11 +159,21 @@ export function bindAll<T>(host: T): T {
     if (aux) {
         for (let key in aux) {
             if (isFunction(aux[key])) {
-                aux[key] = aux[key].bind(aux);
+                aux[key] = safeBind(aux[key], aux);
             }
         }
     }
     
     return host;
+    
+}
+
+export function safeBind<TFunc extends Function>(func: TFunc, context: any):TFunc {
+    
+    var bound = func.bind(context);
+    
+    forEach(func, (value, name) => bound[name] = value);
+    
+    return bound;
     
 }

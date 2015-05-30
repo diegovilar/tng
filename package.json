@@ -19,11 +19,12 @@
     "gulp-util": "3.0.4",
     "lodash.assign": "3.1.0",
     "mkdir-p": "0.0.6",
+    "reflect-metadata": "0.1.0",
     "tsify": "https://github.com/diegovilar/tsify.git",
     "typescript": "1.5.0-beta",
+    "uglifyjs": "2.4.10",
     "vinyl-buffer": "1.0.0",
     "vinyl-source-stream": "1.1.0",
-    "watchify": "3.2.1",
-    "reflect-metadata": "0.1.0"
+    "watchify": "3.2.1"
   }
 }

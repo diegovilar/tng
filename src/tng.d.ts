@@ -12,7 +12,7 @@ declare module "tng" {
 	export {ComponentView, ComponentTemplateNamespace} from "tng/component-view";
 	export {Directive, Transclusion} from "tng/directive";
 	export {Component} from "tng/component";
-	export {Module} from "tng/module";
+	export {Module, publishModule} from "tng/module";
 	export {Application} from "tng/application";
 	export {bootstrap} from "tng/bootstrap";
 }
@@ -432,7 +432,7 @@ declare module "tng/module" {
 	/**
 	 * A decorator to annotate a class as being a module
 	 */
-	function Module(options: ModuleOptions): ClassDecorator;
+	function Module(options?: ModuleOptions): ClassDecorator;
 	
 	/**
 	 * Interface modules MAY implement
@@ -444,9 +444,9 @@ declare module "tng/module" {
 	}
 	
 	/**
-	 * Unwraps a TNG module, registering it and its dependencies on Angular.
+	 * Publishe a TNG module, registering it and its dependencies on Angular.
 	 */
-	export function unwrapModule(moduleController: Function, name?: string): ng.IModule;
+	export function publishModule(moduleController: Function, name?: string): ng.IModule;
 		
 }
 

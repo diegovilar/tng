@@ -2,7 +2,7 @@
 
 import {getAnnotations, hasAnnotation, Reflect} from './reflection';
 import {makeDecorator, setIfInterface, FunctionReturningNothing} from './utils';
-import {merge, create, isString, isFunction} from './utils';
+import {merge, create, isString, isFunction, safeBind} from './utils';
 import {ValueAnnotation, registerValue} from './value';
 import {ConstantAnnotation, registerConstant} from './constant';
 import {FilterAnnotation, registerFilter} from './filter';
@@ -55,8 +55,10 @@ export class ModuleAnnotation {
 	values: Function[] = null;
 	constants: Function[] = null;
 
-	constructor(options: ModuleOptions) {
-		setIfInterface(this, options);
+	constructor(options?: ModuleOptions) {
+        if (options) {
+            setIfInterface(this, options);
+        }
 	}
 
 }
@@ -78,7 +80,7 @@ export interface ModuleConstructor extends Function {
 	new (ngModule: ng.IModule): Module;
 }
 
-type ModuleSignature = (options: ModuleOptions) => ClassDecorator;
+type ModuleSignature = (options?: ModuleOptions) => ClassDecorator;
 
 /**
  * A decorator to annotate a class as being a module
@@ -119,47 +121,51 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
     var directives: any[] = [];
     var modules: any[] = [];
 
-    // TODO optimize this.. to much reflection queries
-    for (let dep of moduleNotes.dependencies) {
-        // Regular angular module
-        if (isString(dep)) {
-            modules.push(dep);
-        }
-        else if (hasAnnotation(dep, ModuleAnnotation)) {
-            if (Reflect.hasOwnMetadata(PUBLISHED_ANNOTATION_KEY, dep)) {
-                modules.push(Reflect.getOwnMetadata(PUBLISHED_ANNOTATION_KEY, dep));
+    // TODO optimize this.. to much reflection queries    
+    if (moduleNotes.dependencies) {
+        for (let dep of moduleNotes.dependencies) {
+            // Regular angular module
+            if (isString(dep)) {
+                modules.push(dep);
+            }
+            else if (hasAnnotation(dep, ModuleAnnotation)) {
+                // If the module has alrady been published to Angular, we add it's name
+                // to de dependency list
+                if (Reflect.hasOwnMetadata(PUBLISHED_ANNOTATION_KEY, dep)) {
+                    modules.push(Reflect.getOwnMetadata(PUBLISHED_ANNOTATION_KEY, dep));
+                }
+                else {
+                    modules.push(registerModule(<ModuleConstructor> dep).name);
+                }
+            }
+            else if (hasAnnotation(dep, ConstantAnnotation, 'constant')) {
+                constants.push(dep);
+            }
+            else if (hasAnnotation(dep, ValueAnnotation, 'value')) {
+                values.push(dep);
+            }
+            else if (hasAnnotation(dep, ServiceAnnotation)) {
+                services.push(dep);
+            }
+            else if (hasAnnotation(dep, DecoratorAnnotation)) {
+                decorators.push(dep);
+            }
+            else if (hasAnnotation(dep, FilterAnnotation)) {
+                filters.push(dep);
+            }
+            else if (hasAnnotation(dep, AnimationAnnotation)) {
+                animations.push(dep);
+            }
+            else if (hasAnnotation(dep, ComponentAnnotation)) {
+                components.push(dep);
+            }
+            else if (hasAnnotation(dep, DirectiveAnnotation)) {
+                directives.push(dep);
             }
             else {
-                modules.push(registerModule(<ModuleConstructor> dep).name);
+                // TODO WTF?
+                throw new Error(`I don't recognize what kind of dependency is this: ${dep}`);
             }
-        }
-        else if (hasAnnotation(dep, ConstantAnnotation, 'constant')) {
-            constants.push(dep);
-        }
-        else if (hasAnnotation(dep, ValueAnnotation, 'value')) {
-            values.push(dep);
-        }
-        else if (hasAnnotation(dep, ServiceAnnotation)) {
-            services.push(dep);
-        }
-        else if (hasAnnotation(dep, DecoratorAnnotation)) {
-            decorators.push(dep);
-        }
-        else if (hasAnnotation(dep, FilterAnnotation)) {
-            filters.push(dep);
-        }
-        else if (hasAnnotation(dep, AnimationAnnotation)) {
-            animations.push(dep);
-        }
-        else if (hasAnnotation(dep, ComponentAnnotation)) {
-            components.push(dep);
-        }
-        else if (hasAnnotation(dep, DirectiveAnnotation)) {
-            directives.push(dep);
-        }
-        else {
-            // TODO WTF?
-            throw new Error(`I don't recognize what kind of dependency is this: ${dep}`);
         }
     }
 
@@ -173,7 +179,7 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
     
     // Register config functions
     var configFns: Function[] = [];
-    if (isFunction(module.onConfig)) configFns.push(module.onConfig.bind(module));
+    if (isFunction(module.onConfig)) configFns.push(safeBind(module.onConfig, module));
     if (moduleNotes.config) {
         if (isFunction(moduleNotes.config)) configFns.push(<Function> moduleNotes.config);
         else configFns = configFns.concat(<Function[]> moduleNotes.config)
@@ -182,7 +188,7 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
     
     // Register initialization functions
     var runFns: Function[] = [];
-    if (isFunction(module.onRun)) runFns.push(module.onRun.bind(module));
+    if (isFunction(module.onRun)) runFns.push(safeBind(module.onRun, module));
     if (moduleNotes.run) {
         if (isFunction(moduleNotes.run)) runFns.push(<Function> moduleNotes.run);
         else runFns = runFns.concat(<Function[]> moduleNotes.run)
@@ -208,6 +214,6 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
 }
 
 /**
- * Unwraps a TNG module, registering it and its dependencies on Angular.
+ * Publishe a TNG module, registering it and its dependencies on Angular.
  */
-export {registerModule as unwrapModule};
+export {registerModule as publishModule};
