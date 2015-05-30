@@ -27,5 +27,8 @@
   "devDependencies": {
     "angular": "1.4.0",
     "reflect-metadata": "0.1.0"
+  },
+  "dependencies": {
+    "angular-mocks": "~1.4.0"
   }
 }

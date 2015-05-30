@@ -19,6 +19,11 @@ var del = require('del');
 var mkdir = require('mkdir-p').sync;
 var util = require('util');
 var uglifyjs = require('uglifyjs');
+var karma = require('gulp-karma');
+
+// --
+
+var test = require('./scripts/test');
 
 
 
@@ -79,6 +84,9 @@ gulp.task('watch', ['clean:browser'], watchBrowser);
 // gulp.task('build:browser:tests', ['clean:browser', 'build:browser'], buildBrowserTests);
 
 gulp.task('minify', ['build'], minifyBrowser);
+
+gulp.task('test:clean', test.clean);
+gulp.task('test:compile', ['test:clean'], test.compile);
 
 gulp.task('default', ['build']);
 
