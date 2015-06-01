@@ -55,7 +55,7 @@ declare module "tng/value" {
 	/**
 	 * A framework envelope for the value
 	 */
-	export interface ValueWrapper {
+	export class ValueWrapper {
 
 	}
 	
@@ -68,6 +68,8 @@ declare module "tng/value" {
 	 * @return A wrapper, to be used as a module dependency
 	 */
 	export function Value(name: string, value: any): ValueWrapper;
+	
+	export function publishValue(value: ValueWrapper, ngModule: ng.IModule, name?:string):ng.IModule;
 
 }
 
@@ -76,7 +78,7 @@ declare module "tng/constant" {
 	/**
 	 * A framework envelope for the constant
 	 */
-	export interface ConstantWrapper {
+	export class ConstantWrapper {
 
 	}
 	
@@ -89,6 +91,8 @@ declare module "tng/constant" {
 	 * @return A wrapper, to be used as a module dependency
 	 */
 	export function Constant(name: string, constant: any): ConstantWrapper;
+	
+	export function publishConstant(constant: ConstantWrapper, ngModule: ng.IModule, name?:string):ng.IModule;
 
 }
 
@@ -209,6 +213,21 @@ declare module "tng/service" {
 	 * A decorator to annotate a class as being a service
 	 */
 	function Service(options: ServiceOptions): ClassDecorator;
+	
+	/**
+	 * @internal
+	 */
+	export class ServiceAnnotation {
+	
+	    name: string;
+	    provider: ng.IServiceProvider|ng.IServiceProviderFactory;
+	    factory: Function;
+	
+	    constructor(options: ServiceOptions);
+	
+	}
+	
+	export function publishService(serviceClass: Function, ngModule: ng.IModule, name?: string): ng.IModule;
 	
 }
 

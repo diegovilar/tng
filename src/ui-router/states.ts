@@ -1,8 +1,8 @@
 /// <reference path="../_references" />
 
 import {bind} from '../di';
-import {makeDecorator, create, merge, isString, isFunction, Map, isArray, forEach} from '../utils';
-import {getAnnotations} from '../reflection';
+import {makeDecorator, create, isString, isFunction, Map, isArray, forEach} from '../utils';
+import {getAnnotations, mergeAnnotations} from '../reflection';
 import {ViewAnnotation} from '../view';
 
 /**
@@ -125,13 +125,15 @@ function translateToUiState(state: InternalStateConfig): ng.ui.IState {
 
 function extractViewData(viewModel: Function) {
     
-    let notes = getAnnotations(viewModel, ViewAnnotation);
+    // Reflect.decorate apply decorators reversely, so we need to reverse
+    // the extracted annotations before merging them
+    let notes = getAnnotations(viewModel, ViewAnnotation).reverse();
     
     if (!notes.length) {
         throw new Error('Template not defined');
     }
     
-    let template = merge(create(ViewAnnotation), ...notes);
+    let template = <ViewAnnotation> mergeAnnotations(create(ViewAnnotation), ...notes);
     let data:any = {};
     
     data.controller = viewModel;

@@ -64,7 +64,9 @@ export var Animation = <DecoratorSignature> makeDecorator(AnimationAnnotation);
  */
 export function registerAnimation(animationClass: AnimationConstructor, ngModule: ng.IModule) {
 
-    var aux = getAnnotations(animationClass, AnimationAnnotation);
+    // Reflect.decorate apply decorators reversely, so we need to reverse
+    // the extracted annotations before merging them
+    var aux = getAnnotations(animationClass, AnimationAnnotation).reverse();
 
     if (!aux.length) {
         throw new Error("Filter annotation not found");

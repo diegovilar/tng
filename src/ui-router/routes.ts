@@ -1,8 +1,8 @@
 /// <reference path="../_references" />
 
 import {bind} from '../di';
-import {makeDecorator, create, merge, Map, forEach} from '../utils';
-import {getAnnotations} from '../reflection';
+import {makeDecorator, create, Map, forEach} from '../utils';
+import {getAnnotations, mergeAnnotations} from '../reflection';
 
 /**
  * @internal
@@ -29,12 +29,14 @@ export var Routes = <RoutesDecorator> makeDecorator(RoutesAnnotation);
  */
 export function registerRoutes(moduleController: Function, ngModule: ng.IModule) {
     
-    var notes = <RoutesAnnotation[]> getAnnotations(moduleController, RoutesAnnotation);
+    // Reflect.decorate apply decorators reversely, so we need to reverse
+    // the extracted annotations before merging them
+    var notes = <RoutesAnnotation[]> getAnnotations(moduleController, RoutesAnnotation).reverse();
         
     if (!notes.length) return;
     
     var routes = {};
-    notes.forEach((note) => merge(routes, note.routes));
+    notes.forEach((note) => mergeAnnotations(routes, note.routes));
     
     ngModule.config(bind(['$urlRouterProvider'], ($urlRouterProvider: ng.ui.IUrlRouterProvider) => {
         

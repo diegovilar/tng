@@ -83,8 +83,10 @@ export function makeComponentDO(componentClass: ComponentConstructor): Component
 
     var cdo = <ComponentDefinitionObject> makeDirectiveDO(<DirectiveConstructor> componentClass);
 
-    // var component = merge(create(ComponentAnnotation), ...getAnnotations(componentClass, ComponentAnnotation));
-    var template = mergeAnnotations<ComponentViewAnnotation>(create(ComponentViewAnnotation), ...getAnnotations(componentClass, ComponentViewAnnotation));
+    // Reflect.decorate apply decorators reversely, so we need to reverse
+    // the extracted annotations before merging them
+    var templateNotes = getAnnotations(componentClass, ComponentViewAnnotation).reverse(); 
+    var template = mergeAnnotations<ComponentViewAnnotation>(create(ComponentViewAnnotation), ...templateNotes);
     
     // TODO Component restrictions
         

@@ -6,7 +6,7 @@ import {getAnnotations, setAnnotations} from './reflection';
 /**
  * A framework envelope for the value
  */
-export interface ValueWrapper {	
+export class ValueWrapper {	
 
 }
 
@@ -20,7 +20,7 @@ export interface ValueWrapper {
  */
 export function Value(name: string, value: any): ValueWrapper {
 
-    var wrapper: ValueWrapper = {};
+    var wrapper = new ValueWrapper();
 
     setAnnotations(wrapper, [new ValueAnnotation<any>({
         name: name,
@@ -44,7 +44,7 @@ export interface ValueOptions {
  */
 export class ValueAnnotation<Type> {
 
-    name = '';
+    name: string = null;
     value: Type = null;
 
     constructor(options: ValueOptions) {
@@ -56,7 +56,7 @@ export class ValueAnnotation<Type> {
 /**
  * @intenal
  */
-export function registerValue(value: ValueWrapper, ngModule: ng.IModule) {
+export function publishValue(value: ValueWrapper, ngModule: ng.IModule, name?:string):ng.IModule {
 
     var aux = getAnnotations(value, ValueAnnotation, 'value');
 
@@ -65,6 +65,12 @@ export function registerValue(value: ValueWrapper, ngModule: ng.IModule) {
     }
 
     var annotation = <ValueAnnotation<any>> aux[0];
-    ngModule.value(annotation.name, annotation.value);
+    name = name != null ? name : annotation.name;  
+    ngModule.value(name, annotation.value);
+    
+    return ngModule;
 
 }
+
+// TODO rename registerValue to publishValue on consumers
+export {publishValue as registerValue};

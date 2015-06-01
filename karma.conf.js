@@ -20,6 +20,7 @@ module.exports = function(config) {
       { pattern: 'bower_components/angular-mocks/angular-mocks.js', watched: false },      
       { pattern: 'bower_components/reflect-metadata/Reflect.js', watched: false },      
       { pattern: 'bower_components/**/*.map', watched: false, included: false },      
+      { pattern: 'bower_components/**/*.ts', watched: false, included: false },      
 
       // tested code
       { pattern: 'build-browser/tng.js', watched: false },

@@ -72,7 +72,9 @@ export var Decorator = <DecoratorSignature> makeDecorator(DecoratorAnnotation);
  */
 export function registerDecorator(decoratorClass: DecoratorConstructor, ngModule: ng.IModule) {
 
-    var aux = getAnnotations(decoratorClass, DecoratorAnnotation);
+    // Reflect.decorate apply decorators reversely, so we need to reverse
+    // the extracted annotations before merging them
+    var aux = getAnnotations(decoratorClass, DecoratorAnnotation).reverse();
 
     if (!aux.length) {
         throw new Error("Decorator annotation not found");

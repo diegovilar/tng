@@ -6,7 +6,7 @@ import {setAnnotations, getAnnotations} from './reflection';
 /**
  * A framework envelope for the constant
  */
-export interface ConstantWrapper {
+export class ConstantWrapper {
 
 }
 
@@ -20,7 +20,7 @@ export interface ConstantWrapper {
  */
 export function Constant(name: string, constant: any): ConstantWrapper {
 
-    var wrapper: ConstantWrapper = {};
+    var wrapper = new ConstantWrapper();
 
     setAnnotations(wrapper, [new ConstantAnnotation<any>({
         name: name,
@@ -56,7 +56,7 @@ export class ConstantAnnotation<Type> {
 /**
  * @internal
  */
-export function registerConstant(constant: ConstantWrapper, ngModule: ng.IModule) {
+export function publishConstant(constant: ConstantWrapper, ngModule: ng.IModule, name?:string):ng.IModule {
 
     var aux = getAnnotations(constant, ConstantAnnotation, 'value');
 
@@ -65,6 +65,12 @@ export function registerConstant(constant: ConstantWrapper, ngModule: ng.IModule
     }
 
     var annotation = <ConstantAnnotation<any>> aux[0];
-    ngModule.constant(annotation.name, annotation.constant);
+    name = name != null ? name : annotation.name;
+    ngModule.constant(name, annotation.constant);
+    
+    return ngModule;
 
 }
+
+// TODO rename registerConstant to publishConstant on consumers
+export {publishConstant as registerConstant}

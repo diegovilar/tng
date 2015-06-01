@@ -1,6 +1,7 @@
 /// <reference path="typings/node/node.d.ts"/>
 
 var gulp = require('gulp');
+var lodash = require('lodash');
 var watch = require('gulp-watch');
 var plumber = require('gulp-plumber');
 var runSequence = require('run-sequence');
@@ -122,6 +123,8 @@ function watchTest(cb) {
     
     var tngBundleError = null;
     var testsBundleError = null;
+    var tngBundle;
+    var testsBundle;
 
     var runTest = debounce(function runTest() {
     // var runTest = function runTest() {
@@ -133,21 +136,43 @@ function watchTest(cb) {
             gulp.start('test:run');
     // };
     }, 3000);
-    
-    var tngBundle  = watchBrowser();
-    var testsBundle = watchAndBundleTests();
-    
-    tngBundle.on('bundle.end', function (err) {
-        tngBundleError = err;
-        runTest.cancel();
-        runTest();
+        
+    linkTngBundle();
+    linkTestsBundle();
+        
+    watch('src/**/*', function (file) {
+        if (file.event == 'add' || file.event == 'unlink') {
+            log(colors.green('File ' + file.event + 'ed to TNG. Restarting bundler...'));
+            tngBundle.bundler.close();
+            linkTngBundle();
+        }
     });
     
-    testsBundle.on('bundle.end', function (err) {
-        testsBundleError = err;
-        runTest.cancel();
-        runTest();
+    watch('test/**/*', function (file) {
+        if (file.event == 'add' || file.event == 'unlink') {
+            log(colors.green('File ' + file.event + 'ed to tests. Restarting bundler...'));
+            testsBundle.bundler.close();
+            linkTestsBundle();
+        }
     });
+    
+    function linkTngBundle() {
+        tngBundle = watchBrowser();
+        tngBundle.events.on('bundle.end', function (err) {
+            tngBundleError = err;
+            runTest.cancel();
+            runTest();
+        });
+    }
+    
+    function linkTestsBundle() {
+        testsBundle = watchAndBundleTests();
+        testsBundle.events.on('bundle.end', function (err) {
+            testsBundleError = err;
+            runTest.cancel();
+            runTest();
+        });
+    }
     
 }
 
@@ -233,8 +258,12 @@ function watchBrowser() {
 
 function watchAndBundleTests() {
     
+    var files = glob.sync('test/**/*.spec.ts');
+    // files = files.concat(glob.sync('test/**/*.ts'));
+    // files = lodash.uniq(files);
+    
      return bundle(
-        glob.sync('test/**/*spec.ts'),
+        files,
         null,
         buildBrowserDir,
         'tng-tests.js',
@@ -247,6 +276,7 @@ function bundle(entryFilePath, requires, destPath, destFileName, continuous) {
     
     var emitter = new EventEmitter2({wildcard: true});
     var bundler;
+    var lastBundle;
     
     var bundlerOptions = {
         debug: true,
@@ -284,26 +314,32 @@ function bundle(entryFilePath, requires, destPath, destFileName, continuous) {
     function run() {
         mkdir(destPath);
 
-        var b = bundler.bundle();
-        proxyEmitter(b, emitter, 'bundle');
+        lastBundle = bundler.bundle();
+        proxyEmitter(lastBundle, emitter, 'bundle');
         
         // Error handling
-        b.on('error', onBundleError)
+        lastBundle.on('error', onBundleError)
             .pipe(plumber());
             
-        b.pipe(output(destFileName))
+        lastBundle.pipe(output(destFileName))
             .pipe(buffer())
             .pipe(sourcemaps.init({ loadMaps: true }))
             .pipe(sourcemaps.write('./'))
             .pipe(gulp.dest(destPath));
         
-        return b;
+        return lastBundle;
     }
         
     // Always run once at startup (even if watching)
     run();
     
-    return emitter; 
+    return {
+        bundler: bundler,
+        events: emitter,
+        getBundle: function() {
+            return lastBundle;
+        }
+    };
     
 }
 

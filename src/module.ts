@@ -103,7 +103,9 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
     var aux: any[];
     var moduleNotes: ModuleAnnotation;
 
-    aux = getAnnotations(moduleClass, ModuleAnnotation);
+    // Reflect.decorate apply decorators reversely, so we need to reverse
+    // the extracted annotations before merging them
+    aux = getAnnotations(moduleClass, ModuleAnnotation).reverse();
 
     if (!aux.length) {
         throw new Error('No module annotation found');

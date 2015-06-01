@@ -153,7 +153,9 @@ const RESTRICTION_MAP: Map<string> = {
  */
 export function makeDirectiveDO(directiveClass: DirectiveConstructor): DirectiveDefinitionObject {
 
-    var directive = mergeAnnotations<DirectiveAnnotation>(create(DirectiveAnnotation), ...getAnnotations(directiveClass, DirectiveAnnotation));
+    // Reflect.decorate apply decorators reversely, so we need to reverse
+    // the extracted annotations before merging them
+    var directive = mergeAnnotations<DirectiveAnnotation>(create(DirectiveAnnotation), ...getAnnotations(directiveClass, DirectiveAnnotation).reverse());
 
     var selectorData = parseSelector(directive.selector);
     var ddo: DirectiveDefinitionObject = {

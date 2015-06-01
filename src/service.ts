@@ -28,7 +28,7 @@ export interface ServiceOptions {
  */
 export class ServiceAnnotation {
 
-    name = '';
+    name:string = null;
     provider: ng.IServiceProvider|ng.IServiceProviderFactory = null;
     factory: Function = null;
 
@@ -63,16 +63,18 @@ export var Service = <DecoratorSignature> makeDecorator(ServiceAnnotation);
 /**
  * @internal
  */
-export function registerService(serviceClass: ServiceConstructor, ngModule: ng.IModule) {
+export function publishService(serviceClass: ServiceConstructor, ngModule: ng.IModule, name?: string): ng.IModule {
 
-    var aux = getAnnotations(serviceClass, ServiceAnnotation);
+    // Reflect.decorate apply decorators reversely, so we need to reverse
+    // the extracted annotations before merging them
+    var aux = getAnnotations(serviceClass, ServiceAnnotation).reverse();
 
     if (!aux.length) {
         throw new Error("Service annotation not found");
     }
 
     var annotation = mergeAnnotations<ServiceAnnotation>(create(ServiceAnnotation), ...aux);
-    var name = annotation.name;
+    var name = name != null ? name : annotation.name;
 
     if (annotation.provider) {
         ngModule.provider(name, <any> annotation.provider);
@@ -84,5 +86,10 @@ export function registerService(serviceClass: ServiceConstructor, ngModule: ng.I
         // TODO Is it invoked later with $injector.invoke()?
         ngModule.service(name, serviceClass);
     }
+    
+    return ngModule;
 
 }
+
+// TODO rename registerService to publishService on consumers
+export {publishService as registerService};
