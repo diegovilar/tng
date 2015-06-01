@@ -1,7 +1,7 @@
 /// <reference path="./_references" />
 
-import {getAnnotations} from './reflection';
-import {makeDecorator, setIfInterface, merge, create, isFunction} from './utils';
+import {getAnnotations, mergeAnnotations} from './reflection';
+import {makeDecorator, setIfInterface, create, isFunction} from './utils';
 import {bind} from './di';
 
 /**
@@ -83,7 +83,7 @@ export function registerFilter(filterClass: FilterConstructor, ngModule: ng.IMod
         throw new Error("Filter annotation not found");
     }
 
-    var {name} = merge(create(FilterAnnotation), ...aux);
+    var {name} = mergeAnnotations<FilterAnnotation>(create(FilterAnnotation), ...aux);
 
     if (!isFunction(filterClass.prototype.filter)) {
         throw new Error(`Filter "${name}" does not implement a filter method`);

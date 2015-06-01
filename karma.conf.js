@@ -18,16 +18,16 @@ module.exports = function(config) {
       // libraries
       { pattern: 'bower_components/angular/angular.js', watched: false },
       { pattern: 'bower_components/angular-mocks/angular-mocks.js', watched: false },      
+      { pattern: 'bower_components/reflect-metadata/Reflect.js', watched: false },      
+      { pattern: 'bower_components/**/*.map', watched: false, included: false },      
 
       // tested code
       { pattern: 'build-browser/tng.js', watched: false },
       { pattern: 'build-browser/tng.js.map', watched: false, included: false },
-      { pattern: 'src/**/*.ts', watched: false, included: false },
 
       // specs
-      { pattern: 'test/**/*.js', watched: false },
-      { pattern: 'test/**/*.map', watched: false, included: false },
-      { pattern: 'test/**/*.ts', watched: false, included: false }
+      { pattern: 'build-browser/tng-tests.js', watched: false },
+      { pattern: 'build-browser/tng-tests.js.map', watched: false, included: false }
     ],
 
 

@@ -1,9 +1,9 @@
 /// <reference path="./_references" />
 
 import {Inject, bind, hasInjectAnnotation} from './di';
-import {makeDecorator, Map, setIfInterface, merge, create, isFunction} from './utils';
+import {makeDecorator, Map, setIfInterface, create, isFunction} from './utils';
 import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils';
-import {getAnnotations} from './reflection';
+import {getAnnotations, mergeAnnotations} from './reflection';
 import {ViewAnnotation} from './view';
 import {ComponentViewAnnotation, NAMESPACE_MAP} from './component-view';
 import {CommonDirectiveOptions, CommonDirectiveAnnotation} from './directive'
@@ -84,7 +84,7 @@ export function makeComponentDO(componentClass: ComponentConstructor): Component
     var cdo = <ComponentDefinitionObject> makeDirectiveDO(<DirectiveConstructor> componentClass);
 
     // var component = merge(create(ComponentAnnotation), ...getAnnotations(componentClass, ComponentAnnotation));
-    var template = merge(create(ComponentViewAnnotation), ...getAnnotations(componentClass, ComponentViewAnnotation));
+    var template = mergeAnnotations<ComponentViewAnnotation>(create(ComponentViewAnnotation), ...getAnnotations(componentClass, ComponentViewAnnotation));
     
     // TODO Component restrictions
         

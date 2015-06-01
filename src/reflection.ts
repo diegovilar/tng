@@ -1,5 +1,7 @@
 /// <reference path="./_references" />
 
+import {forEach} from './utils';
+
 export const ANNOTATIONS_METADATA_KEY = 'tng';
 
 var _Reflect = Reflect;
@@ -21,13 +23,13 @@ export function getAnnotations(target: any, type?: Function, key?: string): any[
 
 }
 
-export function setAnnotations(target: any, annotations: any[], key?: string) {
+export function setAnnotations(target: any, annotations: any[], key?: string):void {
 
 	Reflect.defineMetadata(getKey(key), annotations, target);
 
 }
 
-export function addAnnotation(target: any, annotation: any, key?: string) {
+export function addAnnotation(target: any, annotation: any, key?: string):void {
 
 	var annotations = getAnnotations(target, null, key);
 	annotations.push(annotation);
@@ -43,4 +45,29 @@ export function hasAnnotation(target: any, type?: Function, key?: string): boole
 
 	return getAnnotations(target, type, key).length > 0;
 
+}
+
+// export function mergeAnnotations(...annotations: any[]): any;
+export function mergeAnnotations<Type>(...annotations: any[]): Type;
+export function mergeAnnotations(...annotations: any[]): any {
+	
+	if (!annotations.length) {
+		return null;
+	}
+	else if (annotations.length == 1) {
+		return annotations[0];
+	}
+	
+	var dest = <{[key:string]:any}><any> annotations.shift();
+	
+	for (let source of annotations) {
+		forEach(source, (value, key) => {
+			if (value != null) {
+				dest[key] = value;
+			}
+		});
+	}
+	
+	return <any> dest;
+	
 }

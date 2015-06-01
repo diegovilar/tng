@@ -16,6 +16,7 @@ export var forEach = angular.forEach;
 export var extend = <extendSignature> angular.extend;
 export var copy = <extendSignature> angular.copy;
 export var merge = <extendSignature> (<any> angular).merge;
+export var mergeIfValue = <extendSignature> _mergeIfValue;
 
 export type FunctionReturningNothing = (...args: any[]) => void;
 export type FunctionReturningSomething = (...args: any[]) => any;
@@ -176,4 +177,50 @@ export function safeBind<TFunc extends Function>(func: TFunc, context: any):TFun
     
     return bound;
     
+}
+
+
+
+// --
+
+/**
+ * Set or clear the hashkey for an object.
+ * @param obj object
+ * @param h the hashkey (!truthy to delete the hashkey)
+ */
+function setHashKey(obj:any, h:any) {
+  if (h) {
+    obj.$$hashKey = h;
+  } else {
+    delete obj.$$hashKey;
+  }
+}
+
+
+function baseExtend(dst:any, objs:any[], deep:boolean, ifValue:boolean=false):any {
+  var h = dst.$$hashKey;
+
+  for (var i = 0, ii = objs.length; i < ii; ++i) {
+    var obj = objs[i];
+    if (!isObject(obj) && !isFunction(obj)) continue;
+    var keys = Object.keys(obj);
+    for (var j = 0, jj = keys.length; j < jj; j++) {
+      var key = keys[j];
+      var src = obj[key];
+
+      if (deep && isObject(src)) {
+        if (!isObject(dst[key])) dst[key] = isArray(src) ? [] : {};
+        baseExtend(dst[key], [src], true);
+      } else if (!ifValue || src != null) {
+        dst[key] = src;
+      }
+    }
+  }
+
+  setHashKey(dst, h);
+  return dst;
+}
+
+function _mergeIfValue(dst:any):any {
+    return baseExtend(dst, [].slice.call(arguments, 1), true, true);    
 }

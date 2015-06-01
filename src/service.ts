@@ -1,7 +1,7 @@
 /// <reference path="./_references" />
 
-import {getAnnotations} from './reflection';
-import {makeDecorator, setIfInterface, merge, create, isFunction} from './utils';
+import {getAnnotations, mergeAnnotations} from './reflection';
+import {makeDecorator, setIfInterface, create, isFunction} from './utils';
 
 /**
  * Options available when decorating a class as a service
@@ -71,7 +71,7 @@ export function registerService(serviceClass: ServiceConstructor, ngModule: ng.I
         throw new Error("Service annotation not found");
     }
 
-    var annotation = merge(create(ServiceAnnotation), ...aux);
+    var annotation = mergeAnnotations<ServiceAnnotation>(create(ServiceAnnotation), ...aux);
     var name = annotation.name;
 
     if (annotation.provider) {

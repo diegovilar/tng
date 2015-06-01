@@ -15,6 +15,13 @@ declare module "tng" {
 	export {Module, publishModule} from "tng/module";
 	export {Application} from "tng/application";
 	export {bootstrap} from "tng/bootstrap";
+	
+	export {
+		getAnnotations,
+		setAnnotations,
+		addAnnotation,
+		hasAnnotation
+	} from 'tng/reflection';
 }
 
 declare module "tng/di" {
@@ -447,6 +454,31 @@ declare module "tng/module" {
 	 * Publishe a TNG module, registering it and its dependencies on Angular.
 	 */
 	export function publishModule(moduleController: Function, name?: string): ng.IModule;
+	
+	// -- Internal API
+	
+	/**
+	 * @internal
+	 */
+	export class ModuleAnnotation {
+	
+		dependencies: (string|Function)[];
+		config: Function|Function[];
+		run: Function|Function[];
+	
+		name: string;
+		modules: (string|Function)[];
+		components: Function[];
+		services: Function[];
+		filters: Function[];
+		decorators: Function[];
+		animations: Function[];
+		values: Function[];
+		constants: Function[];
+	
+		constructor(options?: ModuleOptions);
+	
+	}
 		
 }
 
@@ -539,5 +571,19 @@ declare module "tng/ui-router/routes" {
 	 * A decorator to annotate with routes
 	 */
 	function Routes(routes: RoutesMap): ClassDecorator;
+	
+}
+
+// --
+
+declare module 'tng/reflection' {
+	
+	export function getAnnotations(target: any, type?: Function, key?: string): any[];
+	
+	export function setAnnotations(target: any, annotations: any[], key?: string): void;
+	
+	export function addAnnotation(target: any, annotation: any, key?: string): void;
+	
+	export function hasAnnotation(target: any, type?: Function, key?: string): boolean;	
 	
 }

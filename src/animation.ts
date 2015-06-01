@@ -1,10 +1,10 @@
 /// <reference path="./_references" />
 
-import {getAnnotations} from './reflection';
+import {getAnnotations, mergeAnnotations} from './reflection';
 import {bind} from './di';
 import {makeDecorator, FunctionReturningSomething, setIfInterface} from './utils';
-import {merge, create, isFunction, bindAll} from './utils';
-
+import {create, isFunction, bindAll} from './utils';
+// ds()
 /**
  * Options available when decorating a class as an animation controller
  * TODO document
@@ -70,7 +70,7 @@ export function registerAnimation(animationClass: AnimationConstructor, ngModule
         throw new Error("Filter annotation not found");
     }
 
-    var {name} = merge(create(AnimationAnnotation), ...aux);
+    var {name} = mergeAnnotations<AnimationAnnotation>(create(AnimationAnnotation), ...aux);
 
     // TODO validate implementation?
 

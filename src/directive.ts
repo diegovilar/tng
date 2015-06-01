@@ -1,9 +1,9 @@
 /// <reference path="./_references" />
 
 import {Inject, bind, hasInjectAnnotation} from './di';
-import {makeDecorator, Map, setIfInterface, merge, create, isFunction} from './utils';
+import {makeDecorator, Map, setIfInterface, create, isFunction} from './utils';
 import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils';
-import {getAnnotations} from './reflection';
+import {getAnnotations, mergeAnnotations} from './reflection';
 
 /**
  * TODO document
@@ -153,7 +153,7 @@ const RESTRICTION_MAP: Map<string> = {
  */
 export function makeDirectiveDO(directiveClass: DirectiveConstructor): DirectiveDefinitionObject {
 
-    var directive = merge(create(DirectiveAnnotation), ...getAnnotations(directiveClass, DirectiveAnnotation));
+    var directive = mergeAnnotations<DirectiveAnnotation>(create(DirectiveAnnotation), ...getAnnotations(directiveClass, DirectiveAnnotation));
 
     var selectorData = parseSelector(directive.selector);
     var ddo: DirectiveDefinitionObject = {

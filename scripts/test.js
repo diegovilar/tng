@@ -1,72 +1,88 @@
 /// <reference path="../typings/node/node.d.ts"/>
 
 var gulp = require('gulp');
-var karma = require('gulp-karma');
+var karma = require('karma');
 var ts = require("typescript");
 var tsc = require('./tsc');
 var del = require('del');
 
-var sourceTestFiles = "./tests/**/*.ts";
-var compiledTestFiles = "./tests/**/*.js";
-var compiledTestMaps = "./tests/**/*.map";
-var karmaConfigFile = './karma.conf.js';
+
+
+// --
+
+var sourceSpecFiles = "test/**/*.ts";
+var compiledSpecFiles = "test/**/*.js";
+var compiledTestMaps = "test/**/*.map";
+var karmaConfigFile = __dirname + '/../karma.conf.js';
 
 var testCompileOptions = {
-  noEmitOnError: true,
-  noImplicitAny: true,
-  preserveConstEnums: true,
-  sourceMap: true,
-  target: ts.ScriptTarget.ES5,
-  module: ts.ModuleKind.CommonJS
+    noEmitOnError: true,
+    noImplicitAny: true,
+    preserveConstEnums: true,
+    sourceMap: true,
+    target: ts.ScriptTarget.ES5,
+    module: ts.ModuleKind.CommonJS
 };
 
 
 
 // --
 
-exports.cleanTest = cleanTest;
-exports.compileTest = compileTest;
+exports.sourceSpecFiles = sourceSpecFiles;
+
+exports.clean = cleanTest;
+exports.compile = compileTest;
+exports.run = runTest;
+exports.server = startServer;
+
+
+
+// --
+
+gulp.task('test:clean', cleanTest);
+gulp.task('test:compile', ['test:clean'], compileTest);
+// gulp.task('test:run', ['test:compile'], runTest);
+gulp.task('test:run', runTest);
+gulp.task('test:server', startServer);
 
 
 
 // ---
 
 function cleanTest(cb) {
-  del([compiledTestFiles, compiledTestMaps], cb);
+    del([compiledSpecFiles, compiledTestMaps], cb);
 }
 
 function compileTest(cb) {
-  
-  var glob = require('glob');
-  var sourceTestFiles = glob.sync(sourceTestFiles);
+    
+    var glob = require('glob');
+    var files = glob.sync(sourceSpecFiles);
 
-  for (var i = 0; i < sourceTestFiles.length; i++) {
-    var file = sourceTestFiles[i];
-    tsc.compile([file], testCompileOptions);
-  }
-  
-  cb();
-  
+    for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        tsc.compile([file], testCompileOptions);
+    }
+    
+    cb();
+    
 }
 
+function runTest(cb) {
 
-function karmaRun() {
-  // Be sure to return the stream 
-  return gulp.src(compiledTestFiles)
-    .pipe(karma({
-      configFile: karmaConfigFile,
-      action: 'run'
-    }))
-    .on('error', function (err) {
-      // Make sure failed tests cause gulp to exit non-zero 
-      throw err;
+    karma.runner.run({
+        configFile: karmaConfigFile
+    }, function () {
+      cb();
     });
-};
+
+}
  
-function watch() {
-  gulp.src(sourceTestFiles)
-    .pipe(karma({
-      configFile: karmaConfigFile,
-      action: 'watch'
-    }));
+function startServer(cb) {
+
+    karma.server.start({
+        configFile: karmaConfigFile,
+        singleRun: false
+    });
+    
+    setTimeout(cb, 5000);
 };

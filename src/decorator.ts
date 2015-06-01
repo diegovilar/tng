@@ -1,8 +1,8 @@
 /// <reference path="./_references" />
 
 import {bind} from './di';
-import {getAnnotations} from './reflection';
-import {makeDecorator, setIfInterface, merge, create, isFunction} from './utils';
+import {getAnnotations, mergeAnnotations} from './reflection';
+import {makeDecorator, setIfInterface, create, isFunction} from './utils';
 
 /**
  * Options available when decorating a class as a service decorator
@@ -78,7 +78,7 @@ export function registerDecorator(decoratorClass: DecoratorConstructor, ngModule
         throw new Error("Decorator annotation not found");
     }
 
-    var {name} = merge(create(DecoratorAnnotation), ...aux);
+    var {name} = mergeAnnotations<DecoratorAnnotation>(create(DecoratorAnnotation), ...aux);
 
     if (!isFunction(decoratorClass.prototype.decorate)) {
         throw new Error(`Decorator "${name}" does not implement a decorate method`);

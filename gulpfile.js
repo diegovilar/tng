@@ -1,6 +1,9 @@
 /// <reference path="typings/node/node.d.ts"/>
 
 var gulp = require('gulp');
+var watch = require('gulp-watch');
+var plumber = require('gulp-plumber');
+var runSequence = require('run-sequence');
 var gutil = require('gulp-util');
 var colors = gutil.colors;
 var copy = require('gulp-copy');
@@ -19,7 +22,13 @@ var del = require('del');
 var mkdir = require('mkdir-p').sync;
 var util = require('util');
 var uglifyjs = require('uglifyjs');
-var karma = require('gulp-karma');
+var EventEmitter2 = require('eventemitter2').EventEmitter2
+var es = require('event-stream');
+var glob = require("glob");
+var batch = require('gulp-batch');
+var debounce = require('mout/function/debounce');
+
+
 
 // --
 
@@ -29,6 +38,7 @@ var test = require('./scripts/test');
 
 // -- Paths --
 
+var srcFiles = 'src/**/*.ts';
 var srcDir = './src';
 var buildDir = './build';
 var buildBrowserDir = './build-browser';
@@ -68,6 +78,8 @@ var exportedModules = [
 
 // -- Tasks --
 
+gulp.task('default', ['build']);
+
 gulp.task('clean:build', cleanBuild);
 gulp.task('clean:browser', cleanBuildBrowser);
 
@@ -85,11 +97,59 @@ gulp.task('watch', ['clean:browser'], watchBrowser);
 
 gulp.task('minify', ['build'], minifyBrowser);
 
-gulp.task('test:clean', test.clean);
-gulp.task('test:compile', ['test:clean'], test.compile);
+gulp.task('test:watch', watchTest);
 
-gulp.task('default', ['build']);
 
+
+
+// --
+
+function proxyEmitter(emitter, proxy, prefix) {
+  var oldEmit = emitter.emit;
+
+  emitter.emit = function () {
+      var proxyArgs = [].slice.call(arguments, 1);
+      proxyArgs.unshift(prefix + '.' + arguments[0]);
+      // console.log('** ' + arguments[0] + ' proxied as ' + proxyArgs[0]);
+      proxy.emit.apply(proxy, proxyArgs);
+      oldEmit.apply(emitter, arguments);
+  };
+  
+  return emitter;
+}
+
+function watchTest(cb) {
+    
+    var tngBundleError = null;
+    var testsBundleError = null;
+
+    var runTest = debounce(function runTest() {
+    // var runTest = function runTest() {
+        if (tngBundleError)
+            log(colors.yellow('Skiping tests due to TNG bundle error'));
+        else if (testsBundleError)
+            log(colors.yellow('Skiping tests due to tests bundle error'));
+        else
+            gulp.start('test:run');
+    // };
+    }, 3000);
+    
+    var tngBundle  = watchBrowser();
+    var testsBundle = watchAndBundleTests();
+    
+    tngBundle.on('bundle.end', function (err) {
+        tngBundleError = err;
+        runTest.cancel();
+        runTest();
+    });
+    
+    testsBundle.on('bundle.end', function (err) {
+        testsBundleError = err;
+        runTest.cancel();
+        runTest();
+    });
+    
+}
 
 function cleanBuild(cb) {
     del(buildDir + '/*', cb);
@@ -159,7 +219,7 @@ function buildBrowser() {
   
 }
 
-function watchBrowser(cb) {
+function watchBrowser() {
     
      return bundle(
         null,
@@ -171,8 +231,21 @@ function watchBrowser(cb) {
     
 }
 
-function bundle(entryFilePath, requires, destPath, destFileName, watch) {
+function watchAndBundleTests() {
     
+     return bundle(
+        glob.sync('test/**/*spec.ts'),
+        null,
+        buildBrowserDir,
+        'tng-tests.js',
+        true
+    );
+    
+}
+
+function bundle(entryFilePath, requires, destPath, destFileName, continuous) {
+    
+    var emitter = new EventEmitter2({wildcard: true});
     var bundler;
     
     var bundlerOptions = {
@@ -180,7 +253,7 @@ function bundle(entryFilePath, requires, destPath, destFileName, watch) {
         bundleExternal: false
     };
     
-    if (watch) {
+    if (continuous) {
         bundlerOptions = assign({}, watchify.args, bundlerOptions);
         bundler = watchify(browserify(entryFilePath, bundlerOptions));
         bundler.on('log', log);        
@@ -193,7 +266,9 @@ function bundle(entryFilePath, requires, destPath, destFileName, watch) {
     }
     else {
         bundler = browserify(entryFilePath, bundlerOptions); 
-    }    
+    }
+    
+    proxyEmitter(bundler, emitter, 'bundler');
     
     bundler.plugin('tsify', parseTypescriptConfig().compilerOptions);
     
@@ -201,19 +276,34 @@ function bundle(entryFilePath, requires, destPath, destFileName, watch) {
         bundler.require(requires);
     }
     
+    function onBundleError(err) {
+        log(colors.red('Bundle "' + destFileName + '" error:'), err.message);
+        this.emit('end', err);
+    }
+    
     function run() {
         mkdir(destPath);
-        return bundler
-            .bundle()
-            .pipe(output(destFileName))
+
+        var b = bundler.bundle();
+        proxyEmitter(b, emitter, 'bundle');
+        
+        // Error handling
+        b.on('error', onBundleError)
+            .pipe(plumber());
+            
+        b.pipe(output(destFileName))
             .pipe(buffer())
-            .pipe(sourcemaps.init({loadMaps: true}))
+            .pipe(sourcemaps.init({ loadMaps: true }))
             .pipe(sourcemaps.write('./'))
-            .pipe(gulp.dest(destPath))
-            .on('error', log.bind(gutil, colors.red('Browserify Error')));
+            .pipe(gulp.dest(destPath));
+        
+        return b;
     }
         
-    return run(); 
+    // Always run once at startup (even if watching)
+    run();
+    
+    return emitter; 
     
 }
 

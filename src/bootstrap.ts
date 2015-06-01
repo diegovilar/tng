@@ -20,8 +20,8 @@ To process a module is to:
         - Register config and run functions
 */
 
-import {getAnnotations} from './reflection';
-import {merge, create} from './utils';
+import {getAnnotations, mergeAnnotations} from './reflection';
+import {create} from './utils';
 import {ApplicationConstructor, ApplicationAnnotation} from './application';
 import {ModuleConstructor, ModuleAnnotation, registerModule} from './module';
 
@@ -40,7 +40,7 @@ export function bootstrap(moduleClass: ModuleConstructor, selectorOrElement?: an
     if (!aux.length) {
         throw new Error('No module annotation found');
     }
-    appNotes = merge(create(ApplicationAnnotation), ...aux);
+    appNotes = mergeAnnotations<ApplicationAnnotation>(create(ApplicationAnnotation), ...aux);
 
     selectorOrElement = selectorOrElement || appNotes.selector;
     if (!selectorOrElement) {

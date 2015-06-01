@@ -1,8 +1,8 @@
 /// <reference path="./_references" />
 
-import {getAnnotations, hasAnnotation, Reflect} from './reflection';
+import {getAnnotations, hasAnnotation, mergeAnnotations, Reflect} from './reflection';
 import {makeDecorator, setIfInterface, FunctionReturningNothing} from './utils';
-import {merge, create, isString, isFunction, safeBind} from './utils';
+import {create, isString, isFunction, safeBind} from './utils';
 import {ValueAnnotation, registerValue} from './value';
 import {ConstantAnnotation, registerConstant} from './constant';
 import {FilterAnnotation, registerFilter} from './filter';
@@ -45,7 +45,7 @@ export class ModuleAnnotation {
 	config: Function|Function[] = null;
 	run: Function|Function[] = null;
 
-	name: string = '';
+	name: string = null;
 	modules: (string|Function)[] = null;
 	components: Function[] = null;
 	services: Function[] = null;
@@ -109,7 +109,7 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
         throw new Error('No module annotation found');
     }
 
-    moduleNotes = merge(create(ModuleAnnotation), ...aux);
+    moduleNotes = mergeAnnotations<ModuleAnnotation>(create(ModuleAnnotation), ...aux);
 
     var constants: any[] = [];
     var values: any[] = [];
