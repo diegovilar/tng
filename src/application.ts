@@ -1,5 +1,8 @@
 /// <reference path="./_references" />
 
+// TODO debug only?
+import {assert} from './assert';
+
 import {makeDecorator, setIfInterface} from './utils';
 import {ModuleOptions, ModuleAnnotation, Module, ModuleConstructor} from './module';
 
@@ -16,10 +19,15 @@ export interface ApplicationOptions extends ModuleOptions {
  */
 export class ApplicationAnnotation extends ModuleAnnotation {
 
-	selector: string = null;
+	selector: string = void 0;
 
 	constructor(options: ApplicationOptions) {
 		super(options);
+		
+		// TODO debug only?
+        assert.notNull(options, 'options must not be null');
+        assert.notEmpty(options.selector, 'selector cannot be null or empty');
+		
 		setIfInterface(this, options);
 	}
 

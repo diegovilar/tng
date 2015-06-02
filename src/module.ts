@@ -109,9 +109,14 @@ export function publishModule(moduleClass: ModuleConstructor, name?: string): ng
 
     // TODO debug only?
     assert.notEmpty(aux, 'Missing @Module decoration');
+    
+    // Has this module already been published?
+    var publishedAs: string;
+    if (publishedAs = Reflect.getOwnMetadata(PUBLISHED_ANNOTATION_KEY, moduleClass)) {
+        return angular.module(publishedAs);
+    }
 
-    var annotation = <ModuleAnnotation> {/*no defaults*/}
-    mergeAnnotations(annotation, ...aux);
+    var annotation = <ModuleAnnotation> mergeAnnotations(Object.create(null), ...aux);    
 
     var constants: any[] = [];
     var values: any[] = [];
@@ -131,10 +136,9 @@ export function publishModule(moduleClass: ModuleConstructor, name?: string): ng
                 modules.push(dep);
             }
             else if (hasAnnotation(dep, ModuleAnnotation)) {
-                // If the module has alrady been published to Angular, we add it's name
-                // to de dependency list
-                if (Reflect.hasOwnMetadata(PUBLISHED_ANNOTATION_KEY, dep)) {
-                    modules.push(Reflect.getOwnMetadata(PUBLISHED_ANNOTATION_KEY, dep));
+                // If the module has alrady been published, we just push it's name
+                if (publishedAs = Reflect.getOwnMetadata(PUBLISHED_ANNOTATION_KEY, dep)) {
+                    modules.push(publishedAs);
                 }
                 else {
                     modules.push(publishModule(<ModuleConstructor> dep).name);

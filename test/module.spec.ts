@@ -8,9 +8,9 @@ import * as assets from './assets/test-module';
 
 describe('@Module >', function() {
 	
-	beforeEach(angularSpy.spyAndCallThrough);
-	
 	describe('publishModule >', function() {
+		
+		beforeEach(angularSpy.spyAndCallThrough);
 		
 		it('should only accept classes decorated through @Module', function() {
 			function aModule() {
@@ -73,6 +73,8 @@ describe('@Module >', function() {
 	
 	describe('config >', function() {
 		
+		beforeEach(angularSpy.spyAndCallThrough);
+		
 		it('if configuration functions are provided through decoration, register them', function() {
 			var moduleSpy = <ModuleSpy><any> publishModule(assets.ModuleWithConfigDecoration);
 			expect(moduleSpy.config).toHaveBeenCalled();
@@ -90,33 +92,40 @@ describe('@Module >', function() {
 			angular.mock.module('ModuleWithConfigDecorationAndImplementation');
 			angular.mock.inject();
 			
-			expect(assets.configCallOrder).toEqual(['implementation', 'decoration']);
+			expect(assets.ModuleWithConfigDecorationAndImplementation.configCallOrder).toEqual(['implementation', 'decoration']);
 		});
 		
 	});
 	
 	describe('run >', function() {
 		
+		beforeEach(angularSpy.spyAndCallThrough);
+		
 		it('if initialization functions are provided through decoration, register them', function() {
-			var moduleSpy = <ModuleSpy><any> publishModule(assets.ModuleWithRunDecoration);
-			expect(moduleSpy.run).toHaveBeenCalled();
+			var ngModule = publishModule(assets.ModuleWithRunDecoration);
+			expect(ngModule.run).toHaveBeenCalled();
 		});
 		
 		it('if initialization functions are provided through implementation, register them', function() {
-			var moduleSpy = <ModuleSpy><any> publishModule(assets.ModuleWithRunImplementation);
-			expect(moduleSpy.run).toHaveBeenCalled();
+			var ngModule =publishModule(assets.ModuleWithRunImplementation);
+			expect(ngModule.run).toHaveBeenCalled();
 		});
 		
 		it('implementation initialization functions get registered BEFORE decoration initialization functions', function() {
-			var moduleSpy = <ModuleSpy><any> publishModule(assets.ModuleWithRunDecorationAndImplementation);
+			publishModule(assets.ModuleWithRunDecorationAndImplementation);
 			
 			// load the module
 			angular.mock.module('ModuleWithRunDecorationAndImplementation');
 			angular.mock.inject();
 			
-			expect(assets.configCallOrder).toEqual(['implementation', 'decoration']);
+			expect(assets.ModuleWithRunDecorationAndImplementation.runCallOrder).toEqual(['implementation', 'decoration']);
 		});
 		
 	});
+	
+	it('module constructors should receive a reference to their respective angular module when instantiating', function() {
+		var ngModule = publishModule(assets.ModuleToTestIfConstructorGetsCalledWithNgModule);
+		expect(ngModule).toBe(assets.ModuleToTestIfConstructorGetsCalledWithNgModule.injectedModule);
+	})
 	
 });

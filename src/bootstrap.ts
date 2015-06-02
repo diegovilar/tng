@@ -20,6 +20,9 @@ To process a module is to:
         - Register config and run functions
 */
 
+// TODO debug only?
+import {assert} from './assert';
+
 import {getAnnotations, mergeAnnotations} from './reflection';
 import {create} from './utils';
 import {ApplicationConstructor, ApplicationAnnotation} from './application';
@@ -33,19 +36,19 @@ export function bootstrap(moduleClass: ModuleConstructor, element: Element): ng.
 export function bootstrap(moduleClass: ModuleConstructor, selector: string): ng.auto.IInjectorService;
 export function bootstrap(moduleClass: ModuleConstructor, selectorOrElement?: any): ng.auto.IInjectorService {
 
-    var aux: ModuleAnnotation[];
-    var appNotes: ApplicationAnnotation;
+    // Reflect.decorate apply decorators reversely, so we need to reverse
+    // the extracted annotations before merging them
+    var aux = getAnnotations(moduleClass, ModuleAnnotation).reverse();
+    
+    // TODO debug only?
+    assert.notEmpty(aux, 'Missing @Application or @Module decoration');
+    
+    var annotation = <ApplicationAnnotation> mergeAnnotations({}, ...aux);
 
-    aux = getAnnotations(moduleClass, ModuleAnnotation);
-    if (!aux.length) {
-        throw new Error('No module annotation found');
-    }
-    appNotes = mergeAnnotations<ApplicationAnnotation>(create(ApplicationAnnotation), ...aux);
-
-    selectorOrElement = selectorOrElement || appNotes.selector;
-    if (!selectorOrElement) {
-        throw new Error('No selector specified');
-    }
+    selectorOrElement = selectorOrElement || annotation.selector;
+    
+    // TODO debug only?
+    assert(selectorOrElement, 'No selector specified');
 
     var ngModule = publishModule(moduleClass);
 

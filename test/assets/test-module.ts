@@ -4,17 +4,10 @@ import {Module} from 'tng/module';
 
 // --
 
-export var constructorParameter: any;
-
 @Module({
 	name: 'NamedModule'
 })	
 export class NamedModule {
-	
-	constructor(ngModule: any) {
-		constructorParameter = ngModule;
-	}
-	
 }
 
 // --
@@ -87,19 +80,18 @@ export class ModuleWithConfigImplementation {
 
 // --
 
-var configCallOrder: string[] = [];
-export {configCallOrder};
-
 @Module({
 	name: 'ModuleWithConfigDecorationAndImplementation',
 	config: function(){
-		configCallOrder.push('decoration');
+		ModuleWithConfigDecorationAndImplementation.configCallOrder.push('decoration');
 	}
 })
 export class ModuleWithConfigDecorationAndImplementation {
 	
+	static configCallOrder: string[] = [];
+	
 	onConfig() {
-		configCallOrder.push('implementation');
+		ModuleWithConfigDecorationAndImplementation.configCallOrder.push('implementation');
 	}
 	
 }
@@ -123,19 +115,31 @@ export class ModuleWithRunImplementation {
 
 // --
 
-var runCallOrder: string[] = [];
-export {runCallOrder};
 
 @Module({
 	name: 'ModuleWithRunDecorationAndImplementation',
 	run: function(){
-		runCallOrder.push('decoration');
+		ModuleWithRunDecorationAndImplementation.runCallOrder.push('decoration');
 	}
 })
 export class ModuleWithRunDecorationAndImplementation {
 	
+	static runCallOrder: string[] = [];
+	
 	onRun() {
-		runCallOrder.push('implementation');
+		ModuleWithRunDecorationAndImplementation.runCallOrder.push('implementation');
 	}
 	
+}
+
+// --
+
+@Module()
+export class ModuleToTestIfConstructorGetsCalledWithNgModule {
+	
+	static injectedModule: any = null;
+	
+	constructor(ngModule: any) {
+		ModuleToTestIfConstructorGetsCalledWithNgModule.injectedModule = ngModule;
+	}
 }
