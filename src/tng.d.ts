@@ -443,24 +443,29 @@ declare module "tng/component" {
 
 declare module "tng/module" {
 	
+	import {ConstantWrapper} from 'tng/constant';
+	import {ValueWrapper} from 'tng/value';
+	
+	type DependenciesArray = (string|Function|ConstantWrapper<any>|ValueWrapper<any>)[];
+	
 	/**
 	 * Options available when decorating a class as a module
 	 * TODO document
 	 */
 	export interface ModuleOptions {
-		dependencies?: (string|Function)[];
+		name?: string;
+		dependencies?: DependenciesArray;
 		config?: Function|Function[];
 		run?: Function|Function[];
 	
-		name?: string;
-		modules?: (string|Function)[];
-		components?: Function[];
-		services?: Function[];
-		filters?: Function[];
-		decorators?: Function[];
-		animations?: Function[];
-		values?: Function[];
-		constants?: Function[];
+		// modules?: (string|Function)[];
+		// components?: Function[];
+		// services?: Function[];
+		// filters?: Function[];
+		// decorators?: Function[];
+		// animations?: Function[];
+		// values?: Function[];
+		// constants?: Function[];
 	}
 
 	/**
@@ -488,20 +493,19 @@ declare module "tng/module" {
 	 * @internal
 	 */
 	export class ModuleAnnotation {
-	
-		dependencies: (string|Function)[];
+		name: string;
+		dependencies: DependenciesArray;
 		config: Function|Function[];
 		run: Function|Function[];
 	
-		name: string;
-		modules: (string|Function)[];
-		components: Function[];
-		services: Function[];
-		filters: Function[];
-		decorators: Function[];
-		animations: Function[];
-		values: Function[];
-		constants: Function[];
+		// modules: (string|Function)[];
+		// components: Function[];
+		// services: Function[];
+		// filters: Function[];
+		// decorators: Function[];
+		// animations: Function[];
+		// values: Function[];
+		// constants: Function[];
 	
 		constructor(options?: ModuleOptions);
 	

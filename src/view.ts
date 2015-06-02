@@ -1,5 +1,8 @@
 /// <reference path="./_references" />
 
+// TODO debug only?
+import {assert} from './assert';
+
 import {makeDecorator, FunctionReturningString, setIfInterface} from './utils';
 
 /**
@@ -11,7 +14,7 @@ export interface ViewOptions {
     /**
      * TODO should it be required?
      */
-    controllerAs?: string;
+    controllerAs: string;
     
     /**
      * 
@@ -41,6 +44,10 @@ export class ViewAnnotation {
     controllerAs: string = void 0;
 
     constructor(options: ViewOptions) {
+        // TODO debug only?
+        assert.notNull(options, 'options must not be null');
+        assert.notEmpty(options.controllerAs, 'controllerAs cannot be null or empty');
+        
         setIfInterface(this, options);
     }
 

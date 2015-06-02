@@ -39,8 +39,10 @@ export function setIf(target:any, source:any) {
         return;
     }
 	
-	for (let key in source) if (source.hasOwnProperty(key)) {
-        target[key] = source[key];
+	for (let key in source) {
+        if (source.hasOwnProperty(key) && isDefined(source[key])) {
+            target[key] = source[key];
+        }
     }
 	
 }
@@ -51,9 +53,11 @@ export function setIfInterface(target:any, source:any) {
         return;
     }
 	
-	for (let key in source) if (source.hasOwnProperty(key)) {
-        if (target.hasOwnProperty(key)) {
-            target[key] = source[key];
+	for (let key in source) {
+        if (source.hasOwnProperty(key) && isDefined(source[key])) {
+            if (target.hasOwnProperty(key)) {
+                target[key] = source[key];
+            }
         }
     }
 	

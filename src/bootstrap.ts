@@ -23,7 +23,7 @@ To process a module is to:
 import {getAnnotations, mergeAnnotations} from './reflection';
 import {create} from './utils';
 import {ApplicationConstructor, ApplicationAnnotation} from './application';
-import {ModuleConstructor, ModuleAnnotation, registerModule} from './module';
+import {ModuleConstructor, ModuleAnnotation, publishModule} from './module';
 
 /**
  * 
@@ -47,7 +47,7 @@ export function bootstrap(moduleClass: ModuleConstructor, selectorOrElement?: an
         throw new Error('No selector specified');
     }
 
-    var ngModule = registerModule(moduleClass);
+    var ngModule = publishModule(moduleClass);
 
     return angular.bootstrap(selectorOrElement, [ngModule.name]);
 

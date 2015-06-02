@@ -1,8 +1,11 @@
 /// <reference path="./_references" />
 
+// TODO debug only?
+import {assert} from './assert';
+
 import {getAnnotations, hasAnnotation, mergeAnnotations, Reflect} from './reflection';
 import {makeDecorator, setIfInterface, FunctionReturningNothing} from './utils';
-import {create, isString, isFunction, safeBind} from './utils';
+import {create, isString, isFunction, isArray, safeBind} from './utils';
 import {ValueWrapper, publishValue} from './value';
 import {ConstantWrapper, publishConstant} from './constant';
 import {FilterAnnotation, registerFilter} from './filter';
@@ -16,24 +19,26 @@ import {registerRoutes} from './ui-router/routes';
 
 const PUBLISHED_ANNOTATION_KEY = 'tng:module-published-as';
 
+type DependenciesArray = (string|Function|ConstantWrapper<any>|ValueWrapper<any>)[];
+
 /**
  * Options available when decorating a class as a module
  * TODO document
  */
 export interface ModuleOptions {
-	dependencies?: (string|Function)[];
+	name?: string;
+	dependencies?: DependenciesArray;
 	config?: Function|Function[];
 	run?: Function|Function[];
-
-	name?: string;
-	modules?: (string|Function)[];
-	components?: Function[];
-	services?: Function[];
-	filters?: Function[];
-	decorators?: Function[];
-	animations?: Function[];
-	values?: Function[];
-	constants?: Function[];
+	
+    // modules?: (string|Function)[];
+	// components?: Function[];
+	// services?: Function[];
+	// filters?: Function[];
+	// decorators?: Function[];
+	// animations?: Function[];
+	// values?: Function[];
+	// constants?: Function[];
 }
 
 /**
@@ -41,24 +46,22 @@ export interface ModuleOptions {
  */
 export class ModuleAnnotation {
 
-	dependencies: (string|Function)[] = null;
-	config: Function|Function[] = null;
-	run: Function|Function[] = null;
+	name: string = void 0;
+	dependencies: DependenciesArray = void 0;
+	config: Function|Function[] = void 0;
+	run: Function|Function[] = void 0;
 
-	name: string = null;
-	modules: (string|Function)[] = null;
-	components: Function[] = null;
-	services: Function[] = null;
-	filters: Function[] = null;
-	decorators: Function[] = null;
-	animations: Function[] = null;
-	values: Function[] = null;
-	constants: Function[] = null;
+	// modules: (string|Function)[] = void 0;
+	// components: Function[] = void 0;
+	// services: Function[] = void 0;
+	// filters: Function[] = void 0;
+	// decorators: Function[] = void 0;
+	// animations: Function[] = void 0;
+	// values: Function[] = void 0;
+	// constants: Function[] = void 0;
 
 	constructor(options?: ModuleOptions) {
-        if (options) {
-            setIfInterface(this, options);
-        }
+        setIfInterface(this, options);
 	}
 
 }
@@ -98,20 +101,17 @@ function getNewModuleName() {
 /**
  * @internal
  */
-export function registerModule(moduleClass: ModuleConstructor, name?: string): ng.IModule {
-
-    var aux: any[];
-    var moduleNotes: ModuleAnnotation;
+export function publishModule(moduleClass: ModuleConstructor, name?: string): ng.IModule {
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    aux = getAnnotations(moduleClass, ModuleAnnotation).reverse();
+    var aux = getAnnotations(moduleClass, ModuleAnnotation).reverse();
 
-    if (!aux.length) {
-        throw new Error('No module annotation found');
-    }
+    // TODO debug only?
+    assert.notEmpty(aux, 'Missing @Module decoration');
 
-    moduleNotes = mergeAnnotations<ModuleAnnotation>(create(ModuleAnnotation), ...aux);
+    var annotation = <ModuleAnnotation> {/*no defaults*/}
+    mergeAnnotations(annotation, ...aux);
 
     var constants: any[] = [];
     var values: any[] = [];
@@ -124,8 +124,8 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
     var modules: any[] = [];
 
     // TODO optimize this.. to much reflection queries    
-    if (moduleNotes.dependencies) {
-        for (let dep of moduleNotes.dependencies) {
+    if (annotation.dependencies) {
+        for (let dep of annotation.dependencies) {
             // Regular angular module
             if (isString(dep)) {
                 modules.push(dep);
@@ -137,7 +137,7 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
                     modules.push(Reflect.getOwnMetadata(PUBLISHED_ANNOTATION_KEY, dep));
                 }
                 else {
-                    modules.push(registerModule(<ModuleConstructor> dep).name);
+                    modules.push(publishModule(<ModuleConstructor> dep).name);
                 }
             }
             else if (dep instanceof ConstantWrapper) {
@@ -166,12 +166,12 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
             }
             else {
                 // TODO WTF?
-                throw new Error(`I don't recognize what kind of dependency is this: ${dep}`);
+                throw new Error(`I don't recognize what kind of dependency this is: ${dep}`);
             }
         }
     }
 
-    name = name || moduleNotes.name || getNewModuleName();
+    name = name || annotation.name || getNewModuleName();
     
     // Register the module on Angular
     var ngModule = angular.module(name, modules);    
@@ -182,18 +182,18 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
     // Register config functions
     var configFns: Function[] = [];
     if (isFunction(module.onConfig)) configFns.push(safeBind(module.onConfig, module));
-    if (moduleNotes.config) {
-        if (isFunction(moduleNotes.config)) configFns.push(<Function> moduleNotes.config);
-        else configFns = configFns.concat(<Function[]> moduleNotes.config)
+    if (annotation.config) {
+        if (isFunction(annotation.config)) configFns.push(<Function> annotation.config);
+        else if (isArray(annotation.config)) configFns = configFns.concat(<Function[]> annotation.config)
     }
     for (let fn of configFns) ngModule.config(fn);
     
     // Register initialization functions
     var runFns: Function[] = [];
     if (isFunction(module.onRun)) runFns.push(safeBind(module.onRun, module));
-    if (moduleNotes.run) {
-        if (isFunction(moduleNotes.run)) runFns.push(<Function> moduleNotes.run);
-        else runFns = runFns.concat(<Function[]> moduleNotes.run)
+    if (annotation.run) {
+        if (isFunction(annotation.run)) runFns.push(<Function> annotation.run);
+        else if (isArray(annotation.run)) runFns = runFns.concat(<Function[]> annotation.run)
     }
     for (let fn of runFns) ngModule.run(fn);
     
@@ -214,8 +214,3 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
     return ngModule;
 
 }
-
-/**
- * Publishe a TNG module, registering it and its dependencies on Angular.
- */
-export {registerModule as publishModule};

@@ -10,7 +10,7 @@ import {ViewAnnotation} from './view';
 import {ComponentViewAnnotation, NAMESPACE_MAP} from './component-view';
 import {CommonDirectiveOptions, CommonDirectiveAnnotation} from './directive'
 import {Directive, DirectiveAnnotation, DirectiveConstructor, Transclusion} from './directive'
-import {makeDirectiveDO, DirectiveDefinitionObject, inFactory as inFactoryDirective} from './directive'
+import {makeCommonDO, DirectiveDefinitionObject, inFactory as inFactoryDirective} from './directive'
 
 /**
  * TODO document
@@ -65,8 +65,8 @@ export interface ComponentDefinitionObject extends DirectiveDefinitionObject {
 export function publishComponent(componentClass: ComponentConstructor, ngModule: ng.IModule, selector?: string): ng.IModule {
 
     // TODO debug only?
-    assert(hasAnnotation(componentClass, ComponentAnnotation), 'Did you decorate it with @Component?');    
-    assert(hasAnnotation(componentClass, ViewAnnotation), 'Did you decorate it with @View?');
+    assert(hasAnnotation(componentClass, ComponentAnnotation), 'Missing @Component decoration');    
+    assert(hasAnnotation(componentClass, ViewAnnotation), 'Missing @View decoration');
     
     var {name, factory} = makeComponentFactory(componentClass);
 
@@ -83,7 +83,7 @@ export function publishComponent(componentClass: ComponentConstructor, ngModule:
  */
 export function makeComponentDO(componentClass: ComponentConstructor): ComponentDefinitionObject {
 
-    var cdo = <ComponentDefinitionObject> makeDirectiveDO(<DirectiveConstructor> componentClass);
+    var cdo = <ComponentDefinitionObject> makeCommonDO(<DirectiveConstructor> componentClass);
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
@@ -93,24 +93,24 @@ export function makeComponentDO(componentClass: ComponentConstructor): Component
     
     // TODO Component restrictions?
         
-    if (isDefined(view.controllerAs)) {
+    if (view.controllerAs != null) {
         cdo.controllerAs = view.controllerAs;
     }
-    if (isDefined(view.namespace)) {
+    if (view.namespace != null) {
         cdo.templateNamespace = NAMESPACE_MAP[view.namespace];
     }
     
     // TODO styleUrl
     
-    if (isDefined(view.template)) {
+    if (view.template != null) {
         cdo.template = view.template;
     }
-    else if (isDefined(view.templateUrl)) {
+    else if (view.templateUrl != null) {
         cdo.templateUrl = view.templateUrl;
     }
     else {
         throw new Error('Component has no template. Use either template or templateUrl');
-    }    
+    }
         
     return cdo;
 

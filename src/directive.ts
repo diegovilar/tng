@@ -94,9 +94,9 @@ export interface DirectiveOptions extends CommonDirectiveOptions {
  */
 export class DirectiveAnnotation extends CommonDirectiveAnnotation {
 
-    multiElement = false;
-    priority = 0;
-    terminal = false;
+    multiElement: boolean = void 0;
+    priority: number = void 0;
+    terminal: boolean = void 0;
 
     constructor(options: DirectiveOptions) {
         super(<any> options); // TODO WTF needs casting?
@@ -173,12 +173,12 @@ const RESTRICTION_MAP: Map<string> = {
 /**
  * @internal
  */
-export function makeDirectiveDO(directiveClass: DirectiveConstructor): DirectiveDefinitionObject {
+export function makeCommonDO(directiveClass: DirectiveConstructor): DirectiveDefinitionObject {
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    var aux = getAnnotations(directiveClass, DirectiveAnnotation).reverse();
-    var annotation = <DirectiveAnnotation> {/*no defaults*/};
+    var aux = getAnnotations(directiveClass, CommonDirectiveAnnotation).reverse();
+    var annotation = <CommonDirectiveAnnotation> {/*no defaults*/};
     mergeAnnotations(annotation, ...aux);
 
     var selectorData = parseSelector(annotation.selector);
@@ -190,14 +190,32 @@ export function makeDirectiveDO(directiveClass: DirectiveConstructor): Directive
         controller: directiveClass
     };
     
-    if (isDefined(annotation.multiElement)) ddo.multiElement = annotation.multiElement;
-    if (isDefined(annotation.priority)) ddo.priority = annotation.priority;
-    if (isDefined(annotation.terminal)) ddo.terminal = annotation.terminal;
-    if (isDefined(annotation.scope)) ddo.scope = annotation.scope;
-    if (isDefined(annotation.bind)) ddo.bindToController = annotation.bind;
-    if (isDefined(annotation.transclude)) ddo.transclude = TRANSCLUSION_MAP[annotation.transclude];
-    if (isDefined(annotation.compile)) ddo.compile = annotation.compile;
-    if (isDefined(annotation.link)) ddo.link = annotation.link;
+    if (annotation.scope != null) ddo.scope = annotation.scope;
+    if (annotation.bind != null) ddo.bindToController = annotation.bind;
+    if (annotation.transclude != null) ddo.transclude = TRANSCLUSION_MAP[annotation.transclude];
+    if (annotation.compile != null) ddo.compile = annotation.compile;
+    if (annotation.link != null) ddo.link = annotation.link;
+
+    return ddo;
+
+}
+
+/**
+ * @internal
+ */
+export function makeDirectiveDO(directiveClass: DirectiveConstructor): DirectiveDefinitionObject {
+    
+    var ddo = makeCommonDO(<DirectiveConstructor> directiveClass);
+
+    // Reflect.decorate apply decorators reversely, so we need to reverse
+    // the extracted annotations before merging them
+    var aux = getAnnotations(directiveClass, DirectiveAnnotation).reverse();
+    var annotation = <DirectiveAnnotation> {/*no defaults*/};
+    mergeAnnotations(annotation, ...aux);
+    
+    if (annotation.multiElement != null) ddo.multiElement = annotation.multiElement;
+    if (annotation.priority != null) ddo.priority = annotation.priority;
+    if (annotation.terminal != null) ddo.terminal = annotation.terminal;
 
     return ddo;
 
