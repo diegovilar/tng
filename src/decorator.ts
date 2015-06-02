@@ -21,7 +21,7 @@ export interface DecoratorOptions {
  */
 export class DecoratorAnnotation {
 
-    name: string = '';
+    name: string = null;
 
     constructor(options: DecoratorOptions) {
         setIfInterface(this, options);
@@ -67,10 +67,7 @@ type DecoratorSignature = (options: DecoratorOptions) => ClassDecorator;
  */
 export var Decorator = <DecoratorSignature> makeDecorator(DecoratorAnnotation);
 
-/**
- * @inernal
- */
-export function registerDecorator(decoratorClass: DecoratorConstructor, ngModule: ng.IModule) {
+export function publishDecorator(decoratorClass: DecoratorConstructor, ngModule: ng.IModule, name?: string): ng.IModule {
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
@@ -80,7 +77,8 @@ export function registerDecorator(decoratorClass: DecoratorConstructor, ngModule
         throw new Error("Decorator annotation not found");
     }
 
-    var {name} = mergeAnnotations<DecoratorAnnotation>(create(DecoratorAnnotation), ...aux);
+    var annotation = <DecoratorAnnotation> mergeAnnotations(create(DecoratorAnnotation), ...aux);
+    name = name != null ? name : annotation.name;
 
     if (!isFunction(decoratorClass.prototype.decorate)) {
         throw new Error(`Decorator "${name}" does not implement a decorate method`);
@@ -99,5 +97,7 @@ export function registerDecorator(decoratorClass: DecoratorConstructor, ngModule
 
         }));
     }));
+    
+    return ngModule;
 
 }

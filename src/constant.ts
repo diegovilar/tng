@@ -1,76 +1,51 @@
 /// <reference path="./_references" />
 
-import {setIfInterface} from './utils';
-import {setAnnotations, getAnnotations} from './reflection';
+// TODO debug only?
+import {assert} from './assert';
 
 /**
- * A framework envelope for the constant
+ * A framework envelope for constants
  */
-export class ConstantWrapper {
+export class ConstantWrapper<Type> {
 
+    constructor(private _name: string, private _value: Type) {
+    }
+    
+    get name() {
+        return this._name;
+    }
+    
+    get value() {
+        return this._value;
+    }
+    
 }
 
 /**
  * Wraps a constant to be made available for dependency injection
  * 
  * @param name The name of the constant through which it will made available
- * @param constant The constant to be injected, as is
+ * @param value The constant value to be injected, as is
  * 
  * @return A wrapper, to be used as a module dependency
  */
-export function Constant(name: string, constant: any): ConstantWrapper {
+export function Constant<Type>(name: string, value: Type): ConstantWrapper<Type> {
 
-    var wrapper = new ConstantWrapper();
+    // TODO debug only?
+    assert.notEmpty(name, 'name cannot be null or empty');
 
-    setAnnotations(wrapper, [new ConstantAnnotation<any>({
-        name: name,
-        constant: constant
-    })], 'value');
-
-    return wrapper;
+    return new ConstantWrapper(name, value);
 
 }
 
-/**
- * @internal
- */
-export interface ConstantOptions {
-    name: string;
-    constant: any;
-}
+export function publishConstant<Type>(constant: ConstantWrapper<Type>, ngModule: ng.IModule, name?: string): ng.IModule {
 
-/**
- * @internal
- */
-export class ConstantAnnotation<Type> {
-
-    name = '';
-    constant: Type = null;
-
-    constructor(options: ConstantOptions) {
-        setIfInterface(this, options);
-    }
-
-}
-
-/**
- * @internal
- */
-export function publishConstant(constant: ConstantWrapper, ngModule: ng.IModule, name?:string):ng.IModule {
-
-    var aux = getAnnotations(constant, ConstantAnnotation, 'value');
-
-    if (!aux.length) {
-        throw new Error("Constant annotation not found");
-    }
-
-    var annotation = <ConstantAnnotation<any>> aux[0];
-    name = name != null ? name : annotation.name;
-    ngModule.constant(name, annotation.constant);
+    // TODO debug only?
+    assert(constant instanceof ConstantWrapper, 'constant must be a ConstantWrapper');
+    
+    name = name != null ? name : constant.name;
+    ngModule.constant(name, constant.value);
     
     return ngModule;
 
 }
-
-// TODO rename registerConstant to publishConstant on consumers
-export {publishConstant as registerConstant}

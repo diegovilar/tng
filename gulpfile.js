@@ -68,6 +68,7 @@ var exportedModules = [
     { expose: 'tng/utils',          file: './src/utils.ts' },
     { expose: 'tng/value',          file: './src/value.ts' },
     { expose: 'tng/view',           file: './src/view.ts' },
+    { expose: 'tng/assert',         file: './src/assert.ts' },
 
     // TODO extract to different bundle
     { expose: 'tng/ui-router',          file: './src/ui-router.ts' },

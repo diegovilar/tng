@@ -22,7 +22,7 @@ export interface AnimationOptions {
  */
 export class AnimationAnnotation {
 
-    name: string = '';
+    name: string = null;
 
     constructor(options: AnimationOptions) {
         setIfInterface(this, options);

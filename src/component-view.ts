@@ -39,8 +39,8 @@ export interface ComponentViewOptions extends ViewOptions {
  */
 export class ComponentViewAnnotation extends ViewAnnotation {
 
-    namespace = ComponentTemplateNamespace.HTML;
-    replace = false;
+    namespace: ComponentTemplateNamespace = void 0;
+    replace: boolean = void 0;
 
     constructor(options: ComponentViewOptions) {
         super(options);

@@ -1,7 +1,10 @@
 /// <reference path="./_references" />
 
+// TODO debug only?
+import {assert} from './assert';
+
 import {getAnnotations, mergeAnnotations} from './reflection';
-import {makeDecorator, setIfInterface, create, isFunction} from './utils';
+import {makeDecorator, setIfInterface, isFunction} from './utils';
 
 /**
  * Options available when decorating a class as a service
@@ -28,11 +31,15 @@ export interface ServiceOptions {
  */
 export class ServiceAnnotation {
 
-    name:string = null;
-    provider: ng.IServiceProvider|ng.IServiceProviderFactory = null;
-    factory: Function = null;
+    name: string = void 0;
+    provider: ng.IServiceProvider|ng.IServiceProviderFactory = void 0;
+    factory: Function = void 0;
 
     constructor(options: ServiceOptions) {
+        // TODO debug only?
+        assert.notNull(options, 'options must not be null');
+        assert.notEmpty(options.name, 'name cannot be null or empty');        
+
         setIfInterface(this, options);
     }
 
@@ -69,27 +76,24 @@ export function publishService(serviceClass: ServiceConstructor, ngModule: ng.IM
     // the extracted annotations before merging them
     var aux = getAnnotations(serviceClass, ServiceAnnotation).reverse();
 
-    if (!aux.length) {
-        throw new Error("Service annotation not found");
-    }
+    // TODO debug only?
+    assert.notEmpty(aux, 'Did you decorate it with @Service?');
 
-    var annotation = mergeAnnotations<ServiceAnnotation>(create(ServiceAnnotation), ...aux);
+    var annotation = <ServiceAnnotation> {/*no defalts*/};
+    mergeAnnotations(annotation, ...aux);
+    
     var name = name != null ? name : annotation.name;
 
     if (annotation.provider) {
         ngModule.provider(name, <any> annotation.provider);
     }
-    else if (isFunction(annotation.factory)) {
+    else if (annotation.factory) {
         ngModule.factory(name, annotation.factory);
     }
     else {
-        // TODO Is it invoked later with $injector.invoke()?
         ngModule.service(name, serviceClass);
     }
     
     return ngModule;
 
 }
-
-// TODO rename registerService to publishService on consumers
-export {publishService as registerService};

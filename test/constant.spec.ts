@@ -6,33 +6,51 @@ import {angularSpy, ModuleSpy} from './utils';
 // assets
 import * as assets from './assets/test-constant';
 
-describe('Constant',function() {
+describe('Constant >',function() {
 	
-	it('should wrap a constant properly',function() {
+	it('should wrap the given value in a ConstantWrapper',function() {
 		expect(assets.wrappedConstant instanceof ConstantWrapper).toBe(true);		
 	});
 	
-	describe('publishValue', function() {
+	describe('publishConstant >', function() {
 		
-		var fakeModule = new ModuleSpy();
+		var moduleSpy: ModuleSpy;
 		
-		it('should publish the constant to the target module with the annotated name', function() {
-			publishConstant(assets.wrappedConstant, <any>fakeModule);
-			
-			expect(fakeModule.constant).toHaveBeenCalled();
-			
-			var args = fakeModule.constant.calls.mostRecent().args;
-			expect(args[0]).toBe(assets.constantName);
-			expect(args[1]).toBe(assets.constant);
+		beforeEach(function() {
+			moduleSpy = new ModuleSpy();
 		});
 		
-		it('should publish the constant with the provided name instead of the annotated one', function() {
-			var newName = 'newConstantName';
+		it('should only accept instances of ConstantWrapper', function() {
+			function constant() {
+				publishConstant(assets.wrappedConstant, <any>moduleSpy);
+			}
+			expect(constant).not.toThrow();
 			
-			publishConstant(assets.wrappedConstant, <any>fakeModule, newName);			
-			var args = fakeModule.constant.calls.mostRecent().args;
-			expect(args[0]).toBe(newName);
-		});		
+			function notConstant() {
+				publishConstant(<any>null, <any>moduleSpy);
+			}
+			expect(notConstant).toThrow();
+		});
+		
+		it('should publish the constant through angular.Module.constant', function() {
+			publishConstant(assets.wrappedConstant, <any>moduleSpy);			
+			expect(moduleSpy.constant).toHaveBeenCalled();
+			
+			var args = moduleSpy.constant.calls.mostRecent().args;
+			expect(args[1]).toBe(assets.constantValue);
+		});	
+
+		it('should use the annotated name for the constant', function() {
+			publishConstant(assets.wrappedConstant, <any>moduleSpy);			
+			var args = moduleSpy.constant.calls.mostRecent().args;
+			expect(args[0]).toBe(assets.constantName);
+		});	
+		
+		it('should use the provided name, if any, instead of the annotated one', function() {
+			publishConstant(assets.wrappedConstant, <any>moduleSpy, 'newName');			
+			var args = moduleSpy.constant.calls.mostRecent().args;
+			expect(args[0]).toBe('newName');
+		});	
 		
 	});
 	

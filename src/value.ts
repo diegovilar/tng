@@ -1,13 +1,24 @@
 /// <reference path="./_references" />
 
-import {setIfInterface} from './utils';
-import {getAnnotations, setAnnotations} from './reflection';
+// TODO debug only?
+import {assert} from './assert';
 
 /**
- * A framework envelope for the value
+ * A framework envelope for values
  */
-export class ValueWrapper {	
+export class ValueWrapper<Type> {
 
+    constructor(private _name: string, private _value: Type) {
+    }
+    
+    get name() {
+        return this._name;
+    }
+    
+    get value() {
+        return this._value;
+    }
+    
 }
 
 /**
@@ -18,59 +29,23 @@ export class ValueWrapper {
  * 
  * @return A wrapper instance, to be used as a module dependency
  */
-export function Value(name: string, value: any): ValueWrapper {
+export function Value<Type>(name: string, value: Type): ValueWrapper<Type> {
+    
+    // TODO debug only?
+    assert.notEmpty(name, 'name cannot be null or empty');
 
-    var wrapper = new ValueWrapper();
-
-    setAnnotations(wrapper, [new ValueAnnotation<any>({
-        name: name,
-        value: value
-    })], 'value');
-
-    return wrapper;
+    return new ValueWrapper(name, value);
 
 }
 
-/**
- * @internal
- */
-export interface ValueOptions {
-    name: string;
-    value: any;
-}
+export function publishValue<Type>(value: ValueWrapper<Type>, ngModule: ng.IModule, name?: string): ng.IModule {
 
-/**
- * @internal
- */
-export class ValueAnnotation<Type> {
-
-    name: string = null;
-    value: Type = null;
-
-    constructor(options: ValueOptions) {
-        setIfInterface(this, options);
-    }
-
-}
-
-/**
- * @intenal
- */
-export function publishValue(value: ValueWrapper, ngModule: ng.IModule, name?:string):ng.IModule {
-
-    var aux = getAnnotations(value, ValueAnnotation, 'value');
-
-    if (!aux.length) {
-        throw new Error("Value annotation not found");
-    }
-
-    var annotation = <ValueAnnotation<any>> aux[0];
-    name = name != null ? name : annotation.name;  
-    ngModule.value(name, annotation.value);
+    // TODO debug only?
+    assert(value instanceof ValueWrapper, 'constant must be a ConstantWrapper');
+    
+    name = name != null ? name : value.name;
+    ngModule.value(name, value.value);
     
     return ngModule;
 
 }
-
-// TODO rename registerValue to publishValue on consumers
-export {publishValue as registerValue};

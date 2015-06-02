@@ -53,10 +53,11 @@ declare module "tng/di" {
 declare module "tng/value" {
 	
 	/**
-	 * A framework envelope for the value
+	 * A framework envelope for values
 	 */
-	export class ValueWrapper {
-
+	export class ValueWrapper<Type> {
+		name: string;
+		value: Type;	    
 	}
 	
 	/**
@@ -67,32 +68,33 @@ declare module "tng/value" {
 	 * 
 	 * @return A wrapper, to be used as a module dependency
 	 */
-	export function Value(name: string, value: any): ValueWrapper;
+	export function Value<Type>(name: string, value: Type): ValueWrapper<Type>;
 	
-	export function publishValue(value: ValueWrapper, ngModule: ng.IModule, name?:string):ng.IModule;
+	export function publishValue<Type>(value: ValueWrapper<Type>, ngModule: ng.IModule, name?: string): ng.IModule;
 
 }
 
 declare module "tng/constant" {
 	
 	/**
-	 * A framework envelope for the constant
+	 * A framework envelope for constants
 	 */
-	export class ConstantWrapper {
-
+	export class ConstantWrapper<Type> {
+		name: string;
+		value: Type;	    
 	}
 	
 	/**
 	 * Wraps a constant to be made available for dependency injection
 	 * 
 	 * @param name The name of the constant through which it will made available
-	 * @param constant The constant to be injected, as is
+	 * @param value The constant value to be injected, as is
 	 * 
 	 * @return A wrapper, to be used as a module dependency
 	 */
-	export function Constant(name: string, constant: any): ConstantWrapper;
+	export function Constant<Type>(name: string, value: Type): ConstantWrapper<Type>;
 	
-	export function publishConstant(constant: ConstantWrapper, ngModule: ng.IModule, name?:string):ng.IModule;
+	export function publishConstant<Type>(constant: ConstantWrapper<Type>, ngModule: ng.IModule, name?: string): ng.IModule;
 
 }
 
@@ -271,7 +273,9 @@ declare module "tng/decorator" {
 	/**
 	 * A decorator to annotate a class as being a service decorator
 	 */
-	function Decorator(options: DecoratorOptions): ClassDecorator;
+	export function Decorator(options: DecoratorOptions): ClassDecorator;
+	
+	export function publishDecorator(decoratorClass: Function, ngModule: ng.IModule, name?: string): ng.IModule;
 	
 }
 
@@ -404,6 +408,8 @@ declare module "tng/directive" {
 	 */
 	function Directive(options: DirectiveOptions): ClassDecorator;
 	
+	export function publishDirective(directiveClass: Function, ngModule: ng.IModule, selector?: string): ng.IModule;
+	
 }
 
 declare module "tng/component" {
@@ -428,6 +434,8 @@ declare module "tng/component" {
 	 * A decorator to annotate a class as being a component controller
 	 */
 	function Component(options: ComponentOptions): ClassDecorator;
+	
+	export function publishComponent(componentClass: Function, ngModule: ng.IModule, selector?: string): ng.IModule;
 	
 }
 

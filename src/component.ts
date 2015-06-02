@@ -1,9 +1,11 @@
 /// <reference path="./_references" />
 
+import {assert} from './assert';
+
 import {Inject, bind, hasInjectAnnotation} from './di';
-import {makeDecorator, Map, setIfInterface, create, isFunction} from './utils';
+import {makeDecorator, Map, setIfInterface, isFunction, isDefined} from './utils';
 import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils';
-import {getAnnotations, mergeAnnotations} from './reflection';
+import {hasAnnotation, getAnnotations, mergeAnnotations} from './reflection';
 import {ViewAnnotation} from './view';
 import {ComponentViewAnnotation, NAMESPACE_MAP} from './component-view';
 import {CommonDirectiveOptions, CommonDirectiveAnnotation} from './directive'
@@ -60,19 +62,19 @@ export interface ComponentDefinitionObject extends DirectiveDefinitionObject {
     templateNamespace?: string;
 }
 
-/**
- * @internal
- */
-export function registerComponent(componentClass: ComponentConstructor, ngModule: ng.IModule) {
+export function publishComponent(componentClass: ComponentConstructor, ngModule: ng.IModule, selector?: string): ng.IModule {
 
-    var aux = getAnnotations(componentClass, ComponentAnnotation);
-
-    if (!aux.length) {
-        throw new Error("Component annotation not found");
-    }
-
+    // TODO debug only?
+    assert(hasAnnotation(componentClass, ComponentAnnotation), 'Did you decorate it with @Component?');    
+    assert(hasAnnotation(componentClass, ViewAnnotation), 'Did you decorate it with @View?');
+    
     var {name, factory} = makeComponentFactory(componentClass);
+
+    // TODO Allow for selector override through parameter    
+
     ngModule.directive(name, factory);
+    
+    return ngModule;
     
 }
 
@@ -85,18 +87,30 @@ export function makeComponentDO(componentClass: ComponentConstructor): Component
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    var templateNotes = getAnnotations(componentClass, ComponentViewAnnotation).reverse(); 
-    var template = mergeAnnotations<ComponentViewAnnotation>(create(ComponentViewAnnotation), ...templateNotes);
+    var aux = getAnnotations(componentClass, ComponentViewAnnotation).reverse(); 
+    var view = <ComponentViewAnnotation> {/*no defaults*/};
+    mergeAnnotations(view, ...aux);
     
-    // TODO Component restrictions
+    // TODO Component restrictions?
         
-    if (template.controllerAs) cdo.controllerAs = template.controllerAs;
-    if (template.namespace) cdo.templateNamespace = NAMESPACE_MAP[template.namespace];
+    if (isDefined(view.controllerAs)) {
+        cdo.controllerAs = view.controllerAs;
+    }
+    if (isDefined(view.namespace)) {
+        cdo.templateNamespace = NAMESPACE_MAP[view.namespace];
+    }
+    
     // TODO styleUrl
     
-    if (template.template) cdo.template = template.template;
-    else if (template.templateUrl) cdo.templateUrl = template.templateUrl;
-    else throw new Error('Components must have an inline or remote template');    
+    if (isDefined(view.template)) {
+        cdo.template = view.template;
+    }
+    else if (isDefined(view.templateUrl)) {
+        cdo.templateUrl = view.templateUrl;
+    }
+    else {
+        throw new Error('Component has no template. Use either template or templateUrl');
+    }    
         
     return cdo;
 

@@ -1,9 +1,12 @@
 /// <reference path="./_references" />
 
+// TODO debug only?
+import {assert} from './assert';
+
 import {Inject, bind, hasInjectAnnotation} from './di';
-import {makeDecorator, Map, setIfInterface, create, isFunction} from './utils';
+import {makeDecorator, Map, setIfInterface, create, isFunction, isDefined} from './utils';
 import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils';
-import {getAnnotations, mergeAnnotations} from './reflection';
+import {hasAnnotation, getAnnotations, mergeAnnotations} from './reflection';
 
 /**
  * TODO document
@@ -57,15 +60,19 @@ export interface CommonDirectiveOptions {
  */
 export class CommonDirectiveAnnotation {
 
-    selector = '';
-    scope: boolean|Map<string> = false;
-    bind: boolean|Map<string> = false;
-    require: string[] = null;
-    transclude = Transclusion.Content;
-    compile: CompileFunction|FunctionReturningPrePost = null;
-    link: FunctionReturningNothing|PrePost = null;
+    selector: string = void 0;
+    scope: boolean|Map<string> = void 0;
+    bind: boolean|Map<string> = void 0;
+    require: string[] = void 0;
+    transclude: Transclusion = void 0;
+    compile: CompileFunction|FunctionReturningPrePost = void 0;
+    link: FunctionReturningNothing|PrePost = void 0;
 
     constructor(options: CommonDirectiveAnnotation) {
+        // TODO debug only?
+        assert.notNull(options, 'options must not be null');
+        assert.notEmpty(options.selector, 'selector must not be null or empty');
+
         setIfInterface(this, options);
     }
 
@@ -119,10 +126,25 @@ type DirectiveDecorator = (options: DirectiveOptions) => ClassDecorator;
  */
 export var Directive = <DirectiveDecorator> makeDecorator(DirectiveAnnotation);
 
+export function publishDirective(directiveClass: DirectiveConstructor, ngModule: ng.IModule, selector?: string): ng.IModule {
+
+    // TODO debug only?
+    assert(hasAnnotation(directiveClass, DirectiveAnnotation), 'Did you decorate it with @Directive?');
+
+    var {name, factory} = makeDirectiveFactory(directiveClass);
+    
+    // TODO consider provided selector, if any
+    
+    ngModule.directive(name, factory);
+    
+    return ngModule;
+
+}
+
 /**
  * @internal
  */
-//export interface DirectiveDefinitionObject extends ng.IDirective { // bindToController incompatible with angular.d.ts
+//export interface DirectiveDefinitionObject extends ng.IDirective { // bindToController incompatible with current angular.d.ts
 export interface DirectiveDefinitionObject {
     multiElement?: boolean;
     compile?: CompileFunction|FunctionReturningPrePost;
@@ -155,24 +177,27 @@ export function makeDirectiveDO(directiveClass: DirectiveConstructor): Directive
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    var directive = mergeAnnotations<DirectiveAnnotation>(create(DirectiveAnnotation), ...getAnnotations(directiveClass, DirectiveAnnotation).reverse());
+    var aux = getAnnotations(directiveClass, DirectiveAnnotation).reverse();
+    var annotation = <DirectiveAnnotation> {/*no defaults*/};
+    mergeAnnotations(annotation, ...aux);
 
-    var selectorData = parseSelector(directive.selector);
+    var selectorData = parseSelector(annotation.selector);
+    
     var ddo: DirectiveDefinitionObject = {
         semanticName: selectorData.semanticeName,
         imperativeName: selectorData.imperativeName,
         restrict: RESTRICTION_MAP[selectorData.type],
-        controller: directiveClass,
-        multiElement: directive.multiElement,
-        priority: directive.priority,
-        terminal: directive.terminal,
+        controller: directiveClass
     };
-
-    if (directive.scope) ddo.scope = directive.scope;
-    if (directive.bind) ddo.bindToController = directive.bind;
-    if (directive.transclude) ddo.transclude = TRANSCLUSION_MAP[directive.transclude];
-    if (directive.compile) ddo.compile = directive.compile;
-    if (directive.link) ddo.link = directive.link;
+    
+    if (isDefined(annotation.multiElement)) ddo.multiElement = annotation.multiElement;
+    if (isDefined(annotation.priority)) ddo.priority = annotation.priority;
+    if (isDefined(annotation.terminal)) ddo.terminal = annotation.terminal;
+    if (isDefined(annotation.scope)) ddo.scope = annotation.scope;
+    if (isDefined(annotation.bind)) ddo.bindToController = annotation.bind;
+    if (isDefined(annotation.transclude)) ddo.transclude = TRANSCLUSION_MAP[annotation.transclude];
+    if (isDefined(annotation.compile)) ddo.compile = annotation.compile;
+    if (isDefined(annotation.link)) ddo.link = annotation.link;
 
     return ddo;
 
@@ -226,21 +251,5 @@ export function makeDirectiveFactory(directiveClass: DirectiveConstructor) {
         name: ddo.imperativeName,
         factory: factory
     };
-
-}
-
-/**
- * @internal
- */
-export function registerDirective(directiveClass: DirectiveConstructor, ngModule: ng.IModule) {
-
-    var aux = getAnnotations(directiveClass, DirectiveAnnotation);
-
-    if (!aux.length) {
-        throw new Error("Directive annotation not found");
-    }
-
-    var {name, factory} = makeDirectiveFactory(directiveClass);
-    ngModule.directive(name, factory);
 
 }

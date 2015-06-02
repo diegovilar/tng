@@ -5,6 +5,9 @@ export class ModuleSpy {
 	value = jasmine.createSpy('value');
 	constant = jasmine.createSpy('constant');
 	service = jasmine.createSpy('service');
+	factory = jasmine.createSpy('factory');
+	provider = jasmine.createSpy('provider');
+	directive = jasmine.createSpy('directive');
 }
 
 function noop(){}

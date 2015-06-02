@@ -16,7 +16,7 @@ export interface ApplicationOptions extends ModuleOptions {
  */
 export class ApplicationAnnotation extends ModuleAnnotation {
 
-	selector: string = '';
+	selector: string = null;
 
 	constructor(options: ApplicationOptions) {
 		super(options);

@@ -1,76 +1,65 @@
 /// <reference path="./_references" />
 
-import {hasAnnotation, getAnnotations} from 'tng/reflection';
-import {ServiceAnnotation, publishService} from 'tng/service';
-import {angularSpy, ModuleSpy} from './utils';
+import {publishService} from 'tng/service';
+import {ModuleSpy} from './utils';
 
 // assets
 import * as assets from './assets/test-service';
 
-describe('Service',function() {
+describe('@Service > publishService >',function() {
 	
-	it('should have a ServiceAnnotation', function() {
-		var has = hasAnnotation(assets.TestService, ServiceAnnotation);
-		expect(has).toBe(true);
+	var moduleSpy: ModuleSpy;
+		
+	beforeEach(function() {
+		moduleSpy = new ModuleSpy();
 	});
 	
-	it('should allow for multiple ServiceAnnotation instances', function() {
-		var notes = getAnnotations(assets.TestService, ServiceAnnotation);
-		expect(notes.length).toBe(2);
+	it('should only accept classes decorated through @Service', function() {
+		function service() {
+			publishService(assets.TestService, <any>moduleSpy);
+		}
+		expect(service).not.toThrow();
+
+		function notService() {
+			publishService(function() { }, <any>moduleSpy);
+		}
+		expect(notService).toThrow();
 	});
 	
-	describe('publishService', function() {
+	it('should publish the service through angular.Module.service when the service is neither annotated with a provider nor a factory', function() {
+		publishService(assets.TestService, <any>moduleSpy);
+		expect(moduleSpy.service).toHaveBeenCalled();
 		
-		var fakeModule: ModuleSpy;
-		
-		beforeEach(function() {
-			 fakeModule = new ModuleSpy();
-		})		
-		
-		it('should publish the service onto the provided angular module', function() {
-			publishService(assets.TestService, <any>fakeModule);
-			expect(fakeModule.service).toHaveBeenCalled();
-			
-			var args = fakeModule.service.calls.mostRecent().args;
-			expect(args[0]).toBe('testService'); 
-			expect(args[1]).toBe(assets.TestService); 
-		});
-		
-		it('should publishe the service with the provided name instead of the annotated one', function() {
-			publishService(assets.TestService, <any>fakeModule, 'newServiceName');
-			expect(fakeModule.service).toHaveBeenCalled();
-			
-			var args = fakeModule.service.calls.mostRecent().args;
-			expect(args[0]).toBe('newServiceName');			
-		});
-		
+		var args = moduleSpy.service.calls.mostRecent().args;
+		expect(args[1]).toBe(assets.TestService);
 	});
 	
-	describe('factory', function() {
+	it('should publish the service through angular.Module.provider when the service is annotated with a provider', function() {
+		publishService(assets.TestServiceWithProvider, <any>moduleSpy);
+		expect(moduleSpy.provider).toHaveBeenCalled();
 		
-		var ngModule: ng.IModule;
-		var $injector: ng.auto.IInjectorService;
-		var $http: ng.IHttpService;
+		var args = moduleSpy.provider.calls.mostRecent().args;
+		expect(args[1]).toBe(assets.TestServiceWithProvider.provider);
+	});
+	
+	it('should publish the service through angular.Module.factory when the service is annotated with a factory', function() {
+		publishService(assets.TestServiceWithFactory, <any>moduleSpy);
+		expect(moduleSpy.factory).toHaveBeenCalled();
 		
-		beforeEach(function() {
-			angularSpy.spyAndCallThrough();
-			
-			ngModule = angular.module('test', []);
-			publishService(assets.TestServiceWithFactory, ngModule);
-			
-			angular.mock.module('test');
-		});
-		
-		beforeEach(inject(function(_$injector_: any, _$http_: any){
-			$injector = _$injector_;
-			$http = _$http_;
-		}));
-		
-		it('should use the provided factory, if any, and invoke it with injections', function() {
-			$injector.invoke(function(testServiceWithFactory: any) {});
-			expect(assets.factoryArg).toBe($http);
-		});
-		
+		var args = moduleSpy.factory.calls.mostRecent().args;
+		expect(args[1]).toBe(assets.TestServiceWithFactory.factory);
+	});
+	
+	it('should use the annotated name for the service', function() {
+		publishService(assets.TestService, <any>moduleSpy);
+		var args = moduleSpy.service.calls.mostRecent().args;
+		expect(args[0]).toBe('testService');
+	});
+	
+	it('should use the name passed through parameter instead of the annotated one', function() {
+		publishService(assets.TestService, <any>moduleSpy, 'newName');
+		var args = moduleSpy.service.calls.mostRecent().args;
+		expect(args[0]).toBe('newName');
 	});
 	
 });

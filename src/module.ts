@@ -3,14 +3,14 @@
 import {getAnnotations, hasAnnotation, mergeAnnotations, Reflect} from './reflection';
 import {makeDecorator, setIfInterface, FunctionReturningNothing} from './utils';
 import {create, isString, isFunction, safeBind} from './utils';
-import {ValueAnnotation, registerValue} from './value';
-import {ConstantAnnotation, registerConstant} from './constant';
+import {ValueWrapper, publishValue} from './value';
+import {ConstantWrapper, publishConstant} from './constant';
 import {FilterAnnotation, registerFilter} from './filter';
 import {AnimationAnnotation, registerAnimation} from './animation';
-import {ServiceAnnotation, registerService} from './service';
-import {DecoratorAnnotation, registerDecorator} from './decorator';
-import {DirectiveAnnotation, registerDirective} from './directive';
-import {ComponentAnnotation, registerComponent} from './component';
+import {ServiceAnnotation, publishService} from './service';
+import {DecoratorAnnotation, publishDecorator} from './decorator';
+import {DirectiveAnnotation, publishDirective} from './directive';
+import {ComponentAnnotation, publishComponent} from './component';
 import {registerStates} from './ui-router/states';
 import {registerRoutes} from './ui-router/routes';
 
@@ -140,10 +140,10 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
                     modules.push(registerModule(<ModuleConstructor> dep).name);
                 }
             }
-            else if (hasAnnotation(dep, ConstantAnnotation, 'constant')) {
+            else if (dep instanceof ConstantWrapper) {
                 constants.push(dep);
             }
-            else if (hasAnnotation(dep, ValueAnnotation, 'value')) {
+            else if (dep instanceof ValueWrapper) {
                 values.push(dep);
             }
             else if (hasAnnotation(dep, ServiceAnnotation)) {
@@ -200,14 +200,14 @@ export function registerModule(moduleClass: ModuleConstructor, name?: string): n
     registerStates(moduleClass, ngModule);
     registerRoutes(moduleClass, ngModule);
 
-    for (let item of values) registerValue(item, ngModule);
-    for (let item of constants) registerConstant(item, ngModule);
+    for (let item of values) publishValue(item, ngModule);
+    for (let item of constants) publishConstant(item, ngModule);
     for (let item of filters) registerFilter(item, ngModule);
     for (let item of animations) registerAnimation(item, ngModule);
-    for (let item of services) registerService(item, ngModule);
-    for (let item of decorators) registerDecorator(item, ngModule);
-    for (let item of components) registerComponent(item, ngModule);
-    for (let item of directives) registerDirective(item, ngModule);
+    for (let item of services) publishService(item, ngModule);
+    for (let item of decorators) publishDecorator(item, ngModule);
+    for (let item of components) publishComponent(item, ngModule);
+    for (let item of directives) publishDirective(item, ngModule);
 
     Reflect.defineMetadata(PUBLISHED_ANNOTATION_KEY, name, moduleClass);
     

@@ -9,9 +9,9 @@ import {makeDecorator, FunctionReturningString, setIfInterface} from './utils';
 export interface ViewOptions {
     
     /**
-     * 
+     * TODO should it be required?
      */
-    controllerAs: string;
+    controllerAs?: string;
     
     /**
      * 
@@ -35,10 +35,10 @@ export interface ViewOptions {
  */
 export class ViewAnnotation {
 
-    template: string|FunctionReturningString = '';
-    templateUrl: string|FunctionReturningString = '';
-    styleUrl = '';
-    controllerAs = '';
+    template: string|FunctionReturningString = void 0;
+    templateUrl: string|FunctionReturningString = void 0;
+    styleUrl: string = void 0;
+    controllerAs: string = void 0;
 
     constructor(options: ViewOptions) {
         setIfInterface(this, options);

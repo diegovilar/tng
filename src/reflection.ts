@@ -1,6 +1,6 @@
 /// <reference path="./_references" />
 
-import {forEach} from './utils';
+import {forEach, isDefined} from './utils';
 
 export const ANNOTATIONS_METADATA_KEY = 'tng';
 
@@ -58,11 +58,12 @@ export function mergeAnnotations(...annotations: any[]): any {
 		return annotations[0];
 	}
 	
-	var dest = <{[key:string]:any}><any> annotations.shift();
+	var dest = <{ [key: string]: any }><any> annotations.shift();
 	
 	for (let source of annotations) {
 		forEach(source, (value, key) => {
-			if (value != null) {
+			// We only replace if defined (nulls are ok, they remove previously set values)
+			if (isDefined(value)) {
 				dest[key] = value;
 			}
 		});

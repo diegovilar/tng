@@ -2,7 +2,7 @@
 
 import {Constant} from 'tng/constant';
 
-export var constant = 1; 
+export var constantValue = {}; 
 export var constantName = 'TestConstant';
 
-export var wrappedConstant = Constant(constantName, constant);
+export var wrappedConstant = Constant(constantName, constantValue);

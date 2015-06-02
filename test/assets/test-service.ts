@@ -4,17 +4,13 @@ import {Inject, bind} from 'tng/di';
 import {Service} from 'tng/service';
 
 @Service({
-	name: ''
+	name: 'willBeOverriden'
 })
 @Service({
-	name: 'testService'
+	name: 'testService'	// this should override the previous name
 })
 export class TestService {
-	constructor(@Inject('$http') $http:any) {
-		constructorArgs = arguments;
-	}
 }
-var constructorArgs: IArguments;
 
 @Service({
 	name: 'testServiceWithFactory',
@@ -23,12 +19,10 @@ var constructorArgs: IArguments;
 export class TestServiceWithFactory {
 	
 	static factory(@Inject('$http') $http:any) {
-		factoryArg = $http;
 		return new TestServiceWithFactory();
 	}
 	
 }
-export var factoryArg: any;
 
 @Service({
 	name: 'testServiceWithProvider',
@@ -37,7 +31,6 @@ export var factoryArg: any;
 export class TestServiceWithProvider {
 	
 	static provider(@Inject('$http') $http:any) {
-		providerArgs = arguments;
 		return {
 			$get: function() {
 				return new TestServiceWithProvider(); 
@@ -46,4 +39,3 @@ export class TestServiceWithProvider {
 	}
 	
 }
-export var providerArgs: IArguments;

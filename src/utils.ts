@@ -145,9 +145,24 @@ export function parseSelector(selector: string): Selector {
 
     return {
         semanticeName: m[1],
-        imperativeName: 'TODO',
+        imperativeName: toCamelCase(m[1]),
         type: type
     };
+}
+
+// from mout @ https://github.com/mout/mout/blob/v0.11.0/src/string/camelCase.js
+function toCamelCase(str: string) {
+    str = str.replace(/[\-_]/g, ' ') //convert all hyphens and underscores to spaces
+        .replace(/\s[a-z]/g, upperCase) //convert first char of each word to UPPERCASE
+        .replace(/\s+/g, '') //remove spaces
+        .replace(/^[A-Z]/g, lowerCase); //convert first char to lowercase
+    return str;
+}
+function upperCase(str: string){
+    return str.toUpperCase();
+}
+function lowerCase(str: string) {
+    return str.toLowerCase();
 }
 
 /**

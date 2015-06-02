@@ -28,7 +28,7 @@ export interface FilterOptions {
  */
 export class FilterAnnotation {
 
-    name: string = '';
+    name: string = null;
 
     constructor(options: FilterOptions) {
         setIfInterface(this, options);
