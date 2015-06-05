@@ -3,7 +3,7 @@
 // TODO debug only?
 import {assert} from './assert';
 
-import {makeDecorator, setIfInterface} from './utils';
+import {makeDecorator, setIfInterface, isElement} from './utils';
 import {ModuleOptions, ModuleAnnotation, Module, ModuleConstructor} from './module';
 
 /**
@@ -11,7 +11,8 @@ import {ModuleOptions, ModuleAnnotation, Module, ModuleConstructor} from './modu
  * TODO document
  */
 export interface ApplicationOptions extends ModuleOptions {
-	selector: string;
+	// selector?: string;
+	element: Element
 }
 
 /**
@@ -19,14 +20,20 @@ export interface ApplicationOptions extends ModuleOptions {
  */
 export class ApplicationAnnotation extends ModuleAnnotation {
 
-	selector: string = void 0;
+	// selector: string = void 0;
+	element: Element|Document = void 0;
 
-	constructor(options: ApplicationOptions) {
+	constructor(element: Element|Document);
+	constructor(options: ApplicationOptions);
+	constructor(elementOroptions: any) {
 		super(options);
 		
+		var options = isElement(elementOroptions) ? { element: elementOroptions } : elementOroptions;
+		
 		// TODO debug only?
-        assert.notNull(options, 'options must not be null');
-        assert.notEmpty(options.selector, 'selector cannot be null or empty');
+        assert(options && options.element, 'element must be provided');
+        // assert(options.element || options.selector, 'Either element or selector must be provided');
+		// assert(!(options.element && options.selector), 'Provide either selector or element, but not both');
 		
 		setIfInterface(this, options);
 	}

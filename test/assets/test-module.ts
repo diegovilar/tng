@@ -2,22 +2,51 @@
 
 import {Module} from 'tng/module';
 
-// --
+// Test #1
+
+@Module()	
+export class TestModule1 {
+}
+
+
+
+// Test #2
+
+@Module()	
+export class TestModule2 {
+}
+
+
+
+// Test #3
 
 @Module({
-	name: 'NamedModule'
-})	
-export class NamedModule {
+	name: 'TestModule3'
+})
+export class TestModule3 {
 }
 
-// --
+
+
+// Test #4
+
+@Module({
+	name: 'TestModule4'
+})
+export class TestModule4 {
+}
+
+
+
+// Test #5
 
 @Module()
-export class AnnonymousModule {
-	
+export class TestModule5 {
 }
 
-// --
+
+
+// Test #6
 
 import * as constants from './test-constant';
 import * as values from './test-value';
@@ -26,7 +55,7 @@ import * as components from './test-component';
 import * as directives from './test-directive';
 
 @Module()
-class DepModule{}
+class TestModule6b{}
 
 @Module({
 	dependencies: [
@@ -35,111 +64,141 @@ class DepModule{}
 		services.TestService,
 		directives.TestDirective,
 		components.TestComponent,
-		DepModule
+		TestModule6b
 	]
 })
-export class ModuleWithDependencies {}
+export class TestModule6 {
+}
 
-// --
+
+
+// Test #7
 
 @Module()
-export class InnerModule{}
+export class TestModule7 {
+}
+
+
+
+// Test #8
+
+@Module()
+export class TestModule8b{}
 
 @Module({
 	dependencies: [
-		DepModule
+		TestModule8b
 	]
 })
-export class OutterModule {}
+export class TestModule8 {
+}
 
-// --
+
+
+// Test #9
 
 @Module({
 	dependencies: [
 		function(){}
 	]
 })
-export class ModuleWithInvalidDependencies {}
+export class TestModule9 {
+}
 
-// --
+
+
+// Test #10
 
 @Module({
 	config: function(){}
 })
-export class ModuleWithConfigDecoration{}
+export class TestModule10{
+}
 
-// --
+
+
+// Test #11
 
 @Module()
-export class ModuleWithConfigImplementation {
+export class TestModule11 {
 	
 	onConfig() {
 	}
 	
 }
 
-// --
+
+
+// Test #12
 
 @Module({
-	name: 'ModuleWithConfigDecorationAndImplementation',
+	name: 'TestModule12',
 	config: function(){
-		ModuleWithConfigDecorationAndImplementation.configCallOrder.push('decoration');
+		TestModule12.callOrder.push('decoration');
 	}
 })
-export class ModuleWithConfigDecorationAndImplementation {
+export class TestModule12 {
 	
-	static configCallOrder: string[] = [];
+	static callOrder: string[] = [];
 	
 	onConfig() {
-		ModuleWithConfigDecorationAndImplementation.configCallOrder.push('implementation');
+		TestModule12.callOrder.push('implementation');
 	}
 	
 }
 
-// --
+
+
+// Test #13
 
 @Module({
 	run: function(){}
 })
-export class ModuleWithRunDecoration{}
+export class TestModule13 {
+}
 
-// --
+
+
+// Test #14
 
 @Module()
-export class ModuleWithRunImplementation {
+export class TestModule14 {
 	
 	onRun() {
 	}
 	
 }
 
-// --
 
+
+// Test #15
 
 @Module({
-	name: 'ModuleWithRunDecorationAndImplementation',
+	name: 'TestModule15',
 	run: function(){
-		ModuleWithRunDecorationAndImplementation.runCallOrder.push('decoration');
+		TestModule15.runCallOrder.push('decoration');
 	}
 })
-export class ModuleWithRunDecorationAndImplementation {
+export class TestModule15 {
 	
 	static runCallOrder: string[] = [];
 	
 	onRun() {
-		ModuleWithRunDecorationAndImplementation.runCallOrder.push('implementation');
+		TestModule15.runCallOrder.push('implementation');
 	}
 	
 }
 
-// --
+
+
+// Test #16
 
 @Module()
-export class ModuleToTestIfConstructorGetsCalledWithNgModule {
+export class TestModule16 {
 	
 	static injectedModule: any = null;
 	
 	constructor(ngModule: any) {
-		ModuleToTestIfConstructorGetsCalledWithNgModule.injectedModule = ngModule;
+		TestModule16.injectedModule = ngModule;
 	}
 }

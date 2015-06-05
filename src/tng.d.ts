@@ -522,7 +522,7 @@ declare module "tng/application" {
 	 * TODO document
 	 */
 	export interface ApplicationOptions extends ModuleOptions {
-		selector: string;
+		element: Element|Document;
 	}
 	
 	/**
@@ -535,6 +535,7 @@ declare module "tng/application" {
 	/**
 	 * decorator to annotate a class as being an application
 	 */
+	function Application(element: Element|Document): ClassDecorator;
 	function Application(options: ApplicationOptions): ClassDecorator;
 	
 }
@@ -549,12 +550,12 @@ declare module "tng/bootstrap" {
 	/**
 	 * TODO document
 	 */
-	export function bootstrap(moduleClass: Function, element: Element): ng.auto.IInjectorService;
+	export function bootstrap(moduleClass: Function, element: Element|Document): ng.auto.IInjectorService;
 	
 	/**
 	 * TODO document
 	 */
-	export function bootstrap(moduleClass: Function, selector: string): ng.auto.IInjectorService;
+	// export function bootstrap(moduleClass: Function, selector: string): ng.auto.IInjectorService;
 	
 }
 
@@ -573,17 +574,17 @@ declare module "tng/ui-router" {
 
 declare module "tng/ui-router/states" {
 	
-	type StateConfigMap = {[name:string]:StateConfig};
+	type StateConfigMap = {[name: string]: StateConfig};
 	
 	/**
 	 * Options available when decorating an application controller with states
 	 * TODO document
 	 */
 	export interface StateConfig {
-	    path: string;
+	    url: string;
 	    abstract?: boolean;
 	    view?: Function;
-	    views?: {[outlet:string]: Function};
+	    views?: {[outlet: string]: Function};
 	    parent?: StateConfig|string;
 	}
 	
@@ -596,7 +597,7 @@ declare module "tng/ui-router/states" {
 
 declare module "tng/ui-router/routes" {
 	
-	type RoutesMap = {[route:string]:string|Function};
+	type RoutesMap = {[route: string]: string|Function};
 	
 	/**
 	 * A decorator to annotate with routes

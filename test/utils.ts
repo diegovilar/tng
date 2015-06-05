@@ -1,5 +1,8 @@
 /// <reference path="./_references" />
 
+export function newElement(tag='div'): Element {
+	return document.createElement(tag);
+}
 
 export class ModuleSpy {
 	
@@ -44,13 +47,14 @@ export var angularSpy = {
 	
 	module: <jasmine.Spy> null,
 	
-	spy: function(callThrough=false) {
+	spy: function(callThrough=false, spyModules=false) {
 		
 		var orignal = angular.module;
 		var spy = spyOn(angular, 'module');
 		
-		if (callThrough) spy.and.callFake(function() {			
-			return new ModuleSpy(orignal.apply(null, arguments));
+		if (callThrough) spy.and.callFake(function() {
+			let ngModule = orignal.apply(null, arguments);
+			return spyModules ? new ModuleSpy(ngModule) : ngModule;
 		});
 		// if (callThrough) spy.and.callThrough();
 		
@@ -58,8 +62,8 @@ export var angularSpy = {
 				
 	},
 	
-	spyAndCallThrough: function() {
-		angularSpy.spy(true);
+	spyAndCallThrough: function(spyModules=false) {
+		angularSpy.spy(true, spyModules);
 	}
 	
 };

@@ -1,5 +1,8 @@
 /// <reference path="../_references" />
 
+// TODO debug only?
+import {assert} from '../assert';
+
 import {bind} from '../di';
 import {makeDecorator, create, isString, isFunction, Map, isArray, forEach} from '../utils';
 import {getAnnotations, mergeAnnotations} from '../reflection';
@@ -11,7 +14,7 @@ import {ViewAnnotation} from '../view';
  */
 export interface StateConfig {
     
-    path: string;
+    url: string;
     abstract?: boolean;
     view?: Function;
     views?: {[outlet:string]: Function};
@@ -60,34 +63,39 @@ export var States = <StatesDecorator> makeDecorator(StatesAnnotation);
 /**
  * @internal
  */
-export function registerStates(moduleController: Function, ngModule: ng.IModule) {
+export function publishStates(moduleController: Function, ngModule: ng.IModule) {
     
-    var notes = <StatesAnnotation[]> getAnnotations(moduleController, StatesAnnotation);
+    // Reflect.decorate apply decorators reversely, so we need to reverse
+    // the extracted annotations before merging them
+    var notes = <StatesAnnotation[]> getAnnotations(moduleController, StatesAnnotation).reverse();
         
     if (!notes.length) return;
     
-    var states:InternalStateConfig[] = [];
+    var states: ng.ui.IState[] = [];
     
     forEach(notes, (note) =>
         forEach(note.states, (state) =>
-            states.push(state)));
+            states.push( translateToUiState(state) )));
     
     ngModule.config(bind(['$stateProvider'], ($stateProvider: ng.ui.IStateProvider) => {
         
         for (let state of states) {
-            $stateProvider.state(translateToUiState(state));
+            $stateProvider.state(state);
         }
                 
     })); 
     
 }
 
+/**
+ * @internal
+ */
 function translateToUiState(state: InternalStateConfig): ng.ui.IState {
     
     var translatedState:ng.ui.IState = {};
     
     if (state.name) translatedState.name = state.name;
-    if (state.path) translatedState.url = state.path;
+    if (state.url) translatedState.url = state.url;
     if (state.abstract) translatedState.abstract = state.abstract;
     
     // If the state has a parent, we force the string way
@@ -123,6 +131,9 @@ function translateToUiState(state: InternalStateConfig): ng.ui.IState {
 
 }
 
+/**
+ * @internal
+ */
 function extractViewData(viewModel: Function) {
     
     // Reflect.decorate apply decorators reversely, so we need to reverse
@@ -133,7 +144,7 @@ function extractViewData(viewModel: Function) {
         throw new Error('Template not defined');
     }
     
-    let template = <ViewAnnotation> mergeAnnotations(create(ViewAnnotation), ...notes);
+    let template = <ViewAnnotation> mergeAnnotations({}, ...notes);
     let data:any = {};
     
     data.controller = viewModel;

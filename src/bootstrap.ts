@@ -31,10 +31,10 @@ import {ModuleConstructor, ModuleAnnotation, publishModule} from './module';
 /**
  * 
  */
-export function bootstrap(moduleClass: ApplicationConstructor): ng.auto.IInjectorService;
-export function bootstrap(moduleClass: ModuleConstructor, element: Element): ng.auto.IInjectorService;
-export function bootstrap(moduleClass: ModuleConstructor, selector: string): ng.auto.IInjectorService;
-export function bootstrap(moduleClass: ModuleConstructor, selectorOrElement?: any): ng.auto.IInjectorService {
+export function bootstrap(applicationClass: ApplicationConstructor): ng.auto.IInjectorService;
+export function bootstrap(moduleClass: ModuleConstructor, element: Element|Document): ng.auto.IInjectorService;
+// export function bootstrap(moduleClass: ModuleConstructor, selector: string): ng.auto.IInjectorService;
+export function bootstrap(moduleClass: ModuleConstructor, element?: Element|Document): ng.auto.IInjectorService {
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
@@ -45,14 +45,14 @@ export function bootstrap(moduleClass: ModuleConstructor, selectorOrElement?: an
     
     var annotation = <ApplicationAnnotation> mergeAnnotations({}, ...aux);
 
-    selectorOrElement = selectorOrElement || annotation.selector;
+    element = element || annotation.element;
     
     // TODO debug only?
-    assert(selectorOrElement, 'No selector specified');
+    assert(element, 'element must be provided');
 
     var ngModule = publishModule(moduleClass);
 
-    return angular.bootstrap(selectorOrElement, [ngModule.name]);
+    return angular.bootstrap(<any> element, [ngModule.name]);
 
 }
 

@@ -18,6 +18,7 @@ module.exports = function(config) {
       // libraries
       { pattern: 'bower_components/angular/angular.js', watched: false },
       { pattern: 'bower_components/angular-mocks/angular-mocks.js', watched: false },      
+      { pattern: 'bower_components/angular-ui-router/release/angular-ui-router.js', watched: false },      
       { pattern: 'bower_components/reflect-metadata/Reflect.js', watched: false },      
       { pattern: 'bower_components/**/*.map', watched: false, included: false },      
       { pattern: 'bower_components/**/*.ts', watched: false, included: false },      

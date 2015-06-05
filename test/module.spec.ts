@@ -10,11 +10,10 @@ describe('@Module >', function() {
 	
 	describe('publishModule >', function() {
 		
-		beforeEach(angularSpy.spyAndCallThrough);
-		
+		// Test #1
 		it('should only accept classes decorated through @Module', function() {
 			function aModule() {
-				publishModule(assets.NamedModule);
+				publishModule(assets.TestModule1);
 			}
 			expect(aModule).not.toThrow();
 			
@@ -24,31 +23,35 @@ describe('@Module >', function() {
 			expect(notModule).toThrow();
 		});
 		
+		// Test #2
 		it('should publish the module through angular.module', function() {
-			publishModule(assets.NamedModule);
+			angularSpy.spy();
+			publishModule(assets.TestModule2);
 			expect(angularSpy.module).toHaveBeenCalled();
 		});
 		
+		// Test #3
 		it('should use the annotated name for the module', function() {
-			publishModule(assets.NamedModule);
-			var name = angularSpy.module.calls.mostRecent().args[0];
-			expect(name).toBe('NamedModule');
+			var ngModule = publishModule(assets.TestModule3);
+			expect(ngModule.name).toBe('TestModule3');
 		});
 		
+		// Test #4
 		it('should use the name passed through parameter instead of the annotated one', function() {
-			publishModule(assets.NamedModule, 'newName');
-			var name = angularSpy.module.calls.mostRecent().args[0];
-			expect(name).toBe('newName');
+			var ngModule = publishModule(assets.TestModule4, 'newName');
+			expect(ngModule.name).toBe('newName');
 		});
 		
-		it('should use the name passed through parameter instead of the annotated one', function() {
-			publishModule(assets.AnnonymousModule);
-			var name = angularSpy.module.calls.mostRecent().args[0];
-			expect(name).toBe('tng_generated_module#1');
+		// Test #5
+		it('should use an auto-generated name otherwise', function() {
+			var ngModule = publishModule(assets.TestModule5);
+			expect(ngModule.name).toMatch(/tng_generated_module#\d+/);
 		});
 		
+		// Test #6
 		it('should publish values, constants, services, directives, components and other modules', function() {
-			var moduleSpy = <ModuleSpy><any> publishModule(assets.ModuleWithDependencies);
+			angularSpy.spyAndCallThrough(true);
+			var moduleSpy = <ModuleSpy><any> publishModule(assets.TestModule6);
 			expect(moduleSpy.constant).toHaveBeenCalled();
 			expect(moduleSpy.value).toHaveBeenCalled();
 			expect(moduleSpy.service).toHaveBeenCalled();
@@ -56,15 +59,32 @@ describe('@Module >', function() {
 			expect(angularSpy.module.calls.count()).toBe(2); // 1 for itself, 1 for the module it depends on
 		});
 		
-		it('should not publish the same dependent module twice', function() {
-			publishModule(assets.InnerModule);
-			publishModule(assets.OutterModule);
-			expect(angularSpy.module.calls.count()).toBe(2); // Innere does not get republished by Outter
+		// Test #7
+		it('should not publish the same module twice to angular', function() {
+			angularSpy.spyAndCallThrough();
+			publishModule(assets.TestModule7);
+			publishModule(assets.TestModule7);
+			
+			// Second call to angular.module uses the get module signature (angular.module(name)),
+			// taking just 1 parameter, to retrieve the already published module TestModule7
+			expect(angularSpy.module.calls.mostRecent().args.length).toBe(1);
 		});
 		
+		// Test #8
+		it('even as a dependency', function() {
+			angularSpy.spyAndCallThrough();
+			publishModule(assets.TestModule8b);
+			publishModule(assets.TestModule8); // depends on TestModule8b
+			
+			// Second call to angular.module uses the get module signature (angular.module(name)),
+			// taking just 1 parameter, to retrieve the already published module TestModule8b
+			expect(angularSpy.module.calls.argsFor(1).length).toBe(1);
+		});
+		
+		// Test #9
 		it('should not allow unknown dependencies', function() {
 			function invalidDependency() {
-				publishModule(assets.ModuleWithInvalidDependencies);
+				publishModule(assets.TestModule9);
 			} 
 			expect(invalidDependency).toThrow();
 		});
@@ -73,59 +93,68 @@ describe('@Module >', function() {
 	
 	describe('config >', function() {
 		
-		beforeEach(angularSpy.spyAndCallThrough);
-		
+		// Test #10
 		it('if configuration functions are provided through decoration, register them', function() {
-			var moduleSpy = <ModuleSpy><any> publishModule(assets.ModuleWithConfigDecoration);
-			expect(moduleSpy.config).toHaveBeenCalled();
+			angularSpy.spyAndCallThrough(true);
+			var ngModule = publishModule(assets.TestModule10);
+			expect(ngModule.config).toHaveBeenCalled();
 		});
 		
+		// Test #11
 		it('if configuration functions are provided through implementation, register them', function() {
-			var moduleSpy = <ModuleSpy><any> publishModule(assets.ModuleWithConfigImplementation);
-			expect(moduleSpy.config).toHaveBeenCalled();
+			angularSpy.spyAndCallThrough(true);
+			var ngModule = publishModule(assets.TestModule11);
+			expect(ngModule.config).toHaveBeenCalled();
 		});
 		
-		it('implementation config functions get registered BEFORE decoration config functions', function() {
-			var moduleSpy = <ModuleSpy><any> publishModule(assets.ModuleWithConfigDecorationAndImplementation);
+		// Test #12
+		it('implementation config functions get executed BEFORE decoration config functions', function() {
+			angularSpy.spyAndCallThrough(true);
+			publishModule(assets.TestModule12);
 			
 			// load the module
-			angular.mock.module('ModuleWithConfigDecorationAndImplementation');
+			angular.mock.module('TestModule12');
 			angular.mock.inject();
 			
-			expect(assets.ModuleWithConfigDecorationAndImplementation.configCallOrder).toEqual(['implementation', 'decoration']);
+			expect(assets.TestModule12.callOrder).toEqual(['implementation', 'decoration']);
 		});
 		
 	});
 	
 	describe('run >', function() {
 		
-		beforeEach(angularSpy.spyAndCallThrough);
-		
+		// Test #13
 		it('if initialization functions are provided through decoration, register them', function() {
-			var ngModule = publishModule(assets.ModuleWithRunDecoration);
+			angularSpy.spyAndCallThrough(true);
+			var ngModule = publishModule(assets.TestModule13);
 			expect(ngModule.run).toHaveBeenCalled();
 		});
 		
+		// Test #14
 		it('if initialization functions are provided through implementation, register them', function() {
-			var ngModule =publishModule(assets.ModuleWithRunImplementation);
+			angularSpy.spyAndCallThrough(true);
+			var ngModule = publishModule(assets.TestModule14);
 			expect(ngModule.run).toHaveBeenCalled();
 		});
 		
-		it('implementation initialization functions get registered BEFORE decoration initialization functions', function() {
-			publishModule(assets.ModuleWithRunDecorationAndImplementation);
+		// Test #15
+		it('implementation initialization functions get executed BEFORE decoration initialization functions', function() {
+			angularSpy.spyAndCallThrough(true);
+			publishModule(assets.TestModule15);
 			
 			// load the module
-			angular.mock.module('ModuleWithRunDecorationAndImplementation');
+			angular.mock.module('TestModule15');
 			angular.mock.inject();
 			
-			expect(assets.ModuleWithRunDecorationAndImplementation.runCallOrder).toEqual(['implementation', 'decoration']);
+			expect(assets.TestModule15.runCallOrder).toEqual(['implementation', 'decoration']);
 		});
 		
 	});
 	
+	// Test #16
 	it('module constructors should receive a reference to their respective angular module when instantiating', function() {
-		var ngModule = publishModule(assets.ModuleToTestIfConstructorGetsCalledWithNgModule);
-		expect(ngModule).toBe(assets.ModuleToTestIfConstructorGetsCalledWithNgModule.injectedModule);
+		var ngModule = publishModule(assets.TestModule16);
+		expect(ngModule).toBe(assets.TestModule16.injectedModule);
 	})
 	
 });

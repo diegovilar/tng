@@ -14,7 +14,7 @@ import {ServiceAnnotation, publishService} from './service';
 import {DecoratorAnnotation, publishDecorator} from './decorator';
 import {DirectiveAnnotation, publishDirective} from './directive';
 import {ComponentAnnotation, publishComponent} from './component';
-import {registerStates} from './ui-router/states';
+import {publishStates} from './ui-router/states';
 import {registerRoutes} from './ui-router/routes';
 
 const PUBLISHED_ANNOTATION_KEY = 'tng:module-published-as';
@@ -137,12 +137,12 @@ export function publishModule(moduleClass: ModuleConstructor, name?: string): ng
             }
             else if (hasAnnotation(dep, ModuleAnnotation)) {
                 // If the module has alrady been published, we just push it's name
-                if (publishedAs = Reflect.getOwnMetadata(PUBLISHED_ANNOTATION_KEY, dep)) {
-                    modules.push(publishedAs);
-                }
-                else {
+                // if (publishedAs = Reflect.getOwnMetadata(PUBLISHED_ANNOTATION_KEY, dep)) {
+                    // modules.push(publishedAs);
+                // }
+                // else {
                     modules.push(publishModule(<ModuleConstructor> dep).name);
-                }
+                // }
             }
             else if (dep instanceof ConstantWrapper) {
                 constants.push(dep);
@@ -201,7 +201,7 @@ export function publishModule(moduleClass: ModuleConstructor, name?: string): ng
     }
     for (let fn of runFns) ngModule.run(fn);
     
-    registerStates(moduleClass, ngModule);
+    publishStates(moduleClass, ngModule);
     registerRoutes(moduleClass, ngModule);
 
     for (let item of values) publishValue(item, ngModule);

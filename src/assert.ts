@@ -5,9 +5,9 @@ import {isString, isArray} from './utils';
 var slice = Array.prototype.slice;
 
 export interface AssertFunction extends Function {
-	(test: boolean): void;
-	(test: boolean, errorMessage: string): void;
-	(test: boolean, error: Error): void;
+	(test: any): void;
+	(test: any, errorMessage: string): void;
+	(test: any, error: Error): void;
 }
 
 export interface NotNullFunction extends Function {
