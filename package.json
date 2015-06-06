@@ -1,7 +1,7 @@
 {
   "name": "tng",
   "version": "0.0.8",
-  "description": "Angular 1.x on TypeScript",
+  "description": "Angular 1.4 on TypeScript",
   "main": "build/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

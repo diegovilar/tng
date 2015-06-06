@@ -5,7 +5,7 @@
   "authors": [
     "Diego Vilar <diegovilar@gmail.com>"
   ],
-  "description": "Angular 1.x on TypeScript",
+  "description": "Angular 1.4 on TypeScript",
   "main": "build-browser/tng.js",
   "moduleType": [
     "amd",
