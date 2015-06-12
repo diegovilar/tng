@@ -574,7 +574,8 @@ declare module "tng/ui-router" {
 
 declare module "tng/ui-router/states" {
 	
-	type StateConfigMap = {[name: string]: StateConfig};
+    type StateConfigMap = { [name: string]: StateConfig };
+    type EventHandler = (event: ng.IAngularEvent, ...args: any[]) => void;
 	
 	/**
 	 * Options available when decorating an application controller with states
@@ -586,12 +587,18 @@ declare module "tng/ui-router/states" {
 	    view?: Function;
 	    views?: {[outlet: string]: Function};
 	    parent?: StateConfig|string;
-	}
+    }
+    
+    export interface StatesDecorator {
+        (states: StateConfigMap): ClassDecorator;
+        on(eventName: string, handler: EventHandler): ClassDecorator;
+    }
 	
 	/**
 	 * A decorator to annotate a class with states
 	 */
-	function States(states: StateConfigMap): ClassDecorator;
+    export var States: StatesDecorator;
+	// function States(states: StateConfigMap): ClassDecorator;
 	
 }
 

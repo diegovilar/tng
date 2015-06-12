@@ -6,7 +6,7 @@ import {ModuleSpy} from './utils';
 // assets
 import * as assets from './assets/test-service';
 
-describe('@Service >',function() {
+describe('@Service >', function() {
 	
 	describe('publishServie >', function() {
 		

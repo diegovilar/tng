@@ -4,7 +4,7 @@
 import {assert} from '../assert';
 
 import {bind} from '../di';
-import {makeDecorator, create, isString, isFunction, Map, isArray, forEach} from '../utils';
+import {makeDecorator, create, isDefined, isString, isFunction, Map, isArray, forEach} from '../utils';
 import {getAnnotations, mergeAnnotations} from '../reflection';
 import {ViewAnnotation} from '../view';
 
@@ -53,12 +53,25 @@ export class StatesAnnotation {
 
 }
 
-type StatesDecorator = (states: Map<StateConfig>) => ClassDecorator;
+type EventHandler = (event: ng.IAngularEvent, ...args: any[]) => void;
+
+export class UiRouterEventListenerAnnotation {
+    
+    constructor(public eventName: string, public handler: EventHandler) {
+    }
+    
+}
+
+export interface StatesDecorator {
+    (states: Map<StateConfig>): ClassDecorator;
+    on(eventName: string, handler: EventHandler): ClassDecorator;
+}
 
 /**
  * A decorator to annotate a class with states
  */
-export var States = <StatesDecorator> makeDecorator(StatesAnnotation);
+export var States = <StatesDecorator> <any> makeDecorator(StatesAnnotation);
+States.on = makeDecorator(UiRouterEventListenerAnnotation);
 
 /**
  * @internal
@@ -67,23 +80,34 @@ export function publishStates(moduleController: Function, ngModule: ng.IModule) 
     
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    var notes = <StatesAnnotation[]> getAnnotations(moduleController, StatesAnnotation).reverse();
+    var statesAnnotation = <StatesAnnotation[]> getAnnotations(moduleController, StatesAnnotation).reverse();
+    var listenerNotes = <UiRouterEventListenerAnnotation[]> getAnnotations(moduleController, UiRouterEventListenerAnnotation).reverse();
         
-    if (!notes.length) return;
+    if (statesAnnotation.length) {
+        let states: ng.ui.IState[] = [];
+
+        forEach(statesAnnotation, (note) =>
+            forEach(note.states, (state) =>
+                states.push(translateToUiState(state))));
+
+        ngModule.config(bind(['$stateProvider'], ($stateProvider: ng.ui.IStateProvider) => {
+
+            for (let state of states) {
+                $stateProvider.state(state);
+            }
+
+        }));
+    }
     
-    var states: ng.ui.IState[] = [];
-    
-    forEach(notes, (note) =>
-        forEach(note.states, (state) =>
-            states.push( translateToUiState(state) )));
-    
-    ngModule.config(bind(['$stateProvider'], ($stateProvider: ng.ui.IStateProvider) => {
-        
-        for (let state of states) {
-            $stateProvider.state(state);
-        }
-                
-    })); 
+    if (listenerNotes.length) {        
+        ngModule.run(bind(['$rootScope'], ($rootScope: ng.IRootScopeService) => {
+
+            for (let listenerAnnotation of listenerNotes) {
+                $rootScope.$on(listenerAnnotation.eventName, listenerAnnotation.handler);
+            }
+
+        }));
+    }
     
 }
 
@@ -94,12 +118,12 @@ function translateToUiState(state: InternalStateConfig): ng.ui.IState {
     
     var translatedState:ng.ui.IState = {};
     
-    if (state.name) translatedState.name = state.name;
-    if (state.url) translatedState.url = state.url;
-    if (state.abstract) translatedState.abstract = state.abstract;
+    if (isDefined(state.name)) translatedState.name = state.name;
+    if (isDefined(state.url)) translatedState.url = state.url;
+    if (isDefined(state.abstract)) translatedState.abstract = state.abstract;
     
     // If the state has a parent, we force the string way
-    if (state.parent) {
+    if (isDefined(state.parent)) {
         let parent = state.parent;
         if (!isString(parent)) {
             parent = (<InternalStateConfig> parent).name;
