@@ -574,8 +574,120 @@ declare module "tng/ui-router" {
 
 declare module "tng/ui-router/states" {
 	
-    type StateConfigMap = { [name: string]: StateConfig };
-    type EventHandler = (event: ng.IAngularEvent, ...args: any[]) => void;
+    type StateConfigMap = { [stateName: string]: StateConfig };
+    
+    /**
+     * Enumeration of events related to the transition of states.
+     */
+    export const enum StateChangeEvent {
+        
+        /**
+         * Fired when the transition begins.
+         * 
+         * Translates to the UI-Router $stateChangeStart event.
+         * 
+         * The $rootScope broadcasts this event down to child scopes.
+         * 
+         * The handler function receives the following parameters:
+         * 
+         * - event: ng.IAngularEvent
+         * - toState: 
+         * - toParams: 
+         * - fromState:
+         * - fromParams: 
+         * 
+         * Note: Use event.preventDefault() to prevent the transition from happening.
+         */
+        STATE_CHANGE_START,
+        
+        /**
+         * Fired once the state transition is complete.
+         * 
+         * Translates to the UI-Router $stateChangeSuccess event.
+         * 
+         * The $rootScope broadcasts this event down to child scopes.
+         * 
+         * The handler function receives the following parameters:
+         * 
+         * - event: ng.IAngularEvent
+         * - toState: 
+         * - toParams: 
+         * - fromState:
+         * - fromParams:
+         */
+        STATE_CHANGE_SUCCESS,
+        
+        /**
+         * Fired when an error occurs during transition.
+         * 
+         * Translates to the UI-Router $stateChangeError event.
+         * 
+         * The $rootScope broadcasts this event down to child scopes.
+         * 
+         * The handler function receives the following parameters:
+         * 
+         * - event: ng.IAngularEvent
+         * - toState: 
+         * - toParams: 
+         * - fromState:
+         * - fromParams:
+         * - error: Error
+         * 
+         * Note: It's important to note that if you have any errors in your
+         * resolve functions (JavaScript errors, non-existent services, etc)
+         * they will not throw traditionally. You must listen for this
+         * event to catch ALL errors. Use event.preventDefault() to prevent
+         * the $UrlRouter from reverting the URL to the previous valid location
+         * (in case of a URL navigation).
+         */
+        STATE_CHANGE_ERROR
+        
+        /**
+         * TODO: From version 0.3.0 and up. Does it have a stable release?
+         * 
+         * Fired when a state cannot be found by its name.
+         * 
+         * Translates to the UI-Router $stateNotFound event.
+         * 
+         * The $rootScope broadcasts this event down to child scopes.
+         */
+        // STATE_NOT_FOUND
+        
+    }
+    
+    /**
+     * Enumeration of events related to the loading of view contents.
+     */
+    export const enum ViewLoadEvent {
+        
+        /**
+         * Fired once the view begins loading, before the DOM is rendered.
+         * 
+         * Translates to the UI-Router $viewContentLoading event.
+         * 
+         * The $rootScope broadcasts this event down to child scopes.
+         * 
+         * The handler function receives the following parameters:
+         * 
+         * - event: ng.IAngularEvent
+         * - viewConfig: 
+         */
+        VIEW_CONTENT_LOADING = 4,
+        
+        /**
+         * Fired once the view is loaded, after the DOM is rendered. 
+         * 
+         * Translates to the UI-Router $viewContentLoaded event.
+         * 
+         * The '$scope' of the view emits the event up to the $rootScope.
+         * 
+         * The handler function receives the following parameter:
+         * 
+         * - event: ng.IAngularEvent
+         */
+        VIEW_CONTENT_LOADED = 5
+        
+    }
 	
 	/**
 	 * Options available when decorating an application controller with states
@@ -590,15 +702,23 @@ declare module "tng/ui-router/states" {
     }
     
     export interface StatesDecorator {
+        /**
+         * Decorates a module with states.
+         */
         (states: StateConfigMap): ClassDecorator;
-        on(eventName: string, handler: EventHandler): ClassDecorator;
+        
+        /**
+         * Add a listener to a given UI-Router emitted events.
+         * @param event The event to listen to
+         * @param handler The function to invoke when the event is fired
+         */
+        on(event: StateChangeEvent|ViewLoadEvent|string, handler: Function): ClassDecorator;
     }
 	
 	/**
 	 * A decorator to annotate a class with states
 	 */
     export var States: StatesDecorator;
-	// function States(states: StateConfigMap): ClassDecorator;
 	
 }
 

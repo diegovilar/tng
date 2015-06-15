@@ -7,6 +7,9 @@ import {bind} from '../di';
 import {makeDecorator, create, isDefined, isString, isFunction, Map, isArray, forEach} from '../utils';
 import {getAnnotations, mergeAnnotations} from '../reflection';
 import {ViewAnnotation} from '../view';
+import {On, publishListeners} from './events';
+
+export {StateChangeEvent, ViewLoadEvent} from './events';
 
 /**
  * Options available when decorating an application controller with states
@@ -53,25 +56,16 @@ export class StatesAnnotation {
 
 }
 
-type EventHandler = (event: ng.IAngularEvent, ...args: any[]) => void;
-
-export class UiRouterEventListenerAnnotation {
-    
-    constructor(public eventName: string, public handler: EventHandler) {
-    }
-    
-}
-
 export interface StatesDecorator {
     (states: Map<StateConfig>): ClassDecorator;
-    on(eventName: string, handler: EventHandler): ClassDecorator;
+    on: typeof On;
 }
 
 /**
  * A decorator to annotate a class with states
  */
 export var States = <StatesDecorator> <any> makeDecorator(StatesAnnotation);
-States.on = makeDecorator(UiRouterEventListenerAnnotation);
+States.on = On;
 
 /**
  * @internal
@@ -79,13 +73,13 @@ States.on = makeDecorator(UiRouterEventListenerAnnotation);
 export function publishStates(moduleController: Function, ngModule: ng.IModule) {
     
     // Reflect.decorate apply decorators reversely, so we need to reverse
-    // the extracted annotations before merging them
+    // the extracted annotations to ge them on the original order
     var statesAnnotation = <StatesAnnotation[]> getAnnotations(moduleController, StatesAnnotation).reverse();
-    var listenerNotes = <UiRouterEventListenerAnnotation[]> getAnnotations(moduleController, UiRouterEventListenerAnnotation).reverse();
         
     if (statesAnnotation.length) {
         let states: ng.ui.IState[] = [];
 
+        // Translate each state from each annotation and stack them in an array        
         forEach(statesAnnotation, (note) =>
             forEach(note.states, (state) =>
                 states.push(translateToUiState(state))));
@@ -99,15 +93,7 @@ export function publishStates(moduleController: Function, ngModule: ng.IModule) 
         }));
     }
     
-    if (listenerNotes.length) {        
-        ngModule.run(bind(['$rootScope'], ($rootScope: ng.IRootScopeService) => {
-
-            for (let listenerAnnotation of listenerNotes) {
-                $rootScope.$on(listenerAnnotation.eventName, listenerAnnotation.handler);
-            }
-
-        }));
-    }
+    publishListeners(moduleController, ngModule);
     
 }
 

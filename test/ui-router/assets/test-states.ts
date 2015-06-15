@@ -2,7 +2,7 @@
 
 import {Module} from 'tng/module';
 import {View} from 'tng/view';
-import {States} from 'tng/ui-router/states';
+import {States, ViewLoadEvent, StateChangeEvent} from 'tng/ui-router/states';
 
 
 // Common assets
@@ -103,7 +103,7 @@ export class Test4 {
 // test 5
 
 @Module()
-@States.on('$viewContentLoading', test5eventHandler)
+@States.on(ViewLoadEvent.VIEW_CONTENT_LOADING, test5eventHandler)
 export class Test5 {
 }
 
