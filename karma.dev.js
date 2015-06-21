@@ -24,12 +24,12 @@ module.exports = function(config) {
       { pattern: 'bower_components/**/*.ts', watched: false, included: false },      
 
       // tested code
-      { pattern: 'build-browser/tng.js', watched: false },
-      { pattern: 'build-browser/tng.js.map', watched: false, included: false },
+      { pattern: 'dev/tng.js', watched: false },
+      { pattern: 'dev/tng.js.map', watched: false, included: false },
 
       // specs
-      { pattern: 'build-browser/tng-tests.js', watched: false },
-      { pattern: 'build-browser/tng-tests.js.map', watched: false, included: false }
+      { pattern: 'dev/tng-tests.js', watched: false },
+      { pattern: 'dev/tng-tests.js.map', watched: false, included: false }
     ],
 
 

@@ -26,7 +26,7 @@ export class About {
 	controllerAs: 'menu',
     templateUrl: 'menu.html'
 })
-export class Menu {	
+export class Menu {
 }
 
 
