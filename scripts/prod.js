@@ -7,7 +7,7 @@ var mkdir = require('mkdir-p').sync;
 var fs = require('fs-extra');
 var uglifyjs = require('uglifyjs');
 
-var config = require('../gulp.config');
+var config = require('../gulpconfig');
 var test = require('./test');
 
 var helpers = require('./helpers');

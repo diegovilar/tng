@@ -7,7 +7,7 @@ var watch = require('gulp-watch');
 var karma = require('karma');
 var debounce = require('mout/function/debounce');
 
-var config = require('../gulp.config');
+var config = require('../gulpconfig');
 var tsc = require('./tsc');
 var test = require('./test');
 

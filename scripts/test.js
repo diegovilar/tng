@@ -4,7 +4,7 @@ var del = require('del');
 var glob = require("glob");
 var karma = require('karma');
 
-var config = require('../gulp.config');
+var config = require('../gulpconfig');
 var helpers = require('./helpers');
 
 

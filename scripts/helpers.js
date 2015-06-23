@@ -13,7 +13,7 @@ var source = require('vinyl-source-stream');
 var util = require('util');
 var fs = require('fs');
 var ts = require("typescript");
-var config = require('../gulp.config');
+var config = require('../gulpconfig');
 
 
 exports.colors = colors;
