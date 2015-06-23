@@ -13,7 +13,6 @@
         "sourceMap": false
     },
     "files": [        
-        "./src/main.ts",
-        "./src/main-browser.ts"
+        "./src/main.ts"
     ]
 }

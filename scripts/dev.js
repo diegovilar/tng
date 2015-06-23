@@ -1,11 +1,15 @@
-var config = require('./config');
+/// <reference path="../typings/node/node.d.ts"/>
+
 var del = require('del');
 var glob = require("glob");
 var gulp = require('gulp');
 var watch = require('gulp-watch');
 var karma = require('karma');
 var debounce = require('mout/function/debounce');
+
+var config = require('../gulp.config');
 var tsc = require('./tsc');
+var test = require('./test');
 
 var helpers = require('./helpers');
 var log = helpers.log;
@@ -19,7 +23,7 @@ var bundle = helpers.bundle;
 exports.cleanTask = cleanTask;
 function cleanTask (cb) {
     
-    del(config.dev.dir + '/*', cb);
+    del(config.dev.destDir + '/*', cb);
     
 }
 
@@ -32,8 +36,8 @@ function buildTask() {
     return bundle(
         null,
         config.exportedModules,
-        config.dev.dir,
-        'tng.js',
+        config.dev.destDir,
+        config.dev.bundleFileName,
         false
     );
 
@@ -48,8 +52,8 @@ function watchTask() {
     return bundle(
         null,
         config.exportedModules,
-        config.dev.dir,
-        'tng.js',
+        config.dev.destDir,
+        config.dev.bundleFileName,
         true
     );
 
@@ -61,63 +65,43 @@ function watchTask() {
 
 exports.test = {};
 
-/**
- * 
- */
-exports.test.cleanTask = function (cb) {
-    
-    del([config.dev.test.compiledSpecsGlob, config.dev.test.mapsGlob], cb);
-    
-};
+var bundleFile = config.dev.destDir + '/' + config.dev.bundleFileName;
+var bundleMapFile = bundleFile + '.map';
+var files = [
+    { pattern: bundleFile, watched: false },
+    { pattern: bundleMapFile, watched: false, included: false },
+];
 
 /**
  * 
  */
-exports.test.buildTask = function (cb) {
-
-    // var glob = require('glob');
-    var files = glob.sync(config.dev.test.specsGlob);
-
-    for (var i = 0; i < files.length; i++) {
-        var file = files[i];
-        tsc.compile([file], config.dev.test.tsCompilerOptions);
-    }
-
-    cb();
-
-};
+exports.test.runTask = test.createRunnerTask({
+    files: files,
+    port: 10188 // same as serverTask
+});
 
 /**
  * 
  */
-exports.test.runTask = function (cb) {
-
-    karma.runner.run({
-        configFile: config.dev.test.karmaConfig
-    }, function () {
-        cb && cb();
-    });
-
-};
- 
- /**
- * 
- */
-exports.test.serverTask = function (cb) {
-
-    karma.server.start({
-        configFile: config.dev.test.karmaConfig,
-        singleRun: false
-    });
-    
-    cb && setTimeout(cb, 5000);
-    
-};
+exports.test.runOnceTask = test.createServerTask({
+    files: files,
+    singleRun: true,
+    port: 10189
+});
 
 /**
  * 
  */
-exports.test.watchTask = function (cb) {
+exports.test.serverTask = test.createServerTask({
+    files: files,
+    singleRun: false,
+    port: 10188
+});
+
+/**
+ * 
+ */
+exports.test.watchTask = function () {
 
     var tngBundleError = null;
     var testsBundleError = null;
@@ -125,21 +109,18 @@ exports.test.watchTask = function (cb) {
     var testsBundle;
 
     var runTest = debounce(function runTest() {
-        // var runTest = function runTest() {
         if (tngBundleError)
             log(colors.yellow('Skiping tests due to TNG bundle error'));
         else if (testsBundleError)
             log(colors.yellow('Skiping tests due to tests bundle error'));
         else
-            // gulp.start('test:run');
             exports.test.runTask();
-        // };
     }, 3000);
 
     linkTngBundle();
     linkTestsBundle();
 
-    watch('src/**/*', function (file) {
+    watch(config.srcDir + '/**/*', function (file) {
         if (file.event == 'add' || file.event == 'unlink') {
             log(colors.green('File ' + file.event + 'ed to TNG. Restarting bundler...'));
             tngBundle.bundler.close();
@@ -147,7 +128,7 @@ exports.test.watchTask = function (cb) {
         }
     });
 
-    watch('test/**/*', function (file) {
+    watch(config.test.srcDir + '/**/*', function (file) {
         if (file.event == 'add' || file.event == 'unlink') {
             log(colors.green('File ' + file.event + 'ed to tests. Restarting bundler...'));
             testsBundle.bundler.close();
@@ -165,28 +146,12 @@ exports.test.watchTask = function (cb) {
     }
 
     function linkTestsBundle() {
-        testsBundle = watchAndBundleTests();
+        testsBundle = test.watchTask();
         testsBundle.events.on('bundle.end', function (err) {
             testsBundleError = err;
             runTest.cancel();
             runTest();
         });
-    }
-    
-    function watchAndBundleTests() {
-    
-        var files = glob.sync('test/**/*.spec.ts');
-        // files = files.concat(glob.sync('test/**/*.ts'));
-        // files = lodash.uniq(files);
-        
-         return helpers.bundle(
-            files,
-            null,
-            config.dev.dir,
-            'tng-tests.js',
-            true
-        );
-        
     }
 
 };

@@ -9,11 +9,11 @@ var mkdir = require('mkdir-p').sync;
 var buffer = require('vinyl-buffer')
 var sourcemaps = require('gulp-sourcemaps');
 var gulp = require('gulp');
-var output = require('vinyl-source-stream');
+var source = require('vinyl-source-stream');
 var util = require('util');
 var fs = require('fs');
 var ts = require("typescript");
-var config = require('./config');
+var config = require('../gulp.config');
 
 
 exports.colors = colors;
@@ -21,6 +21,7 @@ exports.colors = colors;
 
 exports.proxyEmitter = proxyEmitter;
 function proxyEmitter(emitter, proxy, prefix) {
+    
   var oldEmit = emitter.emit;
 
   emitter.emit = function () {
@@ -32,12 +33,13 @@ function proxyEmitter(emitter, proxy, prefix) {
   };
   
   return emitter;
+  
 }
 
 
 
 exports.bundle = bundle;
-function bundle(entryFilePath, requires, destPath, destFileName, continuous) {
+function bundle(entryFilePath, requires, destPath, destFileName, continuous, tsOptions, minify) {
     
     var emitter = new EventEmitter2({wildcard: true});
     var bundler;
@@ -65,7 +67,13 @@ function bundle(entryFilePath, requires, destPath, destFileName, continuous) {
     
     proxyEmitter(bundler, emitter, 'bundler');
     
-    bundler.plugin('tsify', parseTypescriptConfig(config.tsconfigPath).compilerOptions);
+    tsOptions = assign({}, parseTypescriptConfig(config.tsConfigPath).compilerOptions, tsOptions)
+    bundler.plugin('tsify', tsOptions);
+    
+    if (minify) {
+        // bundler.plugin('minifyify', {map: 'tng.js.map', output: './prod/tng.js.map'});
+        bundler.plugin('minifyify', {map: false});
+    }
     
     if (requires) {
         bundler.require(requires);
@@ -83,14 +91,18 @@ function bundle(entryFilePath, requires, destPath, destFileName, continuous) {
         proxyEmitter(lastBundle, emitter, 'bundle');
         
         // Error handling
-        lastBundle.on('error', onBundleError)
-            .pipe(plumber());
+        lastBundle = lastBundle.on('error', onBundleError)
+            .pipe(plumber())
+            .pipe(source(destFileName));
             
-        lastBundle.pipe(output(destFileName))
-            .pipe(buffer())
-            .pipe(sourcemaps.init({ loadMaps: true }))
-            .pipe(sourcemaps.write('./'))
-            .pipe(gulp.dest(destPath));
+        if (!minify) {
+            lastBundle = lastBundle
+                .pipe(buffer())
+                .pipe(sourcemaps.init({ loadMaps: true }))
+                .pipe(sourcemaps.write('./'))
+        }
+            
+        lastBundle = lastBundle.pipe(gulp.dest(destPath));
         
         return lastBundle;
     }
@@ -172,5 +184,23 @@ function tsc(fileNames, options) {
     //    grunt.log(`Process exiting with code '${exitCode}'.`);
     //}
     //return exitCode;
+    
+}
+
+exports.getKarmaOptions = getKarmaOptions;
+function getKarmaOptions(karmaConfigFile) {
+    
+    var karmaConfig = require(karmaConfigFile);
+    
+    var result;
+    var config = {
+        set: function (options) {
+            result = options; 
+        }
+    }
+    
+    karmaConfig(config);
+    
+    return result;
     
 }

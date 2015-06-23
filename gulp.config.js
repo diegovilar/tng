@@ -1,33 +1,33 @@
-/// <reference path="../typings/node/node.d.ts"/>
+/// <reference path="typings/node/node.d.ts"/>
 
-var ts = require("typescript");
+var path = require('path');
 
 
 
-exports.srcDir   = './src';
-exports.buildDir = './build';
-exports.srcFiles     = 'src/**/*.ts';
-exports.tsconfigPath = './tsconfig.json';
+// -- Paths and files
+
+exports.srcDir = 'src';
+exports.tsConfigPath = path.resolve(__dirname, 'tsconfig.json');
+exports.karmaConfigPath = path.resolve(__dirname, 'karma.config.js');
 
 exports.dev = {};
-exports.dev.dir = './dev';
-exports.dev.test = {};
-exports.dev.test.specsGlob = 'test/**/*.ts';
-exports.dev.test.compiledSpecsGlob = 'test/**/*.js';
-exports.dev.test.mapsGlob = 'test/**/*.map';
-exports.dev.test.karmaConfig = __dirname + '/../karma.dev.js';
+exports.dev.destDir = 'build/dev';
+exports.dev.bundleFileName = 'tng.js';
 
-exports.dev.test.tsCompilerOptions = {
-    noEmitOnError: true,
-    noImplicitAny: true,
-    preserveConstEnums: true,
-    sourceMap: true,
-    target: ts.ScriptTarget.ES5,
-    module: ts.ModuleKind.CommonJS
-};
+exports.prod = {};
+exports.prod.destDir = 'build/prod';
+exports.prod.bundleFileName = 'tng.js';
+
+exports.test = {};
+exports.test.srcDir = 'test';
+exports.test.destDir = 'build/test';
+exports.test.bundleFileName = 'tng-test.js';
+exports.test.specFilesGlob = 'test/**/*.spec.ts';
+
 
 
 // -- Exported TNG modules --
+
 exports.exportedModules = [
     { expose: 'tng',                file: './src/main.ts' },
     { expose: 'tng/animation',      file: './src/animation.ts' },

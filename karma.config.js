@@ -21,15 +21,7 @@ module.exports = function(config) {
       { pattern: 'bower_components/angular-ui-router/release/angular-ui-router.js', watched: false },      
       { pattern: 'bower_components/reflect-metadata/Reflect.js', watched: false },      
       { pattern: 'bower_components/**/*.map', watched: false, included: false },      
-      { pattern: 'bower_components/**/*.ts', watched: false, included: false },      
-
-      // tested code
-      { pattern: 'dev/tng.js', watched: false },
-      { pattern: 'dev/tng.js.map', watched: false, included: false },
-
-      // specs
-      { pattern: 'dev/tng-tests.js', watched: false },
-      { pattern: 'dev/tng-tests.js.map', watched: false, included: false }
+      { pattern: 'bower_components/**/*.ts', watched: false, included: false }
     ],
 
 

@@ -1,11 +1,14 @@
 /// <reference path="../typings/node/node.d.ts"/>
 
 var gulp = require('gulp');
-var config = require('./config');
+var glob = require("glob");
 var del = require('del');
 var mkdir = require('mkdir-p').sync;
-var fs = require('fs');
+var fs = require('fs-extra');
 var uglifyjs = require('uglifyjs');
+
+var config = require('../gulp.config');
+var test = require('./test');
 
 var helpers = require('./helpers');
 var log = helpers.log;
@@ -17,7 +20,7 @@ var bundle = helpers.bundle;
 exports.cleanTask = cleanTask;
 function cleanTask(cb) {
     
-    del(config.buildDir + '/*', cb);
+    del(config.prod.destDir + '/*', cb);
     
 }
 
@@ -27,66 +30,88 @@ function cleanTask(cb) {
  * Compiles the project
  */
 exports.buildTask = buildTask;
-function buildTask(cb) {
+function buildTask() {
     
-    var tsconfig = helpers.parseTypescriptConfig(config.tsconfigPath);
-    var options = tsconfig.compilerOptions;
+    var tsOptions = {
+        removeComments: true
+    };
+
+    var b = bundle(
+        null,
+        config.exportedModules,
+        config.prod.destDir,
+        config.prod.bundleFileName,
+        false,
+        tsOptions
+        // true
+    );
     
-    options.outDir = config.buildDir;
-    //options.declaration = true;
-    options.sourceMap = true;
+    fs.copySync(config.srcDir + '/tng.d.ts', config.prod.destDir + '/tng.d.ts');
     
-    mkdir(config.buildDir);
+    return b;
     
-    // TODO errors?
-    // Compile ts files
-    try {
-        helpers.tsc(tsconfig.files, options);
-    }
-    catch (e) {
-        log(colors.red('Build error:'), helpers.inspect(e));
-    }
-    
-    cb();
+    // b.events.on('bundle.end', function (err) {
+    //     setTimeout(function () {
+    //         cb && cb();
+    //     }, 3000);
+    // });
+
+}
+
+exports.minifyTask = minifyTask;
+function minifyTask(cb) {
+        
+    // setTimeout(function () {
+        var result = uglifyjs.minify(config.prod.destDir + '/tng.js', {
+            inSourceMap: config.prod.destDir + '/tng.js.map',
+            outSourceMap: 'tng-min.js.map',
+            mangle: true,
+            compress: {}
+        });
+        
+        fs.writeFileSync(config.prod.destDir + '/tng-min.js', result.code);
+        fs.writeFileSync(config.prod.destDir + '/tng-min.js.map', result.map);
+        
+        cb && cb();
+    // }, 5000);
     
 }
+
+
+
+//-- test
+
+exports.test = {};
+
+var bundleFile = config.prod.destDir + '/' + config.prod.bundleFileName;
+var bundleMapFile = bundleFile + '.map';
+var files = [
+    { pattern: bundleFile, watched: false },
+    { pattern: bundleMapFile, watched: false, included: false },
+];
 
 /**
  * 
  */
-// exports.watch = watch;
-// function watch() {
-    
-//     var files = helpers.parseTypescriptConfig(config.tsconfigPath).files;
-    
-//     // We also want to monitor these files
-//     files.push(config.srcDir + '/**');
-//     files.push(config.tsconfigPath);    
-    
-//     gulp.watch(files, function(event) {
-//         log('File', colors.magenta(event.path), colors.yellow(event.type));
-//         gulp.start(['build']);
-//     });
-    
-// }
+exports.test.runTask = test.createRunnerTask({
+    files: files,
+    port: 10288 // same as serverTask
+});
 
+/**
+ * 
+ */
+exports.test.runOnceTask = test.createServerTask({
+    files: files,
+    singleRun: true,
+    port: 10289
+});
 
-
-
-
-//-- Helpers
-
-function minify(cb) {
-        
-    var result = uglifyjs.minify(config.devDir + '/tng.js', {
-        inSourceMap: config.devDir + '/tng.js.map',
-        outSourceMap: 'tng.js.map',        
-        mangle: true,
-        compress: {}
-    });
-    
-    fs.writeFileSync(config.devDir + '/tng-min.js', result.code);
-    fs.writeFileSync(config.devDir + '/tng-min.js.map', result.map);
-    
-    cb();
-}
+/**
+ * 
+ */
+exports.test.serverTask = test.createServerTask({
+    files: files,
+    singleRun: false,
+    port: 10288
+});

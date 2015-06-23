@@ -1,6 +1,7 @@
 /// <reference path="../typings/angularjs/angular.d.ts" />
 
 declare module "tng" {
+    
 	export {Inject, bind} from "tng/di";
 	export {Value} from "tng/value";
 	export {Constant} from "tng/constant";
@@ -15,13 +16,7 @@ declare module "tng" {
 	export {Module, publishModule} from "tng/module";
 	export {Application} from "tng/application";
 	export {bootstrap} from "tng/bootstrap";
-	
-	export {
-		getAnnotations,
-		setAnnotations,
-		addAnnotation,
-		hasAnnotation
-	} from 'tng/reflection';
+    
 }
 
 declare module "tng/di" {
