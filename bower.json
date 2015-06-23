@@ -6,30 +6,25 @@
     "Diego Vilar <diegovilar@gmail.com>"
   ],
   "description": "Angular 1.4 on TypeScript",
-  "main": "build-browser/tng.js",
-  "moduleType": [
-    "amd",
-    "globals",
-    "node"
-  ],
+  "main": "build/prod/tng.js",
   "keywords": [
     "angular",
     "typescript"
   ],
   "license": "MIT",
   "ignore": [
-    "**/.*",
     "node_modules",
     "bower_components",
     "test",
-    "tests"
+    "src",
+    "scripts"
   ],
   "devDependencies": {
-    "angular": "1.4.0",
-    "reflect-metadata": "0.1.0",
-    "angular-ui-router": "~0.2.15"
+    "angular-mocks": "1.4.0",
+    "angular-ui-router": "0.2.15"
   },
   "dependencies": {
-    "angular-mocks": "~1.4.0"
+    "angular": "1.4.0",
+    "reflect-metadata": "0.1.0"
   }
 }
