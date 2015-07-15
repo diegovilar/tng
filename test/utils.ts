@@ -3,7 +3,7 @@
 export function newElement(tag='div'): Element {
 	return document.createElement(tag);
 }
-
+ 
 export class ModuleSpy {
 	
 	constructor(ngModule?: ng.IModule) {
