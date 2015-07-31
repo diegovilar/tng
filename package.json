@@ -1,6 +1,6 @@
 {
   "name": "tng",
-  "version": "0.0.8",
+  "version": "0.0.9-alpha.1",
   "description": "Angular 1.4 on TypeScript",
   "main": "build/prod/tng.js",
   "scripts": {
@@ -30,7 +30,7 @@
     "mout": "0.11.0",
     "reflect-metadata": "0.1.0",
     "tsify": "https://github.com/diegovilar/tsify.git",
-    "typescript": "1.5.0-beta",
+    "typescript": "1.5.3",
     "uglifyjs": "2.4.10",
     "vinyl-buffer": "1.0.0",
     "vinyl-source-stream": "1.1.0",
