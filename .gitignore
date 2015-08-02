@@ -1,5 +1,9 @@
+/bower_components
 /node_modules
 /build
-/bower_components
 /build-browser
 /dev
+/dist
+/typings/*
+!/typings/node
+!/typings/tng

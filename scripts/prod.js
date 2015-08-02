@@ -46,7 +46,7 @@ function buildTask() {
         // true
     );
     
-    fs.copySync(config.srcDir + '/tng.d.ts', config.prod.destDir + '/tng.d.ts');
+    //fs.copySync(config.srcDir + '/tng.d.ts', config.prod.destDir + '/tng.d.ts');
     
     return b;
     

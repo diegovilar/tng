@@ -121,13 +121,14 @@ function translateToUiState(state: InternalStateConfig): ng.ui.IState {
         (<any> translatedState).parent = parent;
     }
 
-    if (state.view && state.views) {
-        throw Error('Cannot provide both view and views');
-    }
-    else if (!state.view && !state.views) {
-        throw Error('Must provide either view or views');
-    }
-    else {
+    // if (state.view && state.views) {
+    //     throw Error('Cannot provide both view and views');
+    // }
+    // else if (!state.view && !state.views) {
+    //     throw Error('Must provide either view or views');
+    // }
+    // else {
+    if (state.view || state.views) {
         let views = <{[key:string]:any}> {};
 
         if (state.view) {

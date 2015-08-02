@@ -1,4 +1,4 @@
-/// <reference path="../typings/angularjs/angular.d.ts" />
+/// <reference path="../angularjs/angular.d.ts" />
 
 declare module "tng" {
 
