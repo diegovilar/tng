@@ -4,6 +4,6 @@
 /build-browser
 /dev
 /dist
-/typings/*
-!/typings/node
-!/typings/tng
+#/typings/*
+#!/typings/node
+#!/typings/tng

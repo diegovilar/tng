@@ -554,6 +554,18 @@ declare module "tng/bootstrap" {
 
 }
 
+declare module 'tng/reflection' {
+
+	export function getAnnotations(target: any, type?: Function, key?: string): any[];
+
+	export function setAnnotations(target: any, annotations: any[], key?: string): void;
+
+	export function addAnnotation(target: any, annotation: any, key?: string): void;
+
+	export function hasAnnotation(target: any, type?: Function, key?: string): boolean;
+
+}
+
 
 
 // ----------------------------------------------------------------------------
@@ -731,16 +743,88 @@ declare module "tng/ui-router/routes" {
 
 }
 
-// --
 
-declare module 'tng/reflection' {
 
-	export function getAnnotations(target: any, type?: Function, key?: string): any[];
+// ----------------------------------------------------------------------------
 
-	export function setAnnotations(target: any, annotations: any[], key?: string): void;
+// UI-Bootstrap
 
-	export function addAnnotation(target: any, annotation: any, key?: string): void;
+declare module "tng/ui/bootstrap" {
 
-	export function hasAnnotation(target: any, type?: Function, key?: string): boolean;
+	import {ViewOptions} from "tng/view";
+	type StringMap = {[key: string]: string};
+
+	export enum ModalBackdrop {
+		Show,
+		Hide,
+		Static
+	}
+
+	/**
+	 * Options available when decorating a component with view information
+	 * TODO document
+	 */
+	export interface ModalViewOptions extends ViewOptions {
+
+		animation?: boolean;
+		backdrop?: ModalBackdrop;
+		backdropClass?: string;
+		keyboard?: boolean;
+		windowClass?: string;
+		windowTemplateUrl?: string;
+		size?: string;
+
+	}
+
+	/**
+	 * A decorator to annotate a component with view information
+	 */
+	function ModalView(options: ModalViewOptions): ClassDecorator;
+
+	/**
+	 * TODO document
+	 */
+	export interface ModalOptions {
+
+		scope?: ng.IScope;
+	    bindToController?: boolean;
+		resolve?: {[key: string]: string|Function};
+		keyboard?: boolean;
+
+	}
+
+
+	/**
+	 * Interface components MAY implement
+	 */
+	export interface Modal {
+
+	}
+
+	/**
+	 * A decorator to annotate a class as being a component controller
+	 */
+	function Modal(options: ModalOptions): ClassDecorator;
+
+}
+
+
+declare module angular.ui.bootstrap {
+
+	// interface Modal {
+
+	// }
+
+	interface IModalServiceInstance {
+
+	}
+
+	interface IModalService {
+        /**
+         * @param {Function} modal
+         * @returns {IModalServiceInstance}
+         */
+        open(modal: Function): angular.ui.bootstrap.IModalServiceInstance;
+    }
 
 }
