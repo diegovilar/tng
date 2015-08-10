@@ -1,4 +1,4 @@
-/// <reference path="./_references" />
+/// <reference path="./_references.ts" />
 
 import {makeDecorator, setIfInterface} from './utils';
 import {ViewOptions, ViewAnnotation} from './view';
@@ -22,12 +22,12 @@ export const NAMESPACE_MAP = ['html', 'svg', 'math'];
  * TODO document
  */
 export interface ComponentViewOptions extends ViewOptions {
-    
+
     /**
-     * 
+     *
      */
     namespace?: ComponentTemplateNamespace;
-    
+
     /**
      * @deprecated
      */

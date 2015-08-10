@@ -7,3 +7,4 @@
 /// <reference path="node/node.d.ts" />
 /// <reference path="typescript/typescript.d.ts" />
 /// <reference path="tng/tng.d.ts" />
+/// <reference path="angular-ui-bootstrap/angular-ui-bootstrap.d.ts" />

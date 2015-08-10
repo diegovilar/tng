@@ -21,6 +21,7 @@ export interface StateConfig {
     abstract?: boolean;
     view?: Function;
     views?: {[outlet:string]: Function};
+    modal?: Function,
     parent?: StateConfig|string;
     reloadOnSearch?: boolean;
     onEnter?: Function;

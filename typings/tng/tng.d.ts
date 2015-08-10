@@ -705,6 +705,7 @@ declare module "tng/ui-router/states" {
 	    abstract?: boolean;
 	    view?: Function;
 	    views?: {[outlet: string]: Function};
+		modal?: Function;
 	    parent?: StateConfig|string;
 		reloadOnSearch?: boolean;
 		onEnter?: Function;
@@ -752,7 +753,7 @@ declare module "tng/ui-router/routes" {
 declare module "tng/ui/bootstrap" {
 
 	import {ViewOptions} from "tng/view";
-	type StringMap = {[key: string]: string};
+	// type StringMap = {[key: string]: string};
 
 	export enum ModalBackdrop {
 		Show,
@@ -790,6 +791,7 @@ declare module "tng/ui/bootstrap" {
 	    bindToController?: boolean;
 		resolve?: {[key: string]: string|Function};
 		keyboard?: boolean;
+		dismissAll?: boolean;
 
 	}
 

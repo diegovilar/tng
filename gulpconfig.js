@@ -52,5 +52,7 @@ exports.exportedModules = [
     // TODO extract to different bundle
     { expose: 'tng/ui-router',          file: './src/ui-router.ts' },
     { expose: 'tng/ui-router/routes',   file: './src/ui-router/routes.ts' },
-    { expose: 'tng/ui-router/states',   file: './src/ui-router/states.ts' }
+    { expose: 'tng/ui-router/states',   file: './src/ui-router/states.ts' },
+    { expose: 'tng/ui/bootstrap',       file: './src/ui-bootstrap.ts' },
+    { expose: 'tng/ui/bootstrap/modal', file: './src/ui-bootstrap/modal.ts' }
 ];

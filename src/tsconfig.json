@@ -8,12 +8,9 @@
         "preserveConstEnums": true,
         "removeComments": false,
         "experimentalDecorators": true,
-        
+
         "outDir": "./build",
         "declaration": false,
         "sourceMap": false
-    },
-    "files": [        
-        "./src/main.ts"
-    ]
+    }
 }

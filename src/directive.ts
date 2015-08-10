@@ -34,10 +34,10 @@ export interface CommonDirectiveOptions {
     // [name] = attribute
     // //name = comment (unavailable)
     selector: string;
-    
+
     // infered from the selector
     //restrict?: Restriction|Restriction[]; // [Restriction.Element, Restriction.Element]
-    
+
     // TODO Como simplificar
     // TODO depende de controllerAs?
     // TODO como realmente funciona bindToController no 1.4? Nas docs,
@@ -46,10 +46,10 @@ export interface CommonDirectiveOptions {
     bind?: boolean|Map<string>;
 
     require?: string[];
-    
+
     // needs mapping
     transclude?: Transclusion; // Transclusion.Content
-        
+
     compile?: CompileFunction|FunctionReturningPrePost;
     link?: FunctionReturningNothing|PrePost;
 
@@ -68,7 +68,7 @@ export class CommonDirectiveAnnotation {
     compile: CompileFunction|FunctionReturningPrePost = void 0;
     link: FunctionReturningNothing|PrePost = void 0;
 
-    constructor(options: CommonDirectiveAnnotation) {
+    constructor(options: CommonDirectiveOptions) {
         // TODO debug only?
         assert.notNull(options, 'options must not be null');
         assert.notEmpty(options.selector, 'selector must not be null or empty');
@@ -122,7 +122,7 @@ export interface DirectiveConstructor extends Function {
 type DirectiveDecorator = (options: DirectiveOptions) => ClassDecorator;
 
 /**
- * 
+ *
  */
 export var Directive = <DirectiveDecorator> makeDecorator(DirectiveAnnotation);
 
@@ -132,11 +132,11 @@ export function publishDirective(directiveClass: DirectiveConstructor, ngModule:
     assert(hasAnnotation(directiveClass, DirectiveAnnotation), 'Did you decorate it with @Directive?');
 
     var {name, factory} = makeDirectiveFactory(directiveClass);
-    
+
     // TODO consider provided selector, if any
-    
+
     ngModule.directive(name, factory);
-    
+
     return ngModule;
 
 }
@@ -182,14 +182,14 @@ export function makeCommonDO(directiveClass: DirectiveConstructor): DirectiveDef
     mergeAnnotations(annotation, ...aux);
 
     var selectorData = parseSelector(annotation.selector);
-    
+
     var ddo: DirectiveDefinitionObject = {
         semanticName: selectorData.semanticeName,
         imperativeName: selectorData.imperativeName,
         restrict: RESTRICTION_MAP[selectorData.type],
         controller: directiveClass
     };
-    
+
     if (annotation.scope != null) ddo.scope = annotation.scope;
     if (annotation.bind != null) ddo.bindToController = annotation.bind;
     if (annotation.transclude != null) ddo.transclude = TRANSCLUSION_MAP[annotation.transclude];
@@ -204,7 +204,7 @@ export function makeCommonDO(directiveClass: DirectiveConstructor): DirectiveDef
  * @internal
  */
 export function makeDirectiveDO(directiveClass: DirectiveConstructor): DirectiveDefinitionObject {
-    
+
     var ddo = makeCommonDO(<DirectiveConstructor> directiveClass);
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
@@ -212,7 +212,7 @@ export function makeDirectiveDO(directiveClass: DirectiveConstructor): Directive
     var aux = getAnnotations(directiveClass, DirectiveAnnotation).reverse();
     var annotation = <DirectiveAnnotation> {/*no defaults*/};
     mergeAnnotations(annotation, ...aux);
-    
+
     if (annotation.multiElement != null) ddo.multiElement = annotation.multiElement;
     if (annotation.priority != null) ddo.priority = annotation.priority;
     if (annotation.terminal != null) ddo.terminal = annotation.terminal;

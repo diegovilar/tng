@@ -1,13 +1,13 @@
-/// <reference path="./_references" />
+/// <reference path="./_references.ts" />
 
-import {assert} from './assert';
+import {assert} from './assert'
 
-import {Inject, bind, hasInjectAnnotation} from './di';
-import {makeDecorator, Map, setIfInterface, isFunction, isDefined} from './utils';
-import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils';
-import {hasAnnotation, getAnnotations, mergeAnnotations} from './reflection';
-import {ViewAnnotation} from './view';
-import {ComponentViewAnnotation, NAMESPACE_MAP} from './component-view';
+import {Inject, bind, hasInjectAnnotation} from './di'
+import {makeDecorator, Map, setIfInterface, isFunction, isDefined} from './utils'
+import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils'
+import {hasAnnotation, getAnnotations, mergeAnnotations} from './reflection'
+import {ViewAnnotation} from './view'
+import {ComponentViewAnnotation, NAMESPACE_MAP} from './component-view'
 import {CommonDirectiveOptions, CommonDirectiveAnnotation} from './directive'
 import {Directive, DirectiveAnnotation, DirectiveConstructor, Transclusion} from './directive'
 import {makeCommonDO, DirectiveDefinitionObject, inFactory as inFactoryDirective} from './directive'
@@ -65,17 +65,17 @@ export interface ComponentDefinitionObject extends DirectiveDefinitionObject {
 export function publishComponent(componentClass: ComponentConstructor, ngModule: ng.IModule, selector?: string): ng.IModule {
 
     // TODO debug only?
-    assert(hasAnnotation(componentClass, ComponentAnnotation), 'Missing @Component decoration');    
+    assert(hasAnnotation(componentClass, ComponentAnnotation), 'Missing @Component decoration');
     assert(hasAnnotation(componentClass, ViewAnnotation), 'Missing @View decoration');
-    
+
     var {name, factory} = makeComponentFactory(componentClass);
 
-    // TODO Allow for selector override through parameter    
+    // TODO Allow for selector override through parameter
 
     ngModule.directive(name, factory);
-    
+
     return ngModule;
-    
+
 }
 
 /**
@@ -87,21 +87,21 @@ export function makeComponentDO(componentClass: ComponentConstructor): Component
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    var aux = getAnnotations(componentClass, ComponentViewAnnotation).reverse(); 
+    var aux = getAnnotations(componentClass, ComponentViewAnnotation).reverse();
     var view = <ComponentViewAnnotation> {/*no defaults*/};
     mergeAnnotations(view, ...aux);
-    
+
     // TODO Component restrictions?
-        
+
     if (view.controllerAs != null) {
         cdo.controllerAs = view.controllerAs;
     }
     if (view.namespace != null) {
         cdo.templateNamespace = NAMESPACE_MAP[view.namespace];
     }
-    
+
     // TODO styleUrl
-    
+
     if (view.template != null) {
         cdo.template = view.template;
     }
@@ -111,7 +111,7 @@ export function makeComponentDO(componentClass: ComponentConstructor): Component
     else {
         throw new Error('Component has no template. Use either template or templateUrl');
     }
-        
+
     return cdo;
 
 }
@@ -138,9 +138,9 @@ export function inFactory(cdo: ComponentDefinitionObject, $injector: ng.auto.IIn
             });
         };
     }
-    
+
     // TODO styleUrl
-    
+
     return cdo;
 
 }
