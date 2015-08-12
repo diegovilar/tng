@@ -1,15 +1,16 @@
 /// <reference path="../_references" />
 
 // TODO debug only?
-import {assert} from '../assert';
+import {assert} from '../assert'
 
-import {bind} from '../di';
-import {makeDecorator, create, isDefined, isString, isFunction, Map, isArray, forEach} from '../utils';
-import {getAnnotations, mergeAnnotations} from '../reflection';
-import {ViewAnnotation} from '../view';
-import {On, publishListeners} from './events';
+import {bind} from '../di'
+import {makeDecorator, create, isDefined, isString, isFunction, Map, isArray, forEach, safeBind} from '../utils'
+import {getAnnotations, mergeAnnotations} from '../reflection'
+import {ViewAnnotation} from '../view'
+import {On, publishListeners} from './events'
+import {getModalHandler} from '../ui-bootstrap/modal'
 
-export {StateChangeEvent, ViewLoadEvent} from './events';
+export {StateChangeEvent, ViewLoadEvent} from './events'
 
 /**
  * Options available when decorating an application controller with states
@@ -103,7 +104,7 @@ export function publishStates(moduleController: Function, ngModule: ng.IModule) 
  */
 function translateToUiState(state: InternalStateConfig): ng.ui.IState {
 
-    var translatedState:ng.ui.IState = {};
+    var translatedState: ng.ui.IState = {};
 
     if (isDefined(state.name)) translatedState.name = state.name;
     if (isDefined(state.url)) translatedState.url = state.url;
@@ -140,6 +141,31 @@ function translateToUiState(state: InternalStateConfig): ng.ui.IState {
         }
 
         translatedState.views = views;
+    }
+    else if (state.modal) {
+        let handler = getModalHandler(state.modal);
+
+        if (translatedState.onEnter) {
+            let onEnter = <Function> translatedState.onEnter;
+            translatedState.onEnter = bind(['$injector'], function($injector: ng.auto.IInjectorService) {
+                $injector.invoke(onEnter);
+                $injector.invoke(handler.open, handler);
+            });
+        }
+        else {
+            translatedState.onEnter = safeBind(handler.open, handler);
+        }
+
+        if (translatedState.onExit) {
+            let onExit = <Function> translatedState.onExit;
+            translatedState.onExit = bind(['$injector'], function($injector: ng.auto.IInjectorService) {
+                $injector.invoke(handler.dismiss, handler);
+                $injector.invoke(onExit);
+            });
+        }
+        else {
+            translatedState.onExit = safeBind(handler.dismiss, handler);
+        }
     }
 
     return translatedState;

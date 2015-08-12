@@ -9,6 +9,13 @@ import {makeDecorator, create, isDefined, isString, isFunction, Map, isArray, fo
 import {hasAnnotation, getAnnotations, mergeAnnotations} from '../reflection'
 import {ModalViewAnnotation, MODAL_BACKDROP_MAP} from './modal-view'
 
+import IModalServiceInstance = ng.ui.bootstrap.IModalServiceInstance
+import IModalService = ng.ui.bootstrap.IModalService
+import IModalSettings = ng.ui.bootstrap.IModalSettings
+import IModalStackService = ng.ui.bootstrap.IModalStackService
+
+export {ModalView, ModalBackdrop} from './modal-view'
+
 
 
 export interface ModalOptions {
@@ -44,19 +51,36 @@ type ModalDecorator = (options: ModalOptions) => ClassDecorator;
  */
 export var Modal = <ModalDecorator> makeDecorator(ModalAnnotation);
 
-class ModalHandler {
+export class ModalHandler {
 
-    private $modalInstance: ng.ui.bootstrap.IModalSettings = null;
+    private instance: IModalServiceInstance = null;
 
-    constructor(@Inject('$modal') private $modal: ng.ui.bootstrap.IModalService ){
+    constructor(private modalNotes: ModalAnnotation, private settings: IModalSettings){
 
     }
 
-    // open(): ng.ui.bootstrap.IModalServiceInstance {
+    open(@Inject('$modal') $modal: IModalService,
+         @Inject('$modalStack') $modalStack: IModalStackService): IModalServiceInstance {
 
-    //     this.$modalInstance = this.$modal.open({});
+        if (this.modalNotes.dismissAll) {
+            $modalStack.dismissAll();
+        }
 
-    // }
+        this.instance = $modal.open(this.settings);
+        return this.instance;
+
+    }
+
+    dismiss(@Inject('$modalStack') $modalStack: IModalStackService) {
+
+        if (this.modalNotes.dismissAll) {
+            $modalStack.dismissAll();
+        }
+        else {
+            this.instance.dismiss();
+        }
+
+    }
 
 }
 
@@ -70,36 +94,58 @@ export function getModalHandler(modalClass: Function): ModalHandler {
     assert(modalNotes, 'Missing @Modal decoration');
     assert(viewNotes, 'Missing @ModalView decoration');
 
-    // var handler =
+    var settings: ng.ui.bootstrap.IModalSettings = {
+        controller: modalClass
+    };
 
-    // var modal = <ModalAnnotation> {/*no defaults*/};
-    // mergeAnnotations(modal, ...modalNotes);
+    var modal = <ModalAnnotation> {/*no defaults*/};
+    mergeAnnotations(modal, ...modalNotes);
 
-    // var view = <ModalViewAnnotation> {/*no defaults*/};
-    // mergeAnnotations(view, ...viewNotes);
+    if (isDefined(modal.scope)) {
+        settings.scope = modal.scope;
+    }
 
-    // var settings: ng.ui.bootstrap.IModalSettings = {
-    //     controller: modalClass
-    // };
+    if (isDefined(modal.bindToController)) {
+        settings.bindToController = modal.bindToController;
+    }
 
-    // if (isDefined(modal.bindToController)) {
-    //     settings.bindToController = modal.bindToController;
-    // }
+    // TODO resolve
 
-    // if (isDefined(modal.keyboard)) {
-    //     settings.keyboard = modal.keyboard;
-    // }
+    if (isDefined(modal.keyboard)) {
+        settings.keyboard = modal.keyboard;
+    }
 
-    // if (isDefined(modal.scope)) {
-    //     settings.scope = modal.scope;
-    // }
+    var view = <ModalViewAnnotation> {/*no defaults*/};
+    mergeAnnotations(view, ...viewNotes);
 
-    // if (isDefined(modal.dismissAll)) {
-    //     settings.scope = modal.scope;
-    // }
+    if (isDefined(view.animation)) {
+        settings.animation = view.animation;
+    }
 
+    if (isDefined(view.backdrop)) {
+        settings.backdrop = MODAL_BACKDROP_MAP[view.backdrop];
+    }
 
-    // return settings;
-    return null
+    if (isDefined(view.backdropClass)) {
+        settings.backdropClass = view.backdropClass;
+    }
+
+    if (isDefined(view.keyboard)) {
+        settings.keyboard = view.keyboard;
+    }
+
+    if (isDefined(view.windowClass)) {
+        settings.windowClass = view.windowClass;
+    }
+
+    if (isDefined(view.windowTemplateUrl)) {
+        settings.windowTemplateUrl = view.windowTemplateUrl;
+    }
+
+    if (isDefined(view.size)) {
+        settings.size = view.size;
+    }
+
+    return new ModalHandler(modal, settings);
 
 }
