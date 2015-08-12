@@ -6,6 +6,8 @@ var del = require('del');
 var mkdir = require('mkdir-p').sync;
 var fs = require('fs-extra');
 var uglifyjs = require('uglifyjs');
+var path = require('path');
+var assign = require('lodash.assign');
 
 var config = require('../gulpconfig');
 var test = require('./test');
@@ -15,13 +17,28 @@ var log = helpers.log;
 var colors = helpers.colors;
 var bundle = helpers.bundle;
 
-// --
+
+
+function getTsOptions() {
+
+    var tsConfigOptions = { compilerOptions: {} };
+
+    try {
+        tsConfigOptions = helpers.parseTypescriptConfig(
+            path.resolve(config.srcDir, 'tsconfig.json')
+        );
+    }
+    finally {
+        return assign({}, tsConfigOptions.compilerOptions, config.prod.tsOptions);
+    }
+
+}
 
 exports.cleanTask = cleanTask;
 function cleanTask(cb) {
-    
+
     del(config.prod.destDir + '/*', cb);
-    
+
 }
 
 
@@ -31,10 +48,6 @@ function cleanTask(cb) {
  */
 exports.buildTask = buildTask;
 function buildTask() {
-    
-    var tsOptions = {
-        removeComments: true
-    };
 
     var b = bundle(
         null,
@@ -42,14 +55,14 @@ function buildTask() {
         config.prod.destDir,
         config.prod.bundleFileName,
         false,
-        tsOptions
+        getTsOptions()
         // true
     );
-    
+
     //fs.copySync(config.srcDir + '/tng.d.ts', config.prod.destDir + '/tng.d.ts');
-    
+
     return b;
-    
+
     // b.events.on('bundle.end', function (err) {
     //     setTimeout(function () {
     //         cb && cb();
@@ -60,7 +73,7 @@ function buildTask() {
 
 exports.minifyTask = minifyTask;
 function minifyTask(cb) {
-        
+
     // setTimeout(function () {
         var result = uglifyjs.minify(config.prod.destDir + '/tng.js', {
             inSourceMap: config.prod.destDir + '/tng.js.map',
@@ -68,13 +81,13 @@ function minifyTask(cb) {
             mangle: true,
             compress: {}
         });
-        
+
         fs.writeFileSync(config.prod.destDir + '/tng-min.js', result.code);
         fs.writeFileSync(config.prod.destDir + '/tng-min.js.map', result.map);
-        
+
         cb && cb();
     // }, 5000);
-    
+
 }
 
 
@@ -91,7 +104,7 @@ var files = [
 ];
 
 /**
- * 
+ *
  */
 exports.test.runTask = test.createRunnerTask({
     files: files,
@@ -99,7 +112,7 @@ exports.test.runTask = test.createRunnerTask({
 });
 
 /**
- * 
+ *
  */
 exports.test.runOnceTask = test.createServerTask({
     files: files,
@@ -108,7 +121,7 @@ exports.test.runOnceTask = test.createServerTask({
 });
 
 /**
- * 
+ *
  */
 exports.test.serverTask = test.createServerTask({
     files: files,

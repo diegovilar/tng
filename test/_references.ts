@@ -1,5 +1,5 @@
-/// <reference path="../typings/karma-jasmine/karma-jasmine"/>
-/// <reference path="../typings/angularjs/angular"/>
-/// <reference path="../typings/angularjs/angular-mocks"/>
-/// <reference path="../typings/angular-ui-router/angular-ui-router"/>
-/// <reference path="../src/tng" />
+/// <reference path="../typings/karma-jasmine/karma-jasmine.d.ts"/>
+/// <reference path="../typings/angularjs/angular.d.ts"/>
+/// <reference path="../typings/angularjs/angular-mocks.d.ts"/>
+/// <reference path="../typings/angular-ui-router/angular-ui-router.d.ts"/>
+/// <reference path="../typings/tng/tng.d.ts" />

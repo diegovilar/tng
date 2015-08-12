@@ -4,8 +4,9 @@ var del = require('del');
 var glob = require("glob");
 var gulp = require('gulp');
 var watch = require('gulp-watch');
-var karma = require('karma');
 var debounce = require('mout/function/debounce');
+var path = require('path');
+var assign = require('lodash.assign');
 
 var config = require('../gulpconfig');
 var tsc = require('./tsc');
@@ -17,14 +18,30 @@ var colors = helpers.colors;
 var bundle = helpers.bundle;
 
 
+
+function getTsOptions() {
+
+    var tsConfigOptions = { compilerOptions: {} };
+
+    try {
+        tsConfigOptions = helpers.parseTypescriptConfig(
+            path.resolve(config.srcDir, 'tsconfig.json')
+        );
+    }
+    finally {
+        return assign({}, tsConfigOptions.compilerOptions, config.dev.tsOptions);
+    }
+
+}
+
 /**
  * Cleans all generated files for the in-development version of TNG.
  */
 exports.cleanTask = cleanTask;
 function cleanTask (cb) {
-    
+
     del(config.dev.destDir + '/*', cb);
-    
+
 }
 
 /**
@@ -38,7 +55,8 @@ function buildTask() {
         config.exportedModules,
         config.dev.destDir,
         config.dev.bundleFileName,
-        false
+        false,
+        getTsOptions()
     );
 
 }
@@ -54,7 +72,8 @@ function watchTask() {
         config.exportedModules,
         config.dev.destDir,
         config.dev.bundleFileName,
-        true
+        false,
+        getTsOptions()
     );
 
 }
@@ -73,7 +92,7 @@ var files = [
 ];
 
 /**
- * 
+ *
  */
 exports.test.runTask = test.createRunnerTask({
     files: files,
@@ -81,7 +100,7 @@ exports.test.runTask = test.createRunnerTask({
 });
 
 /**
- * 
+ *
  */
 exports.test.runOnceTask = test.createServerTask({
     files: files,
@@ -90,7 +109,7 @@ exports.test.runOnceTask = test.createServerTask({
 });
 
 /**
- * 
+ *
  */
 exports.test.serverTask = test.createServerTask({
     files: files,
@@ -99,7 +118,7 @@ exports.test.serverTask = test.createServerTask({
 });
 
 /**
- * 
+ *
  */
 exports.test.watchTask = function () {
 

@@ -1,6 +1,5 @@
 /// <reference path="../_references.ts" />
 
-
 // TODO debug only?
 import {assert} from '../assert'
 
@@ -20,7 +19,7 @@ export {ModalView, ModalBackdrop} from './modal-view'
 
 export interface ModalOptions {
 
-    scope?: ng.IScope;
+    scope?: ng.IScope|{(): ng.IScope};
     bindToController?: boolean;
     keyboard?: boolean;
     dismissAll?: boolean;
@@ -145,6 +144,21 @@ export function getModalHandler(modalClass: Function): ModalHandler {
     if (isDefined(view.size)) {
         settings.size = view.size;
     }
+
+    if (isDefined(view.controllerAs)) {
+        settings.controllerAs = view.controllerAs;
+    }
+
+    if (isDefined(view.templateUrl)) {
+        settings.templateUrl = view.templateUrl;
+    }
+
+    if (isDefined(view.template)) {
+        // TODO Accepts {() => string}, from ViewOptions, but the modal does not support it
+        settings.template = <string> view.template;
+    }
+
+    // TODO styleUrl
 
     return new ModalHandler(modal, settings);
 
