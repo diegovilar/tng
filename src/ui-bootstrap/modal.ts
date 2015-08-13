@@ -2,24 +2,23 @@
 
 // TODO debug only?
 import {assert} from '../assert'
-
-import {Inject, bind} from '../di'
+import {Inject, bind, hasInjectAnnotation} from '../di'
 import {makeDecorator, create, isDefined, isString, isFunction, Map, isArray, forEach, setIfInterface} from '../utils'
 import {hasAnnotation, getAnnotations, mergeAnnotations} from '../reflection'
 import {ModalViewAnnotation, MODAL_BACKDROP_MAP} from './modal-view'
+export {ModalView, ModalBackdrop} from './modal-view'
 
 import IModalServiceInstance = ng.ui.bootstrap.IModalServiceInstance
 import IModalService = ng.ui.bootstrap.IModalService
 import IModalSettings = ng.ui.bootstrap.IModalSettings
 import IModalStackService = ng.ui.bootstrap.IModalStackService
-
-export {ModalView, ModalBackdrop} from './modal-view'
+import IModalScope = ng.ui.bootstrap.IModalScope
 
 
 
 export interface ModalOptions {
 
-    scope?: ng.IScope|{(): ng.IScope};
+    scope?: ng.IScope|IModalScope|{(...args: any[]): ng.IScope|IModalScope};
     bindToController?: boolean;
     keyboard?: boolean;
     dismissAll?: boolean;
@@ -27,9 +26,12 @@ export interface ModalOptions {
 
 }
 
+/**
+ * @internal
+ */
 export class ModalAnnotation {
 
-    scope: ng.IScope = void 0;
+    scope: ng.IScope|IModalScope|{(...args: any[]): ng.IScope|IModalScope} = void 0;
     bindToController = true;
     keyboard = true;
     dismissAll = true;
@@ -54,18 +56,44 @@ export class ModalHandler {
 
     private instance: IModalServiceInstance = null;
 
-    constructor(private modalNotes: ModalAnnotation, private settings: IModalSettings){
-
+    constructor(
+        private modalNotes: ModalAnnotation,
+        private viewNotes: ModalViewAnnotation,
+        private settings: IModalSettings){
     }
 
-    open(@Inject('$modal') $modal: IModalService,
-         @Inject('$modalStack') $modalStack: IModalStackService): IModalServiceInstance {
+    open(
+        @Inject('$injector') $injector: ng.auto.IInjectorService,
+        @Inject('$modal') $modal: IModalService,
+        @Inject('$modalStack') $modalStack: IModalStackService): IModalServiceInstance {
 
-        if (this.modalNotes.dismissAll) {
+        var view = this.viewNotes;
+        var modal = this.modalNotes;
+        var calltimeSettings: IModalSettings = angular.copy(this.settings);
+
+        if (modal.dismissAll) {
             $modalStack.dismissAll();
         }
 
-        this.instance = $modal.open(this.settings);
+        if (isDefined(modal.scope)) {
+            calltimeSettings.scope = isFunction(modal.scope) ?
+                $injector.invoke(<any> modal.scope) :
+                    modal.scope;
+        }
+
+        if (isDefined(view.template)) {
+            calltimeSettings.template = isFunction(view.template) ?
+                $injector.invoke(<any> view.template) :
+                    <string> view.template;
+        }
+
+        if (isDefined(view.templateUrl)) {
+            calltimeSettings.templateUrl = isFunction(view.templateUrl) ?
+                $injector.invoke(<any> view.templateUrl) :
+                    view.templateUrl;
+        }
+
+        this.instance = $modal.open(calltimeSettings);
         return this.instance;
 
     }
@@ -100,9 +128,10 @@ export function getModalHandler(modalClass: Function): ModalHandler {
     var modal = <ModalAnnotation> {/*no defaults*/};
     mergeAnnotations(modal, ...modalNotes);
 
-    if (isDefined(modal.scope)) {
-        settings.scope = modal.scope;
-    }
+    // Deferred to be handled by ModalHandler to allow DI
+    // if (isDefined(modal.scope)) {
+    //     settings.scope = modal.scope;
+    // }
 
     if (isDefined(modal.bindToController)) {
         settings.bindToController = modal.bindToController;
@@ -149,17 +178,18 @@ export function getModalHandler(modalClass: Function): ModalHandler {
         settings.controllerAs = view.controllerAs;
     }
 
-    if (isDefined(view.templateUrl)) {
-        settings.templateUrl = view.templateUrl;
-    }
+    // Deferred to be handled by ModalHandler to allow DI
+    // if (isDefined(view.templateUrl)) {
+    //     settings.templateUrl = view.templateUrl;
+    // }
 
-    if (isDefined(view.template)) {
-        // TODO Accepts {() => string}, from ViewOptions, but the modal does not support it
-        settings.template = <string> view.template;
-    }
+    // Deferred to be handled by ModalHandler to allow DI
+    // if (isDefined(view.template)) {
+    //     settings.template = <string> view.template;
+    // }
 
     // TODO styleUrl
 
-    return new ModalHandler(modal, settings);
+    return new ModalHandler(modal, view, settings);
 
 }

@@ -1,7 +1,7 @@
 /// <reference path="../_references.ts" />
 
-import {makeDecorator, setIfInterface} from '../utils';
-import {ViewOptions, ViewAnnotation} from '../view';
+import {makeDecorator, setIfInterface} from '../utils'
+import {ViewOptions, ViewAnnotation} from '../view'
 
 
 
@@ -21,6 +21,11 @@ export const MODAL_BACKDROP_MAP = [true, false, 'static'];
  * TODO document
  */
 export interface ModalViewOptions extends ViewOptions {
+
+	/**
+	 * Overrides ViewOptions.template, which also accepts a function
+	 */
+	// template?: string;
 
     animation?: boolean;
 	backdrop?: ModalBackdrop;

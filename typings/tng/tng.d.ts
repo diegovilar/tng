@@ -752,7 +752,8 @@ declare module "tng/ui-router/routes" {
 
 declare module "tng/ui/bootstrap" {
 
-	import {ViewOptions} from "tng/view";
+	import {ViewOptions} from "tng/view"
+	import IModalScope = angular.ui.bootstrap.IModalScope
 	// type StringMap = {[key: string]: string};
 
 	export enum ModalBackdrop {
@@ -787,7 +788,7 @@ declare module "tng/ui/bootstrap" {
 	 */
 	export interface ModalOptions {
 
-		scope?: ng.IScope;
+		scope?: ng.IScope|IModalScope|{(...args: any[]): ng.IScope|IModalScope};
 	    bindToController?: boolean;
 		resolve?: {[key: string]: string|Function};
 		keyboard?: boolean;
@@ -813,6 +814,10 @@ declare module "tng/ui/bootstrap" {
 
 declare module angular.ui.bootstrap {
 
+	interface IModalScope {
+
+	}
+
 	// interface Modal {
 
 	// }
@@ -826,7 +831,7 @@ declare module angular.ui.bootstrap {
          * @param {Function} modal
          * @returns {IModalServiceInstance}
          */
-        open(modal: Function): angular.ui.bootstrap.IModalServiceInstance;
+        open(modal: Function): IModalServiceInstance;
     }
 
 }

@@ -1,36 +1,37 @@
-/// <reference path="./_references" />
+/// <reference path="./_references.ts" />
 
 // TODO debug only?
-import {assert} from './assert';
+import {assert} from './assert'
+import {makeDecorator, FunctionReturningString, setIfInterface} from './utils'
 
-import {makeDecorator, FunctionReturningString, setIfInterface} from './utils';
+
 
 /**
  * Options available when decorating a class with view information
  * TODO document
  */
 export interface ViewOptions {
-    
+
     /**
      * TODO should it be required?
      */
     controllerAs: string;
-    
+
     /**
-     * 
+     *
      */
     template?: string|FunctionReturningString;
-    
+
     /**
-     * 
+     *
      */
     templateUrl?: string|FunctionReturningString;
-    
+
     /**
-     * 
+     * TODO
      */
     styleUrl?: string;
-        
+
 }
 
 /**
@@ -47,7 +48,7 @@ export class ViewAnnotation {
         // TODO debug only?
         assert.notNull(options, 'options must not be null');
         assert.notEmpty(options.controllerAs, 'controllerAs cannot be null or empty');
-        
+
         setIfInterface(this, options);
     }
 

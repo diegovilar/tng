@@ -1,6 +1,8 @@
-/// <reference path="./_references" />
+/// <reference path="./_references.ts" />
 
-import {Reflect, getAnnotations, addAnnotation} from './reflection';
+import {Reflect, getAnnotations, addAnnotation} from './reflection'
+
+
 
 type extendSignature = <Type>(dest: Type, ...rest: any[]) => Type;
 
@@ -34,25 +36,25 @@ export function create<Type>(constructor: { prototype: Type }): Type {
 }
 
 export function setIf(target:any, source:any) {
-    
+
     if (target == null || source == null) {
         return;
     }
-	
+
 	for (let key in source) {
         if (source.hasOwnProperty(key) && isDefined(source[key])) {
             target[key] = source[key];
         }
     }
-	
+
 }
 
 export function setIfInterface(target:any, source:any) {
-    
+
     if (target == null || source == null) {
         return;
     }
-	
+
 	for (let key in source) {
         if (source.hasOwnProperty(key) && isDefined(source[key])) {
             if (target.hasOwnProperty(key)) {
@@ -60,7 +62,7 @@ export function setIfInterface(target:any, source:any) {
             }
         }
     }
-	
+
 }
 
 export function makeDecorator<T extends Function>(annotationClass: T) {
@@ -90,7 +92,7 @@ export function makeParamDecorator<T extends Function>(annotationClass: T) {
 
             var parameters = Reflect.getMetadata('parameters', target);
             parameters = parameters || [];
-    
+
             // there might be gaps if some in between parameters do not have annotations.
             // we pad with nulls.
             while (parameters.length <= index) {
@@ -126,11 +128,11 @@ const RE_SELECTOR_CLASS = /^\.([a-z\-_]+)$/i;
 const RE_SELECTOR_TAG = /^([a-z\-_]+)$/i;
 
 export function parseSelector(selector: string): Selector {
-    
+
     var semanticeName: string;
     var type: SelectorType;
     var m: RegExpMatchArray;
-    
+
     if (m = RE_SELECTOR_TAG.exec(selector)) {
         type = SelectorType.Tag;
     }
@@ -173,9 +175,9 @@ function lowerCase(str: string) {
  * @internal
  */
 export function bindAll<T>(host: T): T {
-    
+
     var aux = <any> host;
-    
+
     if (aux) {
         for (let key in aux) {
             if (isFunction(aux[key])) {
@@ -183,19 +185,19 @@ export function bindAll<T>(host: T): T {
             }
         }
     }
-    
+
     return host;
-    
+
 }
 
 export function safeBind<TFunc extends Function>(func: TFunc, context: any):TFunc {
-    
+
     var bound = func.bind(context);
-    
+
     forEach(func, (value, name) => bound[name] = value);
-    
+
     return bound;
-    
+
 }
 
 
@@ -241,5 +243,5 @@ function baseExtend(dst:any, objs:any[], deep:boolean, ifValue:boolean=false):an
 }
 
 function _mergeIfValue(dst:any):any {
-    return baseExtend(dst, [].slice.call(arguments, 1), true, true);    
+    return baseExtend(dst, [].slice.call(arguments, 1), true, true);
 }

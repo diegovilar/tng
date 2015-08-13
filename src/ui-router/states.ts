@@ -1,8 +1,7 @@
-/// <reference path="../_references" />
+/// <reference path="../_references.ts" />
 
 // TODO debug only?
 import {assert} from '../assert'
-
 import {bind} from '../di'
 import {makeDecorator, create, isDefined, isString, isFunction, Map, isArray, forEach, safeBind} from '../utils'
 import {getAnnotations, mergeAnnotations} from '../reflection'
@@ -11,6 +10,8 @@ import {On, publishListeners} from './events'
 import {getModalHandler} from '../ui-bootstrap/modal'
 
 export {StateChangeEvent, ViewLoadEvent} from './events'
+
+
 
 /**
  * Options available when decorating an application controller with states
