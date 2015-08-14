@@ -20,9 +20,9 @@ export interface ModalOptions {
 
     scope?: ng.IScope|IModalScope|{(...args: any[]): ng.IScope|IModalScope};
     bindToController?: boolean;
+    resolve?: Map<string|Function>;
     keyboard?: boolean;
     dismissAll?: boolean;
-    resolve?: {[key: string]: string|Function};
 
 }
 
@@ -32,12 +32,12 @@ export interface ModalOptions {
 export class ModalAnnotation {
 
     scope: ng.IScope|IModalScope|{(...args: any[]): ng.IScope|IModalScope} = void 0;
-    bindToController = true;
-    keyboard = true;
-    dismissAll = true;
-    resolve: Map<string|Function> = null;
+    bindToController: boolean = void 0;
+    resolve: Map<string|Function> = void 0;
+    keyboard: boolean = void 0;
+    dismissAll: boolean = void 0;
 
-    constructor(options: ModalOptions) {
+    constructor(options?: ModalOptions) {
 
         setIfInterface(this, options);
 
@@ -45,13 +45,16 @@ export class ModalAnnotation {
 
 }
 
-type ModalDecorator = (options: ModalOptions) => ClassDecorator;
+type ModalDecorator = (options?: ModalOptions) => ClassDecorator;
 
 /**
  * A decorator to annotate a class as being a modal controller
  */
 export var Modal = <ModalDecorator> makeDecorator(ModalAnnotation);
 
+/**
+ * @internal
+ */
 export class ModalHandler {
 
     private instance: IModalServiceInstance = null;
@@ -59,7 +62,7 @@ export class ModalHandler {
     constructor(
         private modalNotes: ModalAnnotation,
         private viewNotes: ModalViewAnnotation,
-        private settings: IModalSettings){
+        private settings: IModalSettings) {
     }
 
     open(
@@ -111,7 +114,9 @@ export class ModalHandler {
 
 }
 
-
+/**
+ * @internal
+ */
 export function getModalHandler(modalClass: Function): ModalHandler {
 
     var modalNotes = getAnnotations(modalClass, ModalAnnotation);
@@ -137,7 +142,9 @@ export function getModalHandler(modalClass: Function): ModalHandler {
         settings.bindToController = modal.bindToController;
     }
 
-    // TODO resolve
+    if (isDefined(modal.resolve)) {
+        settings.resolve = modal.resolve;
+    }
 
     if (isDefined(modal.keyboard)) {
         settings.keyboard = modal.keyboard;

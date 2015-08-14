@@ -22,11 +22,6 @@ export const MODAL_BACKDROP_MAP = [true, false, 'static'];
  */
 export interface ModalViewOptions extends ViewOptions {
 
-	/**
-	 * Overrides ViewOptions.template, which also accepts a function
-	 */
-	// template?: string;
-
     animation?: boolean;
 	backdrop?: ModalBackdrop;
 	backdropClass?: string;

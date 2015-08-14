@@ -796,7 +796,6 @@ declare module "tng/ui/bootstrap" {
 
 	}
 
-
 	/**
 	 * Interface components MAY implement
 	 */
@@ -807,7 +806,7 @@ declare module "tng/ui/bootstrap" {
 	/**
 	 * A decorator to annotate a class as being a component controller
 	 */
-	function Modal(options: ModalOptions): ClassDecorator;
+	function Modal(options?: ModalOptions): ClassDecorator;
 
 }
 
