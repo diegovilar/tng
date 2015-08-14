@@ -28,10 +28,10 @@ export interface StateConfig {
     reloadOnSearch?: boolean;
     onEnter?: Function;
 	onExit?: Function;
+    resolve?: Map<string|Function>;
 
     // TODO
     // params
-    // resolve
     // data
 
 }
@@ -113,6 +113,7 @@ function translateToUiState(state: InternalStateConfig): ng.ui.IState {
     if (isDefined(state.reloadOnSearch)) translatedState.reloadOnSearch = state.reloadOnSearch;
     if (isDefined(state.onEnter)) translatedState.onEnter = state.onEnter;
     if (isDefined(state.onExit)) translatedState.onExit = state.onExit;
+    if (isDefined(state.resolve)) translatedState.resolve = state.resolve;
 
     // If the state has a parent, we force the string way
     if (isDefined(state.parent)) {

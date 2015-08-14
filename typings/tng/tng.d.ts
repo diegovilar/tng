@@ -710,6 +710,7 @@ declare module "tng/ui-router/states" {
 		reloadOnSearch?: boolean;
 		onEnter?: Function;
 		onExit?: Function;
+		resolve?: {[key: string]: string|Function};
     }
 
     export interface StatesDecorator {
@@ -790,7 +791,8 @@ declare module "tng/ui/bootstrap" {
 
 		scope?: ng.IScope|IModalScope|{(...args: any[]): ng.IScope|IModalScope};
 	    bindToController?: boolean;
-		resolve?: {[key: string]: string|Function};
+		// resolve?: {[key: string]: string|Function}; // It doesn't really support strings, as stated in the docs
+		resolve?: {[key: string]: Function};
 		keyboard?: boolean;
 		dismissAll?: boolean;
 
