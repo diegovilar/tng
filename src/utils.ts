@@ -174,7 +174,7 @@ function lowerCase(str: string) {
 /**
  * @internal
  */
-export function bindAll<T>(host: T): T {
+export function bindFunctions<T>(host: T): T {
 
     var aux = <any> host;
 
@@ -190,7 +190,7 @@ export function bindAll<T>(host: T): T {
 
 }
 
-export function safeBind<TFunc extends Function>(func: TFunc, context: any):TFunc {
+export function safeBind<T extends Function>(func: T, context: any): T {
 
     var bound = func.bind(context);
 

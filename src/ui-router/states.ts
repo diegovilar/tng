@@ -2,8 +2,9 @@
 
 // TODO debug only?
 import {assert} from '../assert'
-import {bind} from '../di'
-import {makeDecorator, create, isDefined, isString, isFunction, Map, isArray, forEach, safeBind} from '../utils'
+
+import {injectable, safeBind} from '../di'
+import {makeDecorator, create, isDefined, isString, isFunction, Map, isArray, forEach} from '../utils'
 import {getAnnotations, mergeAnnotations} from '../reflection'
 import {ViewAnnotation} from '../view'
 import {On, publishListeners} from './events'
@@ -87,7 +88,7 @@ export function publishStates(moduleController: Function, ngModule: ng.IModule) 
             forEach(note.states, (state) =>
                 states.push(translateToUiState(state))));
 
-        ngModule.config(bind(['$stateProvider'], ($stateProvider: ng.ui.IStateProvider) => {
+        ngModule.config(injectable(['$stateProvider'], ($stateProvider: ng.ui.IStateProvider) => {
 
             for (let state of states) {
                 $stateProvider.state(state);
@@ -149,7 +150,7 @@ function translateToUiState(state: InternalStateConfig): ng.ui.IState {
 
         if (translatedState.onEnter) {
             let onEnter = <Function> translatedState.onEnter;
-            translatedState.onEnter = bind(['$injector'], function($injector: ng.auto.IInjectorService) {
+            translatedState.onEnter = injectable(['$injector'], function($injector: ng.auto.IInjectorService) {
                 $injector.invoke(onEnter);
                 $injector.invoke(handler.open, handler);
             });
@@ -160,7 +161,7 @@ function translateToUiState(state: InternalStateConfig): ng.ui.IState {
 
         if (translatedState.onExit) {
             let onExit = <Function> translatedState.onExit;
-            translatedState.onExit = bind(['$injector'], function($injector: ng.auto.IInjectorService) {
+            translatedState.onExit = injectable(['$injector'], function($injector: ng.auto.IInjectorService) {
                 $injector.invoke(handler.dismiss, handler);
                 $injector.invoke(onExit);
             });

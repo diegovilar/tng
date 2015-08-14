@@ -1,7 +1,9 @@
 /// <reference path="../_references" />
 
-import {Inject, bind} from 'tng/di';
-import {Service} from 'tng/service';
+import {Inject, injectable} from 'tng/di'
+import {Service} from 'tng/service'
+
+
 
 @Service({
 	name: 'willBeOverriden'

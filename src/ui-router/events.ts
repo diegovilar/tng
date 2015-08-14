@@ -2,7 +2,7 @@
 
 import {makeDecorator, isNumber} from '../utils'
 import {getAnnotations} from '../reflection'
-import {bind} from '../di'
+import {injectable} from '../di'
 
 
 
@@ -151,7 +151,7 @@ export function publishListeners(moduleController: Function, ngModule: ng.IModul
     var listenerNotes = <UiRouterEventListenerAnnotation[]> getAnnotations(moduleController, UiRouterEventListenerAnnotation).reverse();
 
     if (listenerNotes.length) {
-        ngModule.run(bind(['$rootScope'], ($rootScope: ng.IRootScopeService) => {
+        ngModule.run(injectable(['$rootScope'], ($rootScope: ng.IRootScopeService) => {
 
             for (let listenerAnnotation of listenerNotes) {
                 let event = <string> listenerAnnotation.event;

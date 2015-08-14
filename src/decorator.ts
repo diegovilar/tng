@@ -1,8 +1,10 @@
 /// <reference path="./_references" />
 
-import {bind} from './di';
-import {getAnnotations, mergeAnnotations} from './reflection';
-import {makeDecorator, setIfInterface, create, isFunction} from './utils';
+import {injectable} from './di'
+import {getAnnotations, mergeAnnotations} from './reflection'
+import {makeDecorator, setIfInterface, create, isFunction} from './utils'
+
+
 
 /**
  * Options available when decorating a class as a service decorator
@@ -84,8 +86,8 @@ export function publishDecorator(decoratorClass: DecoratorConstructor, ngModule:
         throw new Error(`Decorator "${name}" does not implement a decorate method`);
     }
 
-    ngModule.config(bind(['$provide'], function($provide: ng.auto.IProvideService) {
-        $provide.decorator(name, bind(['$delegate', '$injector'], function($delegate: any, $injector: ng.auto.IInjectorService) {
+    ngModule.config(injectable(['$provide'], function($provide: ng.auto.IProvideService) {
+        $provide.decorator(name, injectable(['$delegate', '$injector'], function($delegate: any, $injector: ng.auto.IInjectorService) {
 
             var instance = <Decorator> $injector.instantiate(decoratorClass, {
                 $delegate: $delegate

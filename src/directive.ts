@@ -1,12 +1,14 @@
-/// <reference path="./_references" />
+/// <reference path="./_references.ts" />
 
 // TODO debug only?
 import {assert} from './assert';
 
-import {Inject, bind, hasInjectAnnotation} from './di';
-import {makeDecorator, Map, setIfInterface, create, isFunction, isDefined} from './utils';
-import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils';
-import {hasAnnotation, getAnnotations, mergeAnnotations} from './reflection';
+import {Inject, injectable, isAnnotated} from './di'
+import {makeDecorator, Map, setIfInterface, create, isFunction, isDefined} from './utils'
+import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils'
+import {hasAnnotation, getAnnotations, mergeAnnotations} from './reflection'
+
+
 
 /**
  * TODO document
@@ -227,7 +229,7 @@ export function makeDirectiveDO(directiveClass: DirectiveConstructor): Directive
 export function inFactory(ddo: DirectiveDefinitionObject, $injector: ng.auto.IInjectorService): DirectiveDefinitionObject {
 
     if (isFunction(ddo.compile)) {
-        ddo.compile = !hasInjectAnnotation(ddo.compile) ? ddo.compile :
+        ddo.compile = !isAnnotated(ddo.compile) ? ddo.compile :
             (tElement: any, tAttrs: any, transclude: any) => {
                 return $injector.invoke(ddo.compile, null, {
                     element: tElement,
@@ -238,7 +240,7 @@ export function inFactory(ddo: DirectiveDefinitionObject, $injector: ng.auto.IIn
     }
 
     if (isFunction(ddo.link)) {
-        ddo.link = !hasInjectAnnotation(ddo.link) ? ddo.link :
+        ddo.link = !isAnnotated(ddo.link) ? ddo.link :
             (scope: any, iElement: any, iAttrs: any, controllers: any, transclude: any) => {
                 return $injector.invoke(<any> ddo.link, null, {
                     scope: scope,
@@ -261,7 +263,7 @@ export function makeDirectiveFactory(directiveClass: DirectiveConstructor) {
 
     var ddo = makeDirectiveDO(directiveClass);
 
-    var factory = bind(['$injector'], function directiveFactory($injector: ng.auto.IInjectorService): ng.IDirective {
+    var factory = injectable(['$injector'], function directiveFactory($injector: ng.auto.IInjectorService): ng.IDirective {
         return <any> inFactory(ddo, $injector);
     });
 

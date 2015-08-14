@@ -1,11 +1,11 @@
 /// <reference path="../_references.ts" />
 
-import {bind} from '../di'
+import {injectable} from '../di'
 import {makeDecorator, create, Map, forEach} from '../utils'
 import {getAnnotations, mergeAnnotations} from '../reflection'
 
 
-/// <reference path="../_references.ts" />
+
 /**
  * @internal
  */
@@ -40,7 +40,7 @@ export function registerRoutes(moduleController: Function, ngModule: ng.IModule)
     var routes = {};
     notes.forEach((note) => mergeAnnotations(routes, note.routes));
 
-    ngModule.config(bind(['$urlRouterProvider'], ($urlRouterProvider: ng.ui.IUrlRouterProvider) => {
+    ngModule.config(injectable(['$urlRouterProvider'], ($urlRouterProvider: ng.ui.IUrlRouterProvider) => {
 
         forEach(routes, (handler, route) => {
             if (route === '?') {

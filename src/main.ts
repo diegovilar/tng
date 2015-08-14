@@ -1,4 +1,4 @@
-export {Inject, bind} from './di'
+export {Inject, injectable} from './di'
 export {Value} from './value';
 export {Constant} from './constant';
 export {Filter} from './filter';

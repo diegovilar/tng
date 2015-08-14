@@ -1,8 +1,7 @@
 /// <reference path="./_references.ts" />
 
 import {assert} from './assert'
-
-import {Inject, bind, hasInjectAnnotation} from './di'
+import {Inject, injectable, isAnnotated} from './di'
 import {makeDecorator, Map, setIfInterface, isFunction, isDefined} from './utils'
 import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils'
 import {hasAnnotation, getAnnotations, mergeAnnotations} from './reflection'
@@ -11,6 +10,8 @@ import {ComponentViewAnnotation, NAMESPACE_MAP} from './component-view'
 import {CommonDirectiveOptions, CommonDirectiveAnnotation} from './directive'
 import {Directive, DirectiveAnnotation, DirectiveConstructor, Transclusion} from './directive'
 import {makeCommonDO, DirectiveDefinitionObject, inFactory as inFactoryDirective} from './directive'
+
+
 
 /**
  * TODO document
@@ -122,7 +123,7 @@ export function makeComponentDO(componentClass: ComponentConstructor): Component
 export function inFactory(cdo: ComponentDefinitionObject, $injector: ng.auto.IInjectorService): ComponentDefinitionObject {
 
     if (isFunction(cdo.template)) {
-        cdo.template = !hasInjectAnnotation(cdo.template) ? cdo.template : (tElement: any, tAttrs: any) => {
+        cdo.template = !isAnnotated(cdo.template) ? cdo.template : (tElement: any, tAttrs: any) => {
             return $injector.invoke(<any> cdo.template, null, {
                 element: tElement,
                 attributes: tAttrs
@@ -131,7 +132,7 @@ export function inFactory(cdo: ComponentDefinitionObject, $injector: ng.auto.IIn
     }
 
     if (isFunction(cdo.templateUrl)) {
-        cdo.templateUrl = !hasInjectAnnotation(cdo.templateUrl) ? cdo.templateUrl : (tElement: any, tAttrs: any) => {
+        cdo.templateUrl = !isAnnotated(cdo.templateUrl) ? cdo.templateUrl : (tElement: any, tAttrs: any) => {
             return $injector.invoke(<any> cdo.templateUrl, null, {
                 element: tElement,
                 attributes: tAttrs
@@ -152,7 +153,7 @@ export function makeComponentFactory(componentClass: ComponentConstructor) {
 
     var cdo = makeComponentDO(componentClass);
 
-    var factory = bind(['$injector'], function directiveFactory($injector: ng.auto.IInjectorService): ng.IDirective {
+    var factory = injectable(['$injector'], function directiveFactory($injector: ng.auto.IInjectorService): ng.IDirective {
         return <any> inFactory(inFactoryDirective(cdo, $injector), $injector);
     });
 

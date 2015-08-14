@@ -2,7 +2,7 @@
 
 import {getAnnotations, mergeAnnotations} from './reflection';
 import {makeDecorator, setIfInterface, create, isFunction} from './utils';
-import {bind} from './di';
+import {injectable} from './di';
 
 /**
  * Options available when decorating a class as a filter
@@ -91,7 +91,7 @@ export function registerFilter(filterClass: FilterConstructor, ngModule: ng.IMod
         throw new Error(`Filter "${name}" does not implement a filter method`);
     }
 
-    ngModule.filter(name, bind(['$injector'], function($injector: ng.auto.IInjectorService) {
+    ngModule.filter(name, injectable(['$injector'], function($injector: ng.auto.IInjectorService) {
         var filterSingleton = <Filter> $injector.instantiate(filterClass);
         return filterSingleton.filter.bind(filterSingleton);
     }));

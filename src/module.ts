@@ -1,21 +1,24 @@
-/// <reference path="./_references" />
+/// <reference path="./_references.ts" />
 
 // TODO debug only?
-import {assert} from './assert';
+import {assert} from './assert'
 
-import {getAnnotations, hasAnnotation, mergeAnnotations, Reflect} from './reflection';
-import {makeDecorator, setIfInterface, FunctionReturningNothing} from './utils';
-import {create, isString, isFunction, isArray, safeBind} from './utils';
-import {ValueWrapper, publishValue} from './value';
-import {ConstantWrapper, publishConstant} from './constant';
-import {FilterAnnotation, registerFilter} from './filter';
-import {AnimationAnnotation, registerAnimation} from './animation';
-import {ServiceAnnotation, publishService} from './service';
-import {DecoratorAnnotation, publishDecorator} from './decorator';
-import {DirectiveAnnotation, publishDirective} from './directive';
-import {ComponentAnnotation, publishComponent} from './component';
-import {publishStates} from './ui-router/states';
-import {registerRoutes} from './ui-router/routes';
+import {getAnnotations, hasAnnotation, mergeAnnotations, Reflect} from './reflection'
+import {makeDecorator, setIfInterface, FunctionReturningNothing} from './utils'
+import {safeBind} from './di'
+import {create, isString, isFunction, isArray} from './utils'
+import {ValueWrapper, publishValue} from './value'
+import {ConstantWrapper, publishConstant} from './constant'
+import {FilterAnnotation, registerFilter} from './filter'
+import {AnimationAnnotation, registerAnimation} from './animation'
+import {ServiceAnnotation, publishService} from './service'
+import {DecoratorAnnotation, publishDecorator} from './decorator'
+import {DirectiveAnnotation, publishDirective} from './directive'
+import {ComponentAnnotation, publishComponent} from './component'
+import {publishStates} from './ui-router/states'
+import {registerRoutes} from './ui-router/routes'
+
+
 
 const PUBLISHED_ANNOTATION_KEY = 'tng:module-published-as';
 

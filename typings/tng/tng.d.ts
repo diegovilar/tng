@@ -2,7 +2,7 @@
 
 declare module "tng" {
 
-	export {Inject, bind} from "tng/di";
+	export {Inject, injectable} from "tng/di";
 	export {Value} from "tng/value";
 	export {Constant} from "tng/constant";
 	export {Filter} from "tng/filter";
@@ -31,7 +31,16 @@ declare module "tng/di" {
 	 * @param dependencies Names of the dependencies to be injected, in order
 	 * @returns The provided function
 	 */
-	export function bind<T extends Function>(dependencies: string[], func: T): T;
+	export function injectable<T extends Function>(dependencies: string[], func: T): T;
+
+	/**
+	* Binds a function to a context and preservers it's annotated dependencies
+	*
+	* @param func The function to be bound
+	* @param context The object to which bind the funcion
+	* @returns A bound function
+	*/
+	export function safeBind<T extends Function>(func: T, context: any): T;
 
 	/**
 	 * A decorator to annotate method parameterss with dependencies to be injected
@@ -42,6 +51,13 @@ declare module "tng/di" {
 	 * @param dependency The name of the dependency to be injected
 	 */
 	export function Inject(dependency: string): ParameterDecorator;
+
+	/**
+	 * Inspects a function for dependency injection annotation
+	 *
+	 * @param func The object to be inspected
+	 */
+	export function isAnnotated(func: Function): boolean;
 
 }
 

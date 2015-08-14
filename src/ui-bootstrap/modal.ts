@@ -2,7 +2,8 @@
 
 // TODO debug only?
 import {assert} from '../assert'
-import {Inject, bind, hasInjectAnnotation} from '../di'
+
+import {Inject, injectable} from '../di'
 import {makeDecorator, create, isDefined, isString, isFunction, Map, isArray, forEach, setIfInterface} from '../utils'
 import {hasAnnotation, getAnnotations, mergeAnnotations} from '../reflection'
 import {ModalViewAnnotation, MODAL_BACKDROP_MAP} from './modal-view'

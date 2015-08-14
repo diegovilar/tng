@@ -1,11 +1,11 @@
-/// <reference path="../_references" />
+/// <reference path="../_references.ts" />
 
-import {bind} from 'tng/di';
-import {publishModule} from 'tng/module';
-import {angularSpy, ModuleSpy} from '../utils';
-
-// assets
+import {injectable} from 'tng/di'
+import {publishModule} from 'tng/module'
+import {angularSpy, ModuleSpy} from '../utils'
 import * as assets from './assets/test-states';
+
+
 
 describe('UI Router > @States ', function() {
 	

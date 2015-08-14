@@ -1,10 +1,12 @@
-/// <reference path="./_references" />
+/// <reference path="./_references.ts" />
 
-import {getAnnotations, mergeAnnotations} from './reflection';
-import {bind} from './di';
-import {makeDecorator, FunctionReturningSomething, setIfInterface} from './utils';
-import {create, isFunction, bindAll} from './utils';
-// ds()
+import {getAnnotations, mergeAnnotations} from './reflection'
+import {injectable} from './di'
+import {makeDecorator, FunctionReturningSomething, setIfInterface} from './utils'
+import {create, isFunction, bindFunctions} from './utils'
+
+
+
 /**
  * Options available when decorating a class as an animation controller
  * TODO document
@@ -76,9 +78,9 @@ export function registerAnimation(animationClass: AnimationConstructor, ngModule
 
     // TODO validate implementation?
 
-    ngModule.animation(name, bind(['$injector'], function($injector: ng.auto.IInjectorService) {
+    ngModule.animation(name, injectable(['$injector'], function($injector: ng.auto.IInjectorService) {
         var singleton = <Animation> $injector.instantiate(animationClass);
-        bindAll(singleton);        
+        bindFunctions(singleton);        
         return singleton;
     }));
 
