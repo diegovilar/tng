@@ -1,8 +1,8 @@
-/// <reference path="../../_references" />
+/// <reference path="../../_references.ts" />
 
 import {Module} from 'tng/module';
 import {View} from 'tng/view';
-import {Routes} from 'tng/ui-router/routes';
+import {Routes} from 'tng/ui/router/routes';
 
 
 
@@ -11,7 +11,7 @@ import {Routes} from 'tng/ui-router/routes';
 @Module()
 @Routes({
     '?' : '/not-found'
-})    
+})
 export class Test1 {
 }
 
@@ -23,6 +23,6 @@ export class Test1 {
 @Routes({
     '': '/home',
     '/index': '/home'
-})    
+})
 export class Test2 {
 }

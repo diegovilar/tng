@@ -15,8 +15,8 @@ import {ServiceAnnotation, publishService} from './service'
 import {DecoratorAnnotation, publishDecorator} from './decorator'
 import {DirectiveAnnotation, publishDirective} from './directive'
 import {ComponentAnnotation, publishComponent} from './component'
-import {publishStates} from './ui-router/states'
-import {registerRoutes} from './ui-router/routes'
+import {publishStates} from './ui/router/states'
+import {registerRoutes} from './ui/router/routes'
 
 
 
@@ -33,7 +33,7 @@ export interface ModuleOptions {
 	dependencies?: DependenciesArray;
 	config?: Function|Function[];
 	run?: Function|Function[];
-	
+
     // modules?: (string|Function)[];
 	// components?: Function[];
 	// services?: Function[];
@@ -96,9 +96,9 @@ export var Module = <ModuleSignature> makeDecorator(ModuleAnnotation);
 var moduleCount = 0;
 
 function getNewModuleName() {
-    
+
     return `tng_generated_module#${++moduleCount}`;
-    
+
 }
 
 /**
@@ -112,14 +112,14 @@ export function publishModule(moduleClass: ModuleConstructor, name?: string): ng
 
     // TODO debug only?
     assert.notEmpty(aux, 'Missing @Module decoration');
-    
+
     // Has this module already been published?
     var publishedAs: string;
     if (publishedAs = Reflect.getOwnMetadata(PUBLISHED_ANNOTATION_KEY, moduleClass)) {
         return angular.module(publishedAs);
     }
 
-    var annotation = <ModuleAnnotation> mergeAnnotations(Object.create(null), ...aux);    
+    var annotation = <ModuleAnnotation> mergeAnnotations(Object.create(null), ...aux);
 
     var constants: any[] = [];
     var values: any[] = [];
@@ -131,7 +131,7 @@ export function publishModule(moduleClass: ModuleConstructor, name?: string): ng
     var directives: any[] = [];
     var modules: any[] = [];
 
-    // TODO optimize this.. to much reflection queries    
+    // TODO optimize this.. to much reflection queries
     if (annotation.dependencies) {
         for (let dep of annotation.dependencies) {
             // Regular angular module
@@ -179,13 +179,13 @@ export function publishModule(moduleClass: ModuleConstructor, name?: string): ng
     }
 
     name = name || annotation.name || getNewModuleName();
-    
+
     // Register the module on Angular
-    var ngModule = angular.module(name, modules);    
-        
+    var ngModule = angular.module(name, modules);
+
     // Instantiate the module
     var module = new moduleClass(ngModule);
-    
+
     // Register config functions
     var configFns: Function[] = [];
     if (isFunction(module.onConfig)) configFns.push(safeBind(module.onConfig, module));
@@ -194,7 +194,7 @@ export function publishModule(moduleClass: ModuleConstructor, name?: string): ng
         else if (isArray(annotation.config)) configFns = configFns.concat(<Function[]> annotation.config)
     }
     for (let fn of configFns) ngModule.config(fn);
-    
+
     // Register initialization functions
     var runFns: Function[] = [];
     if (isFunction(module.onRun)) runFns.push(safeBind(module.onRun, module));
@@ -203,7 +203,7 @@ export function publishModule(moduleClass: ModuleConstructor, name?: string): ng
         else if (isArray(annotation.run)) runFns = runFns.concat(<Function[]> annotation.run)
     }
     for (let fn of runFns) ngModule.run(fn);
-    
+
     publishStates(moduleClass, ngModule);
     registerRoutes(moduleClass, ngModule);
 
@@ -217,7 +217,7 @@ export function publishModule(moduleClass: ModuleConstructor, name?: string): ng
     for (let item of directives) publishDirective(item, ngModule);
 
     Reflect.defineMetadata(PUBLISHED_ANNOTATION_KEY, name, moduleClass);
-    
+
     return ngModule;
 
 }

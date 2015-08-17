@@ -240,7 +240,7 @@ export function inFactory(ddo: DirectiveDefinitionObject, $injector: ng.auto.IIn
     }
 
     if (isFunction(ddo.link)) {
-        ddo.link = !isAnnotated(ddo.link) ? ddo.link :
+        ddo.link = !isAnnotated(<any> ddo.link) ? ddo.link :
             (scope: any, iElement: any, iAttrs: any, controllers: any, transclude: any) => {
                 return $injector.invoke(<any> ddo.link, null, {
                     scope: scope,

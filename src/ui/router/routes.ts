@@ -1,8 +1,8 @@
-/// <reference path="../_references.ts" />
+/// <reference path="../../_references.ts" />
 
-import {injectable} from '../di'
-import {makeDecorator, create, Map, forEach} from '../utils'
-import {getAnnotations, mergeAnnotations} from '../reflection'
+import {injectable} from '../../di'
+import {makeDecorator, create, Map, forEach} from '../../utils'
+import {getAnnotations, mergeAnnotations} from '../../reflection'
 
 
 

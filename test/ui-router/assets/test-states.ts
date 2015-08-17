@@ -1,8 +1,8 @@
-/// <reference path="../../_references" />
+/// <reference path="../../_references.ts" />
 
 import {Module} from 'tng/module';
 import {View} from 'tng/view';
-import {States, ViewLoadEvent, StateChangeEvent} from 'tng/ui-router/states';
+import {States, ViewLoadEvent, StateChangeEvent} from 'tng/ui/router/states';
 
 
 // Common assets
@@ -11,7 +11,7 @@ import {States, ViewLoadEvent, StateChangeEvent} from 'tng/ui-router/states';
 	controllerAs: 'home',
     template: '<div ui-view="side"></div> <div ui-view></div>'
 })
-export class Home {	
+export class Home {
 }
 
 @View({
@@ -19,7 +19,7 @@ export class Home {
     templateUrl: 'about.html',
     template: 'redudant, just for testing'
 })
-export class About {	
+export class About {
 }
 
 @View({
@@ -40,8 +40,8 @@ export class Menu {
 })
 export class TestModule1 {
 }
-    
-    
+
+
 
 // Test 2
 
@@ -50,14 +50,14 @@ export class TestModule1 {
 	'about': { url: '/about', abstract: false, parent: 'home', view: About }
 })
 export class TestModule2 {
-    
+
     static expectedConfig = {
     	name: 'about',
     	url: '/about',
     	abstract: false,
     	parent: 'home'
     };
-    
+
 }
 
 
@@ -69,7 +69,7 @@ export class TestModule2 {
 	'about': { url: '/about', parent: 'home', view: About }
 })
 export class TestModule3 {
-    
+
     static expectedAboutConfig = {
     	views: {
     		'' : {
@@ -78,9 +78,9 @@ export class TestModule3 {
                 templateUrl: 'about.html',
                 template: 'redudant, just for testing'
     		}
-    	}	
+    	}
     };
-    
+
 }
 
 
@@ -94,7 +94,7 @@ export class TestModule3 {
         'side@home': Menu,
         '@home': About
     }}
-})    
+})
 export class Test4 {
 }
 

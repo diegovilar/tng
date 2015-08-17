@@ -123,7 +123,7 @@ export function makeComponentDO(componentClass: ComponentConstructor): Component
 export function inFactory(cdo: ComponentDefinitionObject, $injector: ng.auto.IInjectorService): ComponentDefinitionObject {
 
     if (isFunction(cdo.template)) {
-        cdo.template = !isAnnotated(cdo.template) ? cdo.template : (tElement: any, tAttrs: any) => {
+        cdo.template = !isAnnotated(<any> cdo.template) ? cdo.template : (tElement: any, tAttrs: any) => {
             return $injector.invoke(<any> cdo.template, null, {
                 element: tElement,
                 attributes: tAttrs
@@ -132,7 +132,7 @@ export function inFactory(cdo: ComponentDefinitionObject, $injector: ng.auto.IIn
     }
 
     if (isFunction(cdo.templateUrl)) {
-        cdo.templateUrl = !isAnnotated(cdo.templateUrl) ? cdo.templateUrl : (tElement: any, tAttrs: any) => {
+        cdo.templateUrl = !isAnnotated(<any> cdo.templateUrl) ? cdo.templateUrl : (tElement: any, tAttrs: any) => {
             return $injector.invoke(<any> cdo.templateUrl, null, {
                 element: tElement,
                 attributes: tAttrs

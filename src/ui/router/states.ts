@@ -1,15 +1,16 @@
-/// <reference path="../_references.ts" />
+/// <reference path="../../_references.ts" />
 
 // TODO debug only?
-import {assert} from '../assert'
+import {assert} from '../../assert'
 
-import {injectable, safeBind} from '../di'
-import {makeDecorator, create, isDefined, isString, isFunction, Map, isArray, forEach} from '../utils'
-import {getAnnotations, mergeAnnotations} from '../reflection'
-import {ViewAnnotation} from '../view'
+import {injectable, safeBind} from '../../di'
+import {makeDecorator, create, isDefined, isString, isFunction, Map, isArray, forEach} from '../../utils'
+import {getAnnotations, mergeAnnotations} from '../../reflection'
+import {ViewAnnotation} from '../../view'
 import {On, publishListeners} from './events'
-import {getModalHandler} from '../ui-bootstrap/modal'
+import {getModalHandler} from '../bootstrap/modal'
 
+export {View} from '../../view'
 export {StateChangeEvent, ViewLoadEvent} from './events'
 
 

@@ -51,17 +51,17 @@ exports.exportedModules = [
     { expose: 'tng/directive',      file: './src/directive.ts' },
     { expose: 'tng/filter',         file: './src/filter.ts' },
     { expose: 'tng/module',         file: './src/module.ts' },
-    { expose: 'tng/reflection',     file: './src/reflection.ts' },
     { expose: 'tng/service',        file: './src/service.ts' },
-    { expose: 'tng/utils',          file: './src/utils.ts' },
     { expose: 'tng/value',          file: './src/value.ts' },
     { expose: 'tng/view',           file: './src/view.ts' },
-    { expose: 'tng/assert',         file: './src/assert.ts' },
+
+    // Private API
+    // { expose: 'tng/utils',          file: './src/utils.ts' },
+    // { expose: 'tng/reflection',     file: './src/reflection.ts' },
+    // { expose: 'tng/assert',         file: './src/assert.ts' },
 
     // TODO extract to different bundle
-    { expose: 'tng/ui-router',          file: './src/ui-router.ts' },
-    { expose: 'tng/ui-router/routes',   file: './src/ui-router/routes.ts' },
-    { expose: 'tng/ui-router/states',   file: './src/ui-router/states.ts' },
-    { expose: 'tng/ui/bootstrap',       file: './src/ui-bootstrap.ts' },
-    { expose: 'tng/ui/bootstrap/modal', file: './src/ui-bootstrap/modal.ts' }
+    { expose: 'tng/ui/router/routes',   file: './src/ui/router/routes.ts' },
+    { expose: 'tng/ui/router/states',   file: './src/ui/router/states.ts' },
+    { expose: 'tng/ui/bootstrap/modal', file: './src/ui/bootstrap/modal.ts' }
 ];

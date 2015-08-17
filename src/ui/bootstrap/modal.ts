@@ -1,11 +1,11 @@
-/// <reference path="../_references.ts" />
+/// <reference path="../../_references.ts" />
 
 // TODO debug only?
-import {assert} from '../assert'
+import {assert} from '../../assert'
 
-import {Inject, injectable} from '../di'
-import {makeDecorator, create, isDefined, isString, isFunction, Map, isArray, forEach, setIfInterface} from '../utils'
-import {hasAnnotation, getAnnotations, mergeAnnotations} from '../reflection'
+import {Inject, injectable} from '../../di'
+import {makeDecorator, create, isDefined, isString, isFunction, Map, isArray, forEach, setIfInterface} from '../../utils'
+import {hasAnnotation, getAnnotations, mergeAnnotations} from '../../reflection'
 import {ModalViewAnnotation, MODAL_BACKDROP_MAP} from './modal-view'
 export {ModalView, ModalBackdrop} from './modal-view'
 
