@@ -8,16 +8,11 @@
 // UI-Router
 // ----------------------------------------------------------------------------
 
-declare module "tng/ui/router" {
-
-	export {States, StateConfig} from "tng/ui/router/states";
-	export {Routes} from "tng/ui/router/routes";
-
-}
-
 declare module "tng/ui/router/states" {
 
     type StateConfigMap = { [stateName: string]: StateConfig };
+
+    export {View, ViewOptions} from 'tng/view'
 
     /**
      * Enumeration of events related to the transition of states.
@@ -189,7 +184,15 @@ declare module "tng/ui/router/routes" {
 
 declare module "tng/ui/bootstrap" {
 
-	import {ViewOptions} from "tng/view"
+	export class TngUiBootstrapModule {
+
+    }
+
+}
+
+declare module "tng/ui/bootstrap/modal" {
+
+    import {ViewOptions} from "tng/view"
 	import IModalScope = angular.ui.bootstrap.IModalScope
 	// type StringMap = {[key: string]: string};
 

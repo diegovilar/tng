@@ -121,6 +121,7 @@ export const enum ViewLoadEvent {
 
 /**
  * Maps the event enums to the actual event names used by the UI-Router.
+ * @internal
  */
 const EVENTS_MAP = [
     '$stateChangeStart',
@@ -132,6 +133,9 @@ const EVENTS_MAP = [
     '$viewContentLoaded'
 ];
 
+/**
+ * @internal
+ */
 export class UiRouterEventListenerAnnotation {
 
     constructor(public event: StateChangeEvent|ViewLoadEvent|string, public handler: Function) {
@@ -140,10 +144,19 @@ export class UiRouterEventListenerAnnotation {
 
 }
 
+/**
+ * @internal
+ */
 type OnDecorator = (event: StateChangeEvent|ViewLoadEvent|string, handler: Function) => ClassDecorator;
 
+/**
+ * @internal
+ */
 export var On = <OnDecorator> makeDecorator(UiRouterEventListenerAnnotation);
 
+/**
+ * @internal
+ */
 export function publishListeners(moduleController: Function, ngModule: ng.IModule) {
 
     // Reflect.decorate apply decorators reversely, so we need to reverse

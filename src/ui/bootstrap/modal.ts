@@ -7,13 +7,14 @@ import {Inject, injectable} from '../../di'
 import {makeDecorator, create, isDefined, isString, isFunction, Map, isArray, forEach, setIfInterface} from '../../utils'
 import {hasAnnotation, getAnnotations, mergeAnnotations} from '../../reflection'
 import {ModalViewAnnotation, MODAL_BACKDROP_MAP} from './modal-view'
-export {ModalView, ModalBackdrop} from './modal-view'
 
 import IModalServiceInstance = ng.ui.bootstrap.IModalServiceInstance
 import IModalService = ng.ui.bootstrap.IModalService
 import IModalSettings = ng.ui.bootstrap.IModalSettings
 import IModalStackService = ng.ui.bootstrap.IModalStackService
 import IModalScope = ng.ui.bootstrap.IModalScope
+
+export {ModalView, ModalBackdrop, ModalViewOptions} from './modal-view'
 
 
 

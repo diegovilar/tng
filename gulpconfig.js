@@ -38,7 +38,7 @@ exports.test.tsOptions = {
 // -- Exported TNG modules --
 
 exports.exportedModules = [
-    { expose: 'tng',                file: './src/main.ts' },
+    { expose: 'tng',                file: './src/tng.ts' },
     { expose: 'tng/animation',      file: './src/animation.ts' },
     { expose: 'tng/application',    file: './src/application.ts' },
     { expose: 'tng/bootstrap',      file: './src/bootstrap.ts' },
@@ -63,5 +63,6 @@ exports.exportedModules = [
     // TODO extract to different bundle
     { expose: 'tng/ui/router/routes',   file: './src/ui/router/routes.ts' },
     { expose: 'tng/ui/router/states',   file: './src/ui/router/states.ts' },
+    { expose: 'tng/ui/bootstrap',       file: './src/ui/bootstrap/bootstrap.ts' },
     { expose: 'tng/ui/bootstrap/modal', file: './src/ui/bootstrap/modal.ts' }
 ];

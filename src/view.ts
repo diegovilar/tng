@@ -54,6 +54,9 @@ export class ViewAnnotation {
 
 }
 
+/**
+ * @internal
+ */
 type ViewDecorator = (options: ViewOptions) => ClassDecorator;
 
 /**
