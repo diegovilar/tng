@@ -2,7 +2,6 @@
 
 // TODO debug only?
 import {assert} from './assert'
-
 import {getAnnotations, hasAnnotation, mergeAnnotations, Reflect} from './reflection'
 import {makeDecorator, setIfInterface, FunctionReturningNothing} from './utils'
 import {safeBind} from './di'

@@ -7,30 +7,30 @@ ___
 
 * Decorador: `@Application`
 * É um `Module`, mas com uma notação de seletor que indica o elemento base da aplicação
-  
+
 Exemplo:
 
 `app/app.ts`
 ```js
-    import {Application, Inject, Constant} from 'tng';
-    import {Components} from './concrete/components';
-    import {Services} from './concrete/services';
-    import {Storage} from './abstract/services/storage';
-    
+    import {Application, Inject, Constant, bootstrap} from 'tng'
+    import {Components} from './components'
+    import {Services}   from './services/concrete/services'
+    import {Storage}    from './services/abstract/storage'
+
     var version = Constant('version', '1.3.2');
-    
+
     @Application({
-        selector: 'html',
+        element: document,
         dependencies: ['ngRoute', Components, Services, version]
     })
-    class TodoApp implements Application {
-        
-        onRun(@Inject('storage') storage:Storage) {
+    class TodoApp {
+
+        onRun(@Inject('storage') storage: Storage): void {
             storage.clean();
         }
-        
+
     }
-    
+
     bootstrap(TodoApp);
 ```
 
@@ -41,47 +41,50 @@ Exemplo:
 * Dacorador: `@Module`
 * Equivalente a um módulo do Angular, agregando submódulos, serviços e componentes
 * Permite fornecer funções de configuração:
-  * através da anotação `config` em `@Module`
+  * através da anotação `config`
   * através de método `onConfig()` implementado na classe do módulo
-* Permite fornecer funções de inicializaão:
-  * através da anotação `run` em `@Module`
+* Permite fornecer funções de inicialização:
+  * através da anotação `run`
   * através de método `onRun()` implementado na classe do módulo
 * Informa-se outros módulos, serviços, componentes, decoradores, filtros, animacoes,
-  valores e constantes através da anotação `dependencies` me `@Module`
+  valores e constantes através da anotação `dependencies`
 * Pode-se depender de outros módulos regulares, não implementados usando TNG, bastando apenas
   informar seus nomes em `dependencies`
 
 Exemplos:
 
-`Arquivo: app/concrete/components.ts`
-```js
-    import {Module} from 'tng';
-    import {Todo} from './components/todo';
-    import {TodoItem} from './components/todo-item';
-    
+`Arquivo: app/components.ts`
+```ts
+    import {Module}   from 'tng'
+    import {Todo}     from './components/todo/todo'
+    import {TodoItem} from './components/todo/todo-item'
+
     @Module({
-        dependencies: ['ui.bootstrap', Todo, TodoItem],
-        config: [...]
+        dependencies: ['ui.bootstrap', Todo, TodoItem]
     })
-    export class Components {}
+    export class Components {
+
+    }
 ```
 
-`Arquivo: app/concrete/services.ts`
-```javascript
-    import {Module, Inject} from 'tng';
-    import {Storage} from './services/storage';
-    
+`Arquivo: app/services/services.ts`
+```ts
+    import {Module, Inject} from 'tng'
+    import {Storage}        from './concrete/storage/storage'
+
+    import ICookiesServiceProvider = ng.cookies.ICookiesServiceProvider
+
     @Module({
         dependencies: ['ngCookies', Storage]
     })
     export class Services implements Module {
-                
-        onConfig(@Inject('$cookiesProvider') $cookiesProvider: ng.cookies.ICookiesServiceProvider) {
-            ...
+
+        onConfig(@Inject('$cookiesProvider') $cookiesProvider: ICookiesServiceProvider): void {
+            // STUB
         }
-        
+
     }
-``` 
+```
 
 
 
@@ -89,15 +92,17 @@ Exemplos:
 
 * Decorador: `@Constant`
 
-```js
-    import {Constant, Module} from 'tng';
-    
+```ts
+    import {Constant, Module} from 'tng'
+
     var version = Constant('version', '1.2.3');
-    
+
     @Module({
         dependencies: [version]
     })
-    ...
+    export class MyModule {
+
+    }
 ```
 
 
@@ -106,11 +111,11 @@ Exemplos:
 
 * Decorador: `@Value`
 
-```js
+```ts
     import {Value, Module} from 'tng';
-    
+
     var state = Value('state', {current: 'stoped', next: 'moving'});
-    
+
     @Module({
         dependencies: [state]
     })
@@ -133,16 +138,16 @@ Exemplos:
 Exemplos:
 
 `Arquivo: app/concrete/services/storage.ts`
-```javascript
+```ts
     import {Module, Inject} from 'tng';
-    
+
     @Service({
         name: 'storage'
     })
     export class Storage {
-        
+
         private $cookies: ng.cookies.ICookiesService;
-        
+
         // Dependências são injetáveis no construtor
         constructor(@Inject('$cookies') $cookies:ng.cookies.ICookiesService) {
             this.$cookies = $cookies;
@@ -151,11 +156,11 @@ Exemplos:
         read(key: string):any {
             ...
         }
-        
+
         write(key: string, value:any) {
             ...
         }
-        
+
         clean() {
             ...
         }
@@ -177,14 +182,14 @@ Exemplos:
 * São diretivas que possuem templates, e têm algumas opções forçadas:
   * Para `@Component`:
     * scope é orbigatório, ou `true` ou `{}`, sendo `true` o padrão
-    * ??? bindToController 
-  * Exige `@View` e algum template informado 
-* Podem ser roteadas (`@Route`)  
+    * ??? bindToController
+  * Exige `@View` e algum template informado
+* Podem ser roteadas (`@Route`)
 * A classe do component é o ViewModel (controller) do component
 * Templates, se necessários, podem ser fornecidos pelo decorador `@View`:
   * através da anotação `template`, podendo ser:
     * uma string representando o template
-    * uma função a ser invocada com `$injector.invoke()` e que retorna uma string representando o template 
+    * uma função a ser invocada com `$injector.invoke()` e que retorna uma string representando o template
   * através da anotação `templateUrl`, podendo ser:
     * uma string contendo URL para o arquivo do template
     * uma função a ser invocada com `$injector.invoke()` e que retorna uma string contendo a URL
@@ -209,10 +214,10 @@ Exemplos:
 * ??? Lifecycle? Poderíamos permiter onDestroy (notificar se nao tiver escopo próprio)
 
 `Arquivo: app/concrete/components/todo.ts`
-```javascript
+```ts
     import {Component, View, Inject} from 'tng';
     import {Storage} from './abstract/services/storage';
-    
+
     @Component({
         selector: 'todo'
     })
@@ -221,21 +226,21 @@ Exemplos:
         template: '<div class="todo"></div>'
     })
     export class Todo {
-        
+
         private storage: Storage;
         private element: ng.IJqueryElement;
-        
+
         constructor(@Inject('storage') storage: Storage
                     @Inject('element') element: ng.IJqueryElement) {
             this.storage = storage;
             this.element = element;
         }
-        
+
         static link(@Inject('scope') scope: ng.IScope,
                     @Inject('element') element: ng.IJqueryElement) {
             ...
         }
-        
+
         add() {
             ...
         }
@@ -244,9 +249,9 @@ Exemplos:
 ```
 
 `Arquivo: app/concrete/components/todo-item.ts`
-```js
+```ts
     import {Component, View} from 'tng';
-    
+
     @Component({
         selector: 'todo-item',
         require: ['^todo']
@@ -269,24 +274,24 @@ Exemplos:
 * Tanto o construtor quanto `decorate()` recebem injeções
 * `decorate()` deve retornar o serviço decorado
 
-```js
+```ts
     import {Decorator, Inject} from 'tng';
-    
+
     @Decorator({
         name: 'storage'
     })
     class StorageDecorator implements Decorator {
-        
+
         // Injectable
         constructor() {
             ...
         }
-                
+
         // Injectable
         decorate(@Inject('$delegate') $delegate: any): any {
             ...
         }
-        
+
     }
 ```
 
@@ -298,21 +303,21 @@ Exemplos:
 * Singleton
 * Instanciado com `$injector.instantiate()`
 
-```js
+```ts
     import {Animation} from 'tng';
-    
+
     @Animation({
         name: 'fade'
     })
     class FadeAnimation implements Animation {
-        
+
         // Injectable
         constructor() {
             ...
         }
-        
+
         ...
-    }    
+    }
 ```
 
 
@@ -323,24 +328,24 @@ Exemplos:
 * Singleton
 * Instanciado com `$injector.instantiate()`
 
-```js
+```ts
     import {Filter, Inject} from 'tng';
-    
+
     @Filter({
         name: 'orderBy'
     })
     class OrderByFilter implements Filter {
-        
+
         // Injectable
         constructor() {
             ...
         }
-        
+
         // Not injectable
         filter(input: any, ...args: any[]): any {
             ...
         }
-        
+
     }
 ```
 
@@ -363,12 +368,12 @@ TODO necessário? Acho que não...
 
 Automatic inheriting annotations:
 
-```js
+```ts
     import {Component} from 'tng';
     import {TodoItem} from './todo-item';
 
     // GoldenTodoItem automaticly inherits annotations from TodoItem
-    // Adds new annotations do override inherited ones  
+    // Adds new annotations do override inherited ones
     @Component({
         selector: 'golden-todo-item'
     })
@@ -383,7 +388,7 @@ Automatic inheriting annotations:
 
 Manualy inherting annotations:
 
-```js
+```ts
     import {Component} from 'tng';
     import {TodoItem} from './todo-item';
 
@@ -404,10 +409,10 @@ Manualy inherting annotations:
 
 ### Obtendo versão crua de um módulo para uso da API Angular
 
-```js
+```ts
     import {Module} from 'tng';
     import {Services} from './concrete/services';
-    
+
     var rawModule = Module.unwrap(Services, 'services');
     rawModule.controller(...);
     rawModule.service(...);
@@ -428,7 +433,7 @@ Manualy inherting annotations:
 ```
 
 `greetings.ts`
-```js
+```ts
     @RouteConfig({
         name: 'greetings',              // state.name
         path: '/greetings/:name',       // state.url
@@ -440,7 +445,7 @@ Manualy inherting annotations:
     @View({
         controllerAs: 'greetings',
         template: '{{ greetings.message }}'
-    })    
+    })
     export class Greetings {
         message = 'Hello, {name}!';
         constructor($routeParams) {
@@ -450,15 +455,15 @@ Manualy inherting annotations:
 ```
 
 `app.ts`
-```js
+```ts
     import {Greetings} from './greetings.ts';
-    
+
     @Application({
         selector: 'html',
         dependencies: [Greetings]
     })
     export class App {
-    }    
+    }
 ```
 
 Acesso a `/greetings/Diego`, renderiza...
@@ -466,7 +471,7 @@ Acesso a `/greetings/Diego`, renderiza...
 ```html
     <div ng-outlet="main">
         <greetings>Hello, Diego!</greetings>
-    </div>    
+    </div>
 ```
 
 
@@ -478,7 +483,7 @@ Acesso a `/greetings/Diego`, renderiza...
 ```
 
 `greetings.ts`
-```js
+```ts
     @View
     @Template({
         controllerAs: 'greetings',
@@ -493,11 +498,11 @@ Acesso a `/greetings/Diego`, renderiza...
 ```
 
 `app.ts`
-```js
+```ts
     import {Greetings} from './greetings.ts';
     import {Dashboard} from './dashboard.ts';
     import {Logout} from './dashboard.ts';
-    
+
     @Application({
         selector: 'html',
         dependencies: [Greetings]
@@ -505,19 +510,19 @@ Acesso a `/greetings/Diego`, renderiza...
     @States([
         {name: 'greetings', path: '/greetings/:name', component: Greetings},
         // state = {name: 'greetings', url: '/greetings/:name', views: {'@' : {controller: Greetings...}}}
-        
+
         {name: 'logout', path: '/logout', components: {'@' : Logout}},
         // state = {name: 'logout', url: '/logout', views: {'@' : {controller: Logout...}}}
-        
+
         {name: 'dashboard', path: '/dashboard', component: Dashboard, states: [
             {name: 'config', path: '/config', component: 'config'},
             {name: '', path: '', component: ''}
         ]}
         // state = {name: 'dashboard', url: '/dashboard', views: {'@' : {controller: Dashboard...}}}
-        
+
     ])
     export class App {
-    }    
+    }
 ```
 
 Acesso a `/greetings/Diego`, renderiza...
@@ -525,7 +530,7 @@ Acesso a `/greetings/Diego`, renderiza...
 ```html
     <div ng-outlet>
         <greetings>Hello, Diego!</greetings>
-    </div>    
+    </div>
 ```
 
 ## Exemplo com Aninhamento
@@ -537,16 +542,16 @@ Acesso a `/greetings/Diego`, renderiza...
     <div ng-outlet="main"></div>
 ```
 
-```js
+```ts
     import {Greetings} from  './greetings';
-    
+
     @Route({
         name: 'dashboard',
         path: '/dashboard',
         outlet: 'main',
         components: {
-            content: Greetings, // Greetings é um componente 
-            aside: 'search'     // 'search' = seletor de um component 
+            content: Greetings, // Greetings é um componente
+            aside: 'search'     // 'search' = seletor de um component
         }
     })
     @Component({
@@ -555,7 +560,7 @@ Acesso a `/greetings/Diego`, renderiza...
     @View({
         controllerAs: 'dashboard',
         template: '<div ng-outlet="content"></div><div ng-outlet="aside"></div>'
-    })    
+    })
     class Dashboard {
         message = 'Hello, {name}!';
         constructor($routeParams) {
@@ -576,5 +581,5 @@ Acesso a `/dashboard`, renderiza...
                 <search></search>
             </div>
         </dashboard>
-    </div>    
+    </div>
 ```

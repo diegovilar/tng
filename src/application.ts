@@ -1,10 +1,11 @@
-/// <reference path="./_references" />
+/// <reference path="./_references.ts" />
 
 // TODO debug only?
-import {assert} from './assert';
+import {assert} from './assert'
+import {makeDecorator, setIfInterface, isElement} from './utils'
+import {ModuleOptions, ModuleAnnotation, Module, ModuleConstructor} from './module'
 
-import {makeDecorator, setIfInterface, isElement} from './utils';
-import {ModuleOptions, ModuleAnnotation, Module, ModuleConstructor} from './module';
+
 
 /**
  * Options available when decorating a class as an application
@@ -27,14 +28,14 @@ export class ApplicationAnnotation extends ModuleAnnotation {
 	constructor(options: ApplicationOptions);
 	constructor(elementOroptions: any) {
 		super(options);
-		
+
 		var options = isElement(elementOroptions) ? { element: elementOroptions } : elementOroptions;
-		
+
 		// TODO debug only?
         assert(options && options.element, 'element must be provided');
         // assert(options.element || options.selector, 'Either element or selector must be provided');
 		// assert(!(options.element && options.selector), 'Provide either selector or element, but not both');
-		
+
 		setIfInterface(this, options);
 	}
 
@@ -54,6 +55,9 @@ export interface ApplicationConstructor extends ModuleConstructor {
 
 }
 
+/**
+ * @internal
+ */
 type ApplicationSignature = (options: ApplicationOptions) => ClassDecorator;
 
 /**
