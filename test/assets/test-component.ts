@@ -9,12 +9,14 @@ import {Component, ComponentView} from 'tng';
 	controllerAs: 'test',
 	template: 'sup'
 })
-export class TestComponent {	
+export class TestComponent {
 }
 
 export var expectedDDO = {
 	semanticName: 'test-component',
 	imperativeName: 'testComponent',
+	bindToController: true,
+	scope: {},
 	restrict: 'E',
 	controller: TestComponent,
 	controllerAs: 'test',
@@ -30,5 +32,5 @@ export var expectedDDO = {
 	controllerAs: 'test'
 })
 export class TestComponentWithNoTemplate {
-	
+
 }

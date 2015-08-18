@@ -192,11 +192,11 @@ export function makeCommonDO(directiveClass: DirectiveConstructor): DirectiveDef
         controller: directiveClass
     };
 
-    if (annotation.scope != null) ddo.scope = annotation.scope;
-    if (annotation.bind != null) ddo.bindToController = annotation.bind;
-    if (annotation.transclude != null) ddo.transclude = TRANSCLUSION_MAP[annotation.transclude];
-    if (annotation.compile != null) ddo.compile = annotation.compile;
-    if (annotation.link != null) ddo.link = annotation.link;
+    if (isDefined(annotation.scope)) ddo.scope = annotation.scope;
+    if (isDefined(annotation.bind)) ddo.bindToController = annotation.bind;
+    if (isDefined(annotation.transclude)) ddo.transclude = TRANSCLUSION_MAP[annotation.transclude];
+    if (isDefined(annotation.compile)) ddo.compile = annotation.compile;
+    if (isDefined(annotation.link)) ddo.link = annotation.link;
 
     return ddo;
 
@@ -215,9 +215,9 @@ export function makeDirectiveDO(directiveClass: DirectiveConstructor): Directive
     var annotation = <DirectiveAnnotation> {/*no defaults*/};
     mergeAnnotations(annotation, ...aux);
 
-    if (annotation.multiElement != null) ddo.multiElement = annotation.multiElement;
-    if (annotation.priority != null) ddo.priority = annotation.priority;
-    if (annotation.terminal != null) ddo.terminal = annotation.terminal;
+    if (isDefined(annotation.multiElement)) ddo.multiElement = annotation.multiElement;
+    if (isDefined(annotation.priority)) ddo.priority = annotation.priority;
+    if (isDefined(annotation.terminal)) ddo.terminal = annotation.terminal;
 
     return ddo;
 
@@ -232,9 +232,9 @@ export function inFactory(ddo: DirectiveDefinitionObject, $injector: ng.auto.IIn
         ddo.compile = !isAnnotated(ddo.compile) ? ddo.compile :
             (tElement: any, tAttrs: any, transclude: any) => {
                 return $injector.invoke(ddo.compile, null, {
-                    element: tElement,
-                    attributes: tAttrs,
-                    transclude: transclude
+                    $element: tElement,
+                    $attrs: tAttrs,
+                    $transclude: transclude
                 });
             }
     }
@@ -243,11 +243,11 @@ export function inFactory(ddo: DirectiveDefinitionObject, $injector: ng.auto.IIn
         ddo.link = !isAnnotated(<any> ddo.link) ? ddo.link :
             (scope: any, iElement: any, iAttrs: any, controllers: any, transclude: any) => {
                 return $injector.invoke(<any> ddo.link, null, {
-                    scope: scope,
-                    element: iElement,
-                    attributes: iAttrs,
-                    controller: controllers,
-                    transclude: transclude
+                    $scope: scope,
+                    $element: iElement,
+                    $attrs: iAttrs,
+                    $controller: controllers,
+                    $transclude: transclude
                 });
             }
     }

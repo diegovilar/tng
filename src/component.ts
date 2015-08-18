@@ -25,10 +25,14 @@ export interface ComponentOptions extends CommonDirectiveOptions {
  */
 export class ComponentAnnotation extends CommonDirectiveAnnotation {
 
-    /*constructor(options: ComponentOptions) {
-        super(<any> options); // TODO WTF needs casting?
+    // Defaults to isolate ascope and bind to controller for components
+    scope: Map<string> = {};
+    bind: boolean|Map<string> = true;
+
+    constructor(options: ComponentOptions) {
+        super(options); // TODO WTF needs casting?
         //setIfInterface(this, options); nothing to do so far
-    }*/
+    }
 
 }
 
@@ -88,25 +92,25 @@ export function makeComponentDO(componentClass: ComponentConstructor): Component
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    var aux = getAnnotations(componentClass, ComponentViewAnnotation).reverse();
+    var aux = getAnnotations(componentClass, ViewAnnotation).reverse();
     var view = <ComponentViewAnnotation> {/*no defaults*/};
     mergeAnnotations(view, ...aux);
 
     // TODO Component restrictions?
 
-    if (view.controllerAs != null) {
+    if (isDefined(view.controllerAs)) {
         cdo.controllerAs = view.controllerAs;
     }
-    if (view.namespace != null) {
+    if (isDefined(view.namespace)) {
         cdo.templateNamespace = NAMESPACE_MAP[view.namespace];
     }
 
     // TODO styleUrl
 
-    if (view.template != null) {
+    if (isDefined(view.template)) {
         cdo.template = view.template;
     }
-    else if (view.templateUrl != null) {
+    else if (isDefined(view.templateUrl)) {
         cdo.templateUrl = view.templateUrl;
     }
     else {

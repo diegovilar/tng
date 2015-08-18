@@ -1,7 +1,9 @@
 /// <reference path="./_references.ts" />
 
-import {makeDecorator, setIfInterface} from './utils';
-import {ViewOptions, ViewAnnotation} from './view';
+import {makeDecorator, setIfInterface} from './utils'
+import {ViewOptions, ViewAnnotation} from './view'
+
+
 
 /**
  * TODO document
@@ -32,6 +34,7 @@ export interface ComponentViewOptions extends ViewOptions {
      * @deprecated
      */
     replace?: boolean;
+
 }
 
 /**

@@ -1,25 +1,29 @@
-/// <reference path="./_references" />
+/// <reference path="./_references.ts" />
 
-import {getAnnotations, mergeAnnotations} from './reflection';
-import {makeDecorator, setIfInterface, create, isFunction} from './utils';
-import {injectable} from './di';
+import {getAnnotations, mergeAnnotations} from './reflection'
+import {makeDecorator, setIfInterface, create, isFunction} from './utils'
+import {injectable} from './di'
+
+
 
 /**
  * Options available when decorating a class as a filter
  */
 export interface FilterOptions {
-    
+
     /**
      * The name with which the filter will be invoked in templates
-     * 
+     *
      * Must be valid angular Expressions identifiers, such as "uppercase",
      * "upperCase" or "upper_case". Special charaters such as hyphens and dots
      * are not allowed.
-     * 
+     *
      * To get a hold of the filter delegate through dependency injection,
-     * ask the injector for this name plus the suffix "Filter". 
+     * ask the injector for this name plus the suffix "Filter".
      */
     name: string;
+
+    stateful?: boolean;
 
 }
 
@@ -28,7 +32,8 @@ export interface FilterOptions {
  */
 export class FilterAnnotation {
 
-    name: string = null;
+    name: string = void 0;
+    stateful: boolean = void 0;
 
     constructor(options: FilterOptions) {
         setIfInterface(this, options);
@@ -38,19 +43,19 @@ export class FilterAnnotation {
 
 /**
  * Interface filter classes MUST implement
- * 
+ *
  * * It's a singleton, instantiated the first time it is needed
  * * The constructor can receive dependency injections
  * * When asked for, what is provided is actually the method filter() bound the it's instance
  */
 export interface Filter {
-    
+
     /**
      * The method that does the actual filtering
-     * 
+     *
      * When asked for, what is provided is actually this method
      * bound the it's instance
-     * 
+     *
      * * Cannot receive dependency injections (use the constructor)
      */
     filter(input: any, ...rest: any[]): any;
@@ -85,15 +90,21 @@ export function registerFilter(filterClass: FilterConstructor, ngModule: ng.IMod
         throw new Error("Filter annotation not found");
     }
 
-    var {name} = mergeAnnotations<FilterAnnotation>(create(FilterAnnotation), ...aux);
+    var notes = mergeAnnotations<FilterAnnotation>(create(FilterAnnotation), ...aux);
 
     if (!isFunction(filterClass.prototype.filter)) {
-        throw new Error(`Filter "${name}" does not implement a filter method`);
+        throw new Error(`Filter "${notes.name}" does not implement a filter method`);
     }
 
-    ngModule.filter(name, injectable(['$injector'], function($injector: ng.auto.IInjectorService) {
+    ngModule.filter(notes.name, injectable(['$injector'], function($injector: ng.auto.IInjectorService) {
         var filterSingleton = <Filter> $injector.instantiate(filterClass);
-        return filterSingleton.filter.bind(filterSingleton);
+        var boundFilterMethod = filterSingleton.filter.bind(filterSingleton);
+
+        if (notes.stateful) {
+            boundFilterMethod.$stateful = true;
+        }
+
+        return boundFilterMethod;
     }));
 
 }

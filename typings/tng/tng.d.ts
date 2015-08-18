@@ -130,6 +130,8 @@ declare module "tng/filter" {
 	     */
 	    name: string;
 
+		stateful?: boolean;
+
 	}
 
 	/**
@@ -571,21 +573,3 @@ declare module "tng/bootstrap" {
 	// export function bootstrap(moduleClass: Function, selector: string): ng.auto.IInjectorService;
 
 }
-
-
-
-// ----------------------------------------------------------------------------
-// Private API
-// ----------------------------------------------------------------------------
-
-// declare module 'tng/reflection' {
-
-// 	export function getAnnotations(target: any, type?: Function, key?: string): any[];
-
-// 	export function setAnnotations(target: any, annotations: any[], key?: string): void;
-
-// 	export function addAnnotation(target: any, annotation: any, key?: string): void;
-
-// 	export function hasAnnotation(target: any, type?: Function, key?: string): boolean;
-
-// }
