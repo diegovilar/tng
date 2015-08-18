@@ -144,6 +144,9 @@ declare module "tng/ui/router/states" {
 		resolve?: {[key: string]: string|Function};
     }
 
+    type StateChangeHandler = (event?: ng.IAngularEvent, toState?: any, toParams?: any, fromState?: any, fromParams?: any) => void;
+    type StateChangeErrorHandler = (event?: ng.IAngularEvent, toState?: any, toParams?: any, fromState?: any, fromParams?: any, error?: Error) => void;
+
     export interface StatesDecorator {
         /**
          * Decorates a module with states.
@@ -155,7 +158,12 @@ declare module "tng/ui/router/states" {
          * @param event The event to listen to
          * @param handler The function to invoke when the event is fired
          */
-        on(event: StateChangeEvent|ViewLoadEvent|string, handler: Function): ClassDecorator;
+        // on(event: StateChangeEvent|ViewLoadEvent|string, handler: Function): ClassDecorator;
+
+        onStateChangeStart(handler: StateChangeHandler): ClassDecorator;
+        onStateChangeSuccess(handler: StateChangeHandler): ClassDecorator;
+        onStateChangeError(handler: StateChangeErrorHandler): ClassDecorator;
+        // onStateChangeNotFound(handler: stateChangeHandler): ClassDecorator;
     }
 
 	/**
@@ -169,10 +177,26 @@ declare module "tng/ui/router/routes" {
 
 	type RoutesMap = {[route: string]: string|Function};
 
+    export interface RoutesDecorator {
+
+        /**
+         * Decorates a module with states.
+         */
+        (routes: RoutesMap): ClassDecorator;
+
+        when(what: string|RegExp|ng.ui.IUrlMatcher, redirect: string): void;
+        when(what: string|RegExp|ng.ui.IUrlMatcher, handler: Function): void;
+
+        otherwise(redirect: string): void;
+        otherwise(handler: Function): void;
+
+    }
+
 	/**
 	 * A decorator to annotate with routes
 	 */
-	function Routes(routes: RoutesMap): ClassDecorator;
+	export var Routes: RoutesDecorator;
+    // function Routes(routes: RoutesMap): ClassDecorator;
 
 }
 
@@ -229,7 +253,7 @@ declare module "tng/ui/bootstrap/modal" {
 	export interface ModalOptions {
 
 		scope?: ng.IScope|IModalScope|{(...args: any[]): ng.IScope|IModalScope};
-	    bindToController?: boolean;
+	    bindToController?: boolean; // defautls to true; differs from the original
 		// resolve?: {[key: string]: string|Function}; // It doesn't really support strings, as stated in the docs
 		resolve?: {[key: string]: Function};
 		keyboard?: boolean;

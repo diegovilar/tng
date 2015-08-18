@@ -35,7 +35,7 @@ export interface ModalOptions {
 export class ModalAnnotation {
 
     scope: ng.IScope|IModalScope|{(...args: any[]): ng.IScope|IModalScope} = void 0;
-    bindToController: boolean = void 0;
+    bindToController: boolean = true; // defautls to true; differs from the original
     // resolve: Map<string|Function> = void 0; // It doesn't really support strings, as stated in the docs
     resolve: Map<Function> = void 0;
     keyboard: boolean = void 0;
