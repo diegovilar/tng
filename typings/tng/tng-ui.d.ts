@@ -158,7 +158,7 @@ declare module "tng/ui/router/states" {
          * @param event The event to listen to
          * @param handler The function to invoke when the event is fired
          */
-        // on(event: StateChangeEvent|ViewLoadEvent|string, handler: Function): ClassDecorator;
+        on(event: StateChangeEvent|ViewLoadEvent|string, handler: Function): ClassDecorator;
 
         onStateChangeStart(handler: StateChangeHandler): ClassDecorator;
         onStateChangeSuccess(handler: StateChangeHandler): ClassDecorator;
@@ -280,9 +280,10 @@ declare module angular.ui.bootstrap {
 	interface IModalService {
         /**
          * @param {Function} modal
+         * @param {ng.IScope|IModalScope} scope
          * @returns {IModalServiceInstance}
          */
-        open(modal: Function): IModalServiceInstance;
+        open(modal: Function, scope?: ng.IScope|IModalScope): IModalServiceInstance;
     }
 
 }

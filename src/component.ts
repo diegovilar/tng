@@ -4,7 +4,7 @@ import {assert} from './assert'
 import {Inject, injectable, isAnnotated} from './di'
 import {makeDecorator, Map, setIfInterface, isFunction, isDefined} from './utils'
 import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils'
-import {hasAnnotation, getAnnotations, mergeAnnotations} from './reflection'
+import {hasAnnotation, getAnnotations, mergeAnnotations, addAnnotation} from './reflection'
 import {ViewAnnotation} from './view'
 import {ComponentViewAnnotation, NAMESPACE_MAP} from './component-view'
 import {CommonDirectiveOptions, CommonDirectiveAnnotation} from './directive'
@@ -26,8 +26,8 @@ export interface ComponentOptions extends CommonDirectiveOptions {
 export class ComponentAnnotation extends CommonDirectiveAnnotation {
 
     // Defaults to isolate ascope and bind to controller for components
-    scope: Map<string> = {};
-    bind: boolean|Map<string> = true;
+    // scope: Map<string> = {};
+    // bind: boolean|Map<string> = true;
 
     constructor(options: ComponentOptions) {
         super(options); // TODO WTF needs casting?
@@ -50,12 +50,38 @@ export interface ComponentConstructor extends DirectiveConstructor {
     new (): Component;
 }
 
+// type ComponentDecoratorExtensorDecorator = () => ClassDecorator;
+
+var ComponentDecoratorExtensor = function(baseClass: Function) {
+
+    // debugger;
+
+    var annotations = <ComponentAnnotation[]> getAnnotations(baseClass, ComponentAnnotation);
+
+    return function(target: any) {
+        // debugger;
+        // TODO clone?
+        for (let annotation of annotations) {
+            addAnnotation(target, annotation)
+        }
+        return target;
+    }
+
+};
+
+interface ComponentDecoratorType {
+    (options: ComponentOptions): ClassDecorator;
+    extends: typeof ComponentDecoratorExtensor;
+}
+
 type ComponentDecorator = (options: ComponentOptions) => ClassDecorator;
 
 /**
  * A decorator to annotate a class as being a component controller
  */
-export var Component = <ComponentDecorator> makeDecorator(ComponentAnnotation);
+export var Component = <ComponentDecoratorType><any> makeDecorator(ComponentAnnotation);
+
+Component.extends = ComponentDecoratorExtensor;
 
 /**
  * @internal
@@ -96,7 +122,14 @@ export function makeComponentDO(componentClass: ComponentConstructor): Component
     var view = <ComponentViewAnnotation> {/*no defaults*/};
     mergeAnnotations(view, ...aux);
 
-    // TODO Component restrictions?
+    // Default scope is isolate
+    if (typeof cdo.scope === "undefined") {
+        cdo.scope = {};
+    }
+    // Default bind value
+    if (typeof cdo.bindToController === "undefined") {
+        cdo.bindToController = true;
+    }
 
     if (isDefined(view.controllerAs)) {
         cdo.controllerAs = view.controllerAs;

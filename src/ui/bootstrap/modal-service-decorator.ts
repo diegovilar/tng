@@ -21,11 +21,11 @@ export class ModalServiceDecorator implements Decorator {
 		@Inject('$injector') $injector: ng.auto.IInjectorService): IModalService {
 
 		var originalOpen = $modal.open;
-		$modal.open = function(optionsOrModal: any): IModalServiceInstance {
+		$modal.open = function(optionsOrModal: any, scope?: ng.IScope): IModalServiceInstance {
 
 			// Usign @Modal decorator?
 			if (typeof optionsOrModal === 'function') {
-				var handler = getModalHandler(<Function> optionsOrModal)
+				var handler = getModalHandler(<Function> optionsOrModal, scope);
 				return $injector.invoke(handler.open, handler);
 			}
 			// Using the original IModalSettings object

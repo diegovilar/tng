@@ -399,7 +399,7 @@ declare module "tng/directive" {
 	    require?: string[];
 	    transclude?: Transclusion;
 	    compile?: CompileFunction|FunctionReturningPrePost;
-	    link?: FunctionReturningNothing|PrePost;
+	    link?: FunctionReturningNothing|PrePost|string;
 	}
 
 	/**
@@ -445,10 +445,17 @@ declare module "tng/component" {
 
 	}
 
+    interface ComponentDecoratorType {
+        (options: ComponentOptions): ClassDecorator;
+        extends: any;
+    }
+
 	/**
 	 * A decorator to annotate a class as being a component controller
 	 */
-	function Component(options: ComponentOptions): ClassDecorator;
+	// function Component(options: ComponentOptions): ClassDecorator;
+    export var Component: ComponentDecoratorType;
+
 
 	export function publishComponent(componentClass: Function, ngModule: ng.IModule, selector?: string): ng.IModule;
 

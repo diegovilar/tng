@@ -121,7 +121,7 @@ export class ModalHandler {
 /**
  * @internal
  */
-export function getModalHandler(modalClass: Function): ModalHandler {
+export function getModalHandler(modalClass: Function, scope?: ng.IScope): ModalHandler {
 
     var modalNotes = getAnnotations(modalClass, ModalAnnotation);
     var viewNotes = getAnnotations(modalClass, ModalViewAnnotation);
@@ -141,6 +141,9 @@ export function getModalHandler(modalClass: Function): ModalHandler {
     // if (isDefined(modal.scope)) {
     //     settings.scope = modal.scope;
     // }
+    if (scope) {
+        modal.scope = scope;
+    }
 
     if (isDefined(modal.bindToController)) {
         settings.bindToController = modal.bindToController;
