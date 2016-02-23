@@ -11,6 +11,8 @@ import {CommonDirectiveOptions, CommonDirectiveAnnotation} from './directive'
 import {Directive, DirectiveAnnotation, DirectiveConstructor, Transclusion} from './directive'
 import {makeCommonDO, DirectiveDefinitionObject, inFactory as inFactoryDirective} from './directive'
 
+export {Bind} from './directive';
+
 
 
 /**
@@ -24,10 +26,6 @@ export interface ComponentOptions extends CommonDirectiveOptions {
  * @internal
  */
 export class ComponentAnnotation extends CommonDirectiveAnnotation {
-
-    // Defaults to isolate ascope and bind to controller for components
-    // scope: Map<string> = {};
-    // bind: boolean|Map<string> = true;
 
     constructor(options: ComponentOptions) {
         super(options); // TODO WTF needs casting?
@@ -52,7 +50,7 @@ export interface ComponentConstructor extends DirectiveConstructor {
 
 // type ComponentDecoratorExtensorDecorator = () => ClassDecorator;
 
-var ComponentDecoratorExtensor = function(baseClass: Function) {
+function componentDecoratorExtensor(baseClass: Function) {
 
     // debugger;
 
@@ -71,7 +69,7 @@ var ComponentDecoratorExtensor = function(baseClass: Function) {
 
 interface ComponentDecoratorType {
     (options: ComponentOptions): ClassDecorator;
-    extends: typeof ComponentDecoratorExtensor;
+    extends: typeof componentDecoratorExtensor;
 }
 
 type ComponentDecorator = (options: ComponentOptions) => ClassDecorator;
@@ -81,7 +79,7 @@ type ComponentDecorator = (options: ComponentOptions) => ClassDecorator;
  */
 export var Component = <ComponentDecoratorType><any> makeDecorator(ComponentAnnotation);
 
-Component.extends = ComponentDecoratorExtensor;
+Component.extends = componentDecoratorExtensor;
 
 /**
  * @internal
@@ -118,37 +116,21 @@ export function makeComponentDO(componentClass: ComponentConstructor): Component
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    var aux = getAnnotations(componentClass, ViewAnnotation).reverse();
+    // var aux = getAnnotations(componentClass, ViewAnnotation).reverse();
+    var aux = getAnnotations(componentClass, ViewAnnotation);
     var view = <ComponentViewAnnotation> {/*no defaults*/};
     mergeAnnotations(view, ...aux);
 
-    // Default scope is isolate
-    if (typeof cdo.scope === "undefined") {
-        cdo.scope = {};
-    }
-    // Default bind value
-    if (typeof cdo.bindToController === "undefined") {
-        cdo.bindToController = true;
-    }
-
-    if (isDefined(view.controllerAs)) {
-        cdo.controllerAs = view.controllerAs;
-    }
-    if (isDefined(view.namespace)) {
-        cdo.templateNamespace = NAMESPACE_MAP[view.namespace];
-    }
+    if (!isDefined(cdo.scope)) cdo.scope = {}; // Default scope is isolate
+    if (!isDefined(cdo.bindToController)) cdo.bindToController = true; // Default bindToController value
+    if (isDefined(view.controllerAs)) cdo.controllerAs = view.controllerAs;
+    if (isDefined(view.namespace)) cdo.templateNamespace = NAMESPACE_MAP[view.namespace];
 
     // TODO styleUrl
 
-    if (isDefined(view.template)) {
-        cdo.template = view.template;
-    }
-    else if (isDefined(view.templateUrl)) {
-        cdo.templateUrl = view.templateUrl;
-    }
-    else {
-        throw new Error('Component has no template. Use either template or templateUrl');
-    }
+    if (isDefined(view.template)) cdo.template = view.template;
+    else if (isDefined(view.templateUrl)) cdo.templateUrl = view.templateUrl;
+    else throw new Error('Component has no template. Use either template or templateUrl');
 
     return cdo;
 

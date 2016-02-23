@@ -12,7 +12,7 @@ import {create, isFunction, bindFunctions} from './utils'
  * TODO document
  */
 export interface AnimationOptions {
-    
+
     /**
      * TODO rules?
      */
@@ -68,7 +68,8 @@ export function registerAnimation(animationClass: AnimationConstructor, ngModule
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    var aux = getAnnotations(animationClass, AnimationAnnotation).reverse();
+    // var aux = getAnnotations(animationClass, AnimationAnnotation).reverse();
+    var aux = getAnnotations(animationClass, AnimationAnnotation);
 
     if (!aux.length) {
         throw new Error("Filter annotation not found");
@@ -80,7 +81,7 @@ export function registerAnimation(animationClass: AnimationConstructor, ngModule
 
     ngModule.animation(name, injectable(['$injector'], function($injector: ng.auto.IInjectorService) {
         var singleton = <Animation> $injector.instantiate(animationClass);
-        bindFunctions(singleton);        
+        bindFunctions(singleton);
         return singleton;
     }));
 

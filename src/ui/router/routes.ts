@@ -33,7 +33,8 @@ export function registerRoutes(moduleController: Function, ngModule: ng.IModule)
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    var notes = <RoutesAnnotation[]> getAnnotations(moduleController, RoutesAnnotation).reverse();
+    // var notes = <RoutesAnnotation[]> getAnnotations(moduleController, RoutesAnnotation).reverse();
+    var notes = <RoutesAnnotation[]> getAnnotations(moduleController, RoutesAnnotation);
 
     if (!notes.length) return;
 

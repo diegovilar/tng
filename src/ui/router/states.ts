@@ -79,7 +79,8 @@ export function publishStates(moduleController: Function, ngModule: ng.IModule) 
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations to ge them on the original order
-    var statesAnnotation = <StatesAnnotation[]> getAnnotations(moduleController, StatesAnnotation).reverse();
+    // var statesAnnotation = <StatesAnnotation[]> getAnnotations(moduleController, StatesAnnotation).reverse();
+    var statesAnnotation = <StatesAnnotation[]> getAnnotations(moduleController, StatesAnnotation);
 
     if (statesAnnotation.length) {
         let states: ng.ui.IState[] = [];
@@ -183,7 +184,8 @@ function extractViewData(viewModel: Function) {
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    let notes = getAnnotations(viewModel, ViewAnnotation).reverse();
+    // let notes = getAnnotations(viewModel, ViewAnnotation).reverse();
+    let notes = getAnnotations(viewModel, ViewAnnotation);
 
     if (!notes.length) {
         throw new Error('Template not defined');

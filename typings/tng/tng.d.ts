@@ -13,7 +13,7 @@ declare module "tng" {
 	export {Decorator} from "tng/decorator"
 	export {View} from "tng/view"
 	export {ComponentView, ComponentTemplateNamespace} from "tng/component-view"
-	export {Directive, Transclusion} from "tng/directive"
+	export {Directive, Transclusion, Bind} from "tng/directive"
 	export {Component} from "tng/component"
 	export {Module, publishModule} from "tng/module"
 	export {Application} from "tng/application"
@@ -395,7 +395,7 @@ declare module "tng/directive" {
 	export interface CommonDirectiveOptions {
 	    selector: string;
 	    scope?: boolean|StringMap;
-	    bind?: boolean|StringMap;
+	    bindToController?: boolean;
 	    require?: string[];
 	    transclude?: Transclusion;
 	    compile?: CompileFunction|FunctionReturningPrePost;
@@ -423,6 +423,11 @@ declare module "tng/directive" {
 	 */
 	function Directive(options: DirectiveOptions): ClassDecorator;
 
+    /**
+     * A decorator to annotate a property as being a binding to the controller
+     */
+    function Bind(binding: string): PropertyDecorator;
+
 	export function publishDirective(directiveClass: Function, ngModule: ng.IModule, selector?: string): ng.IModule;
 
 }
@@ -430,6 +435,7 @@ declare module "tng/directive" {
 declare module "tng/component" {
 
 	import {Directive, CommonDirectiveOptions} from "tng/directive";
+	export  {Bind} from "tng/directive";
 
 	/**
 	 * TODO document
@@ -455,7 +461,6 @@ declare module "tng/component" {
 	 */
 	// function Component(options: ComponentOptions): ClassDecorator;
     export var Component: ComponentDecoratorType;
-
 
 	export function publishComponent(componentClass: Function, ngModule: ng.IModule, selector?: string): ng.IModule;
 

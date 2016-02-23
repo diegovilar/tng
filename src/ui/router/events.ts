@@ -161,7 +161,8 @@ export function publishListeners(moduleController: Function, ngModule: ng.IModul
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations to ge them on the original order
-    var listenerNotes = <UiRouterEventListenerAnnotation[]> getAnnotations(moduleController, UiRouterEventListenerAnnotation).reverse();
+    // var listenerNotes = <UiRouterEventListenerAnnotation[]> getAnnotations(moduleController, UiRouterEventListenerAnnotation).reverse();
+    var listenerNotes = <UiRouterEventListenerAnnotation[]> getAnnotations(moduleController, UiRouterEventListenerAnnotation);
 
     if (listenerNotes.length) {
         ngModule.run(injectable(['$rootScope'], ($rootScope: ng.IRootScopeService) => {

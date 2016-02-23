@@ -84,7 +84,8 @@ export function registerFilter(filterClass: FilterConstructor, ngModule: ng.IMod
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    var aux = getAnnotations(filterClass, FilterAnnotation).reverse();
+    // var aux = getAnnotations(filterClass, FilterAnnotation).reverse();
+    var aux = getAnnotations(filterClass, FilterAnnotation);
 
     if (!aux.length) {
         throw new Error("Filter annotation not found");

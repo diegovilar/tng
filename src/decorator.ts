@@ -33,20 +33,20 @@ export class DecoratorAnnotation {
 
 /**
  * Interface service decorators MUST implement
- * 
+ *
  * * It's a singleton, instantiated the first the decorated service is needed
  * * The constructor can receive dependency injections
- * * The original service instance is available for injection locally as $delegate 
+ * * The original service instance is available for injection locally as $delegate
  * * When asked for, what is provided is actually the method decorate() bound the decorator instance
  */
 export interface Decorator {
-   
+
     /**
      * The method that does the actual decoration
-     * 
+     *
      * This method must return the decorated service, as it will be used when
      * the service is asked for.
-     * 
+     *
      * * Can receive dependency injections
      * * The original service instance is available for injection locally as $delegate
      */
@@ -73,7 +73,8 @@ export function publishDecorator(decoratorClass: DecoratorConstructor, ngModule:
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    var aux = getAnnotations(decoratorClass, DecoratorAnnotation).reverse();
+    // var aux = getAnnotations(decoratorClass, DecoratorAnnotation).reverse();
+    var aux = getAnnotations(decoratorClass, DecoratorAnnotation);
 
     if (!aux.length) {
         throw new Error("Decorator annotation not found");
@@ -99,7 +100,7 @@ export function publishDecorator(decoratorClass: DecoratorConstructor, ngModule:
 
         }));
     }));
-    
+
     return ngModule;
 
 }

@@ -14,12 +14,12 @@ export interface ServiceOptions {
      * The name the service will be made available for injection
      */
     name: string;
-    
+
     /**
      * An optional provider object or provider factory
      */
     provider?: ng.IServiceProvider|ng.IServiceProviderFactory;
-    
+
     /**
      * An optional service factory
      */
@@ -38,7 +38,7 @@ export class ServiceAnnotation {
     constructor(options: ServiceOptions) {
         // TODO debug only?
         assert.notNull(options, 'options must not be null');
-        assert.notEmpty(options.name, 'name cannot be null or empty');        
+        assert.notEmpty(options.name, 'name cannot be null or empty');
 
         setIfInterface(this, options);
     }
@@ -74,14 +74,15 @@ export function publishService(serviceClass: ServiceConstructor, ngModule: ng.IM
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    var aux = getAnnotations(serviceClass, ServiceAnnotation).reverse();
+    // var aux = getAnnotations(serviceClass, ServiceAnnotation).reverse();
+    var aux = getAnnotations(serviceClass, ServiceAnnotation);
 
     // TODO debug only?
     assert.notEmpty(aux, 'Did you decorate it with @Service?');
 
     var annotation = <ServiceAnnotation> {/*no defalts*/};
     mergeAnnotations(annotation, ...aux);
-    
+
     var name = name != null ? name : annotation.name;
 
     if (annotation.provider) {
@@ -93,7 +94,7 @@ export function publishService(serviceClass: ServiceConstructor, ngModule: ng.IM
     else {
         ngModule.service(name, serviceClass);
     }
-    
+
     return ngModule;
 
 }

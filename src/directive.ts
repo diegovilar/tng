@@ -6,7 +6,7 @@ import {assert} from './assert';
 import {Inject, injectable, isAnnotated} from './di'
 import {makeDecorator, Map, setIfInterface, create, isFunction, isDefined} from './utils'
 import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils'
-import {hasAnnotation, getAnnotations, mergeAnnotations} from './reflection'
+import {hasAnnotation, getAnnotations, mergeAnnotations, addAnnotation} from './reflection'
 
 
 
@@ -40,12 +40,8 @@ export interface CommonDirectiveOptions {
     // infered from the selector
     //restrict?: Restriction|Restriction[]; // [Restriction.Element, Restriction.Element]
 
-    // TODO Como simplificar
-    // TODO depende de controllerAs?
-    // TODO como realmente funciona bindToController no 1.4? Nas docs,
-    //      ainda esta como boolean apenas, mas parece que pode ser um Map
     scope?: boolean|Map<string>;
-    bind?: boolean|Map<string>;
+    bindToController?: boolean;
 
     require?: string[];
 
@@ -64,7 +60,7 @@ export class CommonDirectiveAnnotation {
 
     selector: string = void 0;
     scope: boolean|Map<string> = void 0;
-    bind: boolean|Map<string> = void 0;
+    bindToController: boolean = void 0;
     require: string[] = void 0;
     transclude: Transclusion = void 0;
     compile: CompileFunction|FunctionReturningPrePost = void 0;
@@ -128,6 +124,35 @@ type DirectiveDecorator = (options: DirectiveOptions) => ClassDecorator;
  */
 export var Directive = <DirectiveDecorator> makeDecorator(DirectiveAnnotation);
 
+
+// ---
+
+// @Bind
+
+export class BindAnnotation {
+    constructor(
+        public propertyKey: string,
+        public binding: string) {
+    }
+}
+
+function bindDecorator(binding: string): PropertyDecorator {
+
+    return function(target: any, propertyKey: string) {
+
+        var newBind = new BindAnnotation(propertyKey, binding);
+        addAnnotation(target.constructor, newBind);
+
+    }
+
+}
+
+export var Bind = bindDecorator;
+
+// ---
+
+
+
 export function publishDirective(directiveClass: DirectiveConstructor, ngModule: ng.IModule, selector?: string): ng.IModule {
 
     // TODO debug only?
@@ -179,7 +204,8 @@ export function makeCommonDO(directiveClass: DirectiveConstructor): DirectiveDef
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    var aux = getAnnotations(directiveClass, CommonDirectiveAnnotation).reverse();
+    // var aux = getAnnotations(directiveClass, CommonDirectiveAnnotation).reverse();
+    var aux = getAnnotations(directiveClass, CommonDirectiveAnnotation);
     var annotation = <CommonDirectiveAnnotation> {/*no defaults*/};
     mergeAnnotations(annotation, ...aux);
 
@@ -192,11 +218,24 @@ export function makeCommonDO(directiveClass: DirectiveConstructor): DirectiveDef
         controller: directiveClass
     };
 
-    if (isDefined(annotation.scope)) ddo.scope = annotation.scope;
-    if (isDefined(annotation.bind)) ddo.bindToController = annotation.bind;
     if (isDefined(annotation.transclude)) ddo.transclude = TRANSCLUSION_MAP[annotation.transclude];
     if (isDefined(annotation.compile)) ddo.compile = annotation.compile;
     if (isDefined(annotation.link)) ddo.link = annotation.link;
+
+    // scope
+    if (isDefined(annotation.scope)) ddo.scope = annotation.scope;
+
+    // bindToController
+    // let bindAnnotations = <BindAnnotation[]> getAnnotations(directiveClass, BindAnnotation).reverse();
+    let bindAnnotations = <BindAnnotation[]> getAnnotations(directiveClass, BindAnnotation);
+    if (bindAnnotations.length) {
+        let map: Map<string> = {};
+        for (let bind of bindAnnotations) {
+            map[bind.propertyKey] = bind.binding;
+        }
+        ddo.bindToController = map;
+    }
+    else if (isDefined(annotation.bindToController)) ddo.bindToController = annotation.bindToController;
 
     return ddo;
 
@@ -211,7 +250,8 @@ export function makeDirectiveDO(directiveClass: DirectiveConstructor): Directive
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    var aux = getAnnotations(directiveClass, DirectiveAnnotation).reverse();
+    // var aux = getAnnotations(directiveClass, DirectiveAnnotation).reverse();
+    var aux = getAnnotations(directiveClass, DirectiveAnnotation);
     var annotation = <DirectiveAnnotation> {/*no defaults*/};
     mergeAnnotations(annotation, ...aux);
 

@@ -7,7 +7,7 @@ export {Service} from './service';
 export {Decorator} from './decorator';
 export {View} from './view';
 export {ComponentView, ComponentTemplateNamespace} from './component-view';
-export {Directive, Transclusion} from './directive';
+export {Directive, Transclusion, Bind} from './directive';
 export {Component} from './component';
 export {Module, publishModule} from './module';
 export {Application} from './application';

@@ -107,7 +107,8 @@ export function publishModule(moduleClass: ModuleConstructor, name?: string): ng
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    var aux = getAnnotations(moduleClass, ModuleAnnotation).reverse();
+    // var aux = getAnnotations(moduleClass, ModuleAnnotation).reverse();
+    var aux = getAnnotations(moduleClass, ModuleAnnotation);
 
     // TODO debug only?
     assert.notEmpty(aux, 'Missing @Module decoration');
