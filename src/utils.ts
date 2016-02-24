@@ -122,10 +122,10 @@ type Selector = {
     type: SelectorType
 };
 
-const RE_SELECTOR_ATTRIBUTE = /^\[([a-z\-_]+)\]$/i;
-const RE_SELECTOR_CLASS = /^\.([a-z\-_]+)$/i;
-//const RE_SELECTOR_COMMENT = /^\/\/([a-z\-_]+)$/i;
-const RE_SELECTOR_TAG = /^([a-z\-_]+)$/i;
+const RE_SELECTOR_ATTRIBUTE = /^\[([a-z_][a-z\-_0-9]+)\]$/i;
+const RE_SELECTOR_CLASS = /^\.([a-z_][a-z\-_0-9]+)$/i;
+//const RE_SELECTOR_COMMENT = /^\/\/([a-z_][a-z\-_0-9]+)$/i;
+const RE_SELECTOR_TAG = /^([a-z_][a-z\-_0-9]+)$/i;
 
 export function parseSelector(selector: string): Selector {
 

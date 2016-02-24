@@ -6,7 +6,7 @@ import {assert} from './assert';
 import {Inject, injectable, isAnnotated} from './di'
 import {makeDecorator, Map, setIfInterface, create, isFunction, isDefined} from './utils'
 import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils'
-import {hasAnnotation, getAnnotations, mergeAnnotations, addAnnotation} from './reflection'
+import {hasOwnAnnotation, getAnnotations, mergeAnnotations, addAnnotation} from './reflection'
 
 
 
@@ -156,7 +156,7 @@ export var Bind = bindDecorator;
 export function publishDirective(directiveClass: DirectiveConstructor, ngModule: ng.IModule, selector?: string): ng.IModule {
 
     // TODO debug only?
-    assert(hasAnnotation(directiveClass, DirectiveAnnotation), 'Did you decorate it with @Directive?');
+    assert(hasOwnAnnotation(directiveClass, DirectiveAnnotation), 'Did you decorate it with @Directive?');
 
     var {name, factory} = makeDirectiveFactory(directiveClass);
 

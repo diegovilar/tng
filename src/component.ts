@@ -4,7 +4,7 @@ import {assert} from './assert'
 import {Inject, injectable, isAnnotated} from './di'
 import {makeDecorator, Map, setIfInterface, isFunction, isDefined} from './utils'
 import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils'
-import {hasAnnotation, getAnnotations, mergeAnnotations, addAnnotation} from './reflection'
+import {hasAnnotation, hasOwnAnnotation, getAnnotations, mergeAnnotations, addAnnotation} from './reflection'
 import {ViewAnnotation} from './view'
 import {ComponentViewAnnotation, NAMESPACE_MAP} from './component-view'
 import {CommonDirectiveOptions, CommonDirectiveAnnotation} from './directive'
@@ -94,7 +94,7 @@ export interface ComponentDefinitionObject extends DirectiveDefinitionObject {
 export function publishComponent(componentClass: ComponentConstructor, ngModule: ng.IModule, selector?: string): ng.IModule {
 
     // TODO debug only?
-    assert(hasAnnotation(componentClass, ComponentAnnotation), 'Missing @Component decoration');
+    assert(hasOwnAnnotation(componentClass, ComponentAnnotation), 'Missing @Component decoration');
     assert(hasAnnotation(componentClass, ViewAnnotation), 'Missing @View decoration');
 
     var {name, factory} = makeComponentFactory(componentClass);
