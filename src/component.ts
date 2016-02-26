@@ -48,9 +48,8 @@ export interface ComponentConstructor extends DirectiveConstructor {
     new (): Component;
 }
 
-// type ComponentDecoratorExtensorDecorator = () => ClassDecorator;
 
-function componentDecoratorExtensor(baseClass: Function) {
+/*function componentDecoratorExtensor(baseClass: Function) {
 
     // debugger;
 
@@ -65,11 +64,11 @@ function componentDecoratorExtensor(baseClass: Function) {
         return target;
     }
 
-};
+};*/
 
 interface ComponentDecoratorType {
     (options: ComponentOptions): ClassDecorator;
-    extends: typeof componentDecoratorExtensor;
+    // extends: typeof componentDecoratorExtensor;
 }
 
 type ComponentDecorator = (options: ComponentOptions) => ClassDecorator;
@@ -79,7 +78,7 @@ type ComponentDecorator = (options: ComponentOptions) => ClassDecorator;
  */
 export var Component = <ComponentDecoratorType><any> makeDecorator(ComponentAnnotation);
 
-Component.extends = componentDecoratorExtensor;
+// Component.extends = componentDecoratorExtensor;
 
 /**
  * @internal

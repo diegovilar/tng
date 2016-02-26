@@ -453,7 +453,7 @@ declare module "tng/component" {
 
     interface ComponentDecoratorType {
         (options: ComponentOptions): ClassDecorator;
-        extends: any;
+        // extends: any;
     }
 
 	/**
