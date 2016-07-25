@@ -1,6 +1,6 @@
 {
   "name": "tng",
-  "version": "0.0.9-alpha.5",
+  "version": "1.0.0",
   "description": "Angular 1 on TypeScript",
   "homepage": "https://github.com/diegovilar/tng",
   "authors": [
@@ -20,12 +20,12 @@
     "scripts"
   ],
   "devDependencies": {
-    "angular-mocks": "1.4.0",
+    "angular-mocks": "1.4.12",
     "angular-ui-router": "0.2.15",
     "angular-bootstrap": "0.13.3"
   },
   "dependencies": {
-    "angular": "1.4.0",
+    "angular": "1.4.12",
     "reflect-metadata": "0.1.0"
   }
 }

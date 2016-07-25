@@ -1,6 +1,6 @@
 {
   "name": "tng",
-  "version": "0.0.9-alpha.5",
+  "version": "1.0.0",
   "description": "Angular 1 on TypeScript",
   "main": "build/prod/tng.js",
   "scripts": {
