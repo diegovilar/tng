@@ -2,7 +2,7 @@
 
 import {assert} from './assert'
 import {Inject, injectable, isAnnotated} from './di'
-import {makeDecorator, Map, setIfInterface, isFunction, isDefined} from './utils'
+import {isDefined, isFunction, makeDecorator, Map, setIfInterface} from "./utils";
 import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils'
 import {hasAnnotation, hasOwnAnnotation, getAnnotations, mergeAnnotations, addAnnotation} from './reflection'
 import {ViewAnnotation} from './view'
@@ -87,6 +87,8 @@ export interface ComponentDefinitionObject extends DirectiveDefinitionObject {
     controllerAs?: string;
     template?: string|FunctionReturningString;
     templateUrl?: string|FunctionReturningString;
+    styles?: string|string[];
+    // stylesUrls?: string[];
     templateNamespace?: string;
 }
 
@@ -125,7 +127,10 @@ export function makeComponentDO(componentClass: ComponentConstructor): Component
     if (isDefined(view.controllerAs)) cdo.controllerAs = view.controllerAs;
     if (isDefined(view.namespace)) cdo.templateNamespace = NAMESPACE_MAP[view.namespace];
 
-    // TODO styleUrl
+    if (isDefined(view.styles)) {
+        cdo.styles = typeof view.styles === "string" ? [<string> view.styles] : view.styles;
+    }
+    // else if (isDefined(view.stylesUrls)) cdo.stylesUrls = view.stylesUrls;
 
     if (isDefined(view.template)) cdo.template = view.template;
     else if (isDefined(view.templateUrl)) cdo.templateUrl = view.templateUrl;
@@ -172,6 +177,16 @@ export function makeComponentFactory(componentClass: ComponentConstructor) {
     var cdo = makeComponentDO(componentClass);
 
     var factory = injectable(['$injector'], function directiveFactory($injector: ng.auto.IInjectorService): ng.IDirective {
+
+        if (cdo.styles) {
+            for (let i = 0; i < cdo.styles.length; i++) {
+                insertStyle(cdo.styles[i], `tng-component_${cdo.imperativeName}_${i}`);
+            }
+        }
+        // else if (cdo.stylesUrls) {
+            // TODO
+        // }
+
         return <any> inFactory(inFactoryDirective(cdo, $injector), $injector);
     });
 
@@ -179,5 +194,22 @@ export function makeComponentFactory(componentClass: ComponentConstructor) {
         name: cdo.imperativeName,
         factory: factory
     };
+
+}
+
+function insertStyle(style: string, id: string) {
+
+    id = `#${id}`;
+    let head = document.head;
+
+    if (head.querySelector(id)) {
+        return;
+    }
+
+    let el = document.createElement("style");
+    el.id = id;
+    el.type = "text/css"
+    el.textContent = style;
+    head.insertBefore(el, head.querySelector("style"));
 
 }

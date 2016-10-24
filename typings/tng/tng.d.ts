@@ -319,10 +319,15 @@ declare module "tng/view" {
 	     */
 	    templateUrl?: string|FunctionReturningString;
 
+        /**
+	     *
+	     */
+	    styles?: string|string[];
+
 	    /**
 	     *
 	     */
-	    styleUrl?: string;
+	    // stylesUrls?: string[];
 
 	}
 
@@ -473,7 +478,8 @@ declare module "tng/module" {
 	import {ConstantWrapper} from 'tng/constant';
 	import {ValueWrapper} from 'tng/value';
 
-	type DependenciesArray = (string|Function|ConstantWrapper<any>|ValueWrapper<any>)[];
+	export type Dependency = (string|Function|ConstantWrapper<any>|ValueWrapper<any>);
+    export type DependenciesArray = (Dependency|Dependency[])[];
 
 	/**
 	 * Options available when decorating a class as a module
@@ -512,7 +518,8 @@ declare module "tng/module" {
 	/**
 	 * Publishe a TNG module, registering it and its dependencies on Angular.
 	 */
-	export function publishModule(moduleController: Function, name?: string): ng.IModule;
+	export function publishModule(moduleController: Function, name?: string,
+        dependencies?: DependenciesArray, constructorParameters?: any[]): ng.IModule;
 
 	// -- Internal API
 
@@ -569,15 +576,19 @@ declare module "tng/application" {
 
 declare module "tng/bootstrap" {
 
-	/**
-	 * TODO document
-	 */
-	export function bootstrap(applicationClass: Function): ng.auto.IInjectorService;
+    import {DependenciesArray} from "tng/module";
 
 	/**
 	 * TODO document
 	 */
-	export function bootstrap(moduleClass: Function, element: Element|Document): ng.auto.IInjectorService;
+	export function bootstrap(applicationClass: Function, element?: Element|Document,
+        dependencies?: DependenciesArray, constructorParameters?: any[]): ng.auto.IInjectorService;
+
+	/**
+	 * TODO document
+	 */
+	export function bootstrap(moduleClass: Function, element: Element|Document,
+        dependencies?: DependenciesArray, constructorParameters?: any[]): ng.auto.IInjectorService;
 
 	/**
 	 * TODO document

@@ -21,7 +21,8 @@ import {registerRoutes} from './ui/router/routes'
 
 const PUBLISHED_ANNOTATION_KEY = 'tng:module-published-as';
 
-type DependenciesArray = (string|Function|ConstantWrapper<any>|ValueWrapper<any>)[];
+export type Dependency = string|Function|ConstantWrapper<any>|ValueWrapper<any>;
+export type DependenciesArray = (Dependency|Dependency[])[];
 
 /**
  * Options available when decorating a class as a module
@@ -103,7 +104,8 @@ function getNewModuleName() {
 /**
  * @internal
  */
-export function publishModule(moduleClass: ModuleConstructor, name?: string): ng.IModule {
+export function publishModule(moduleClass: ModuleConstructor, name?: string,
+    dependencies?: DependenciesArray, constructorParameters?: any[]): ng.IModule {
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
@@ -131,52 +133,64 @@ export function publishModule(moduleClass: ModuleConstructor, name?: string): ng
     var directives: any[] = [];
     var modules: any[] = [];
 
-    // TODO optimize this.. to much reflection queries
-    if (annotation.dependencies) {
-        for (let dep of annotation.dependencies) {
-            // Regular angular module
-            if (isString(dep)) {
-                modules.push(dep);
-            }
-            else if (hasAnnotation(dep, ModuleAnnotation)) {
-                // If the module has alrady been published, we just push it's name
-                // if (publishedAs = Reflect.getOwnMetadata(PUBLISHED_ANNOTATION_KEY, dep)) {
-                    // modules.push(publishedAs);
-                // }
-                // else {
-                    modules.push(publishModule(<ModuleConstructor> dep).name);
-                // }
-            }
-            else if (dep instanceof ConstantWrapper) {
-                constants.push(dep);
-            }
-            else if (dep instanceof ValueWrapper) {
-                values.push(dep);
-            }
-            else if (hasAnnotation(dep, ServiceAnnotation)) {
-                services.push(dep);
-            }
-            else if (hasAnnotation(dep, DecoratorAnnotation)) {
-                decorators.push(dep);
-            }
-            else if (hasAnnotation(dep, FilterAnnotation)) {
-                filters.push(dep);
-            }
-            else if (hasAnnotation(dep, AnimationAnnotation)) {
-                animations.push(dep);
-            }
-            else if (hasAnnotation(dep, ComponentAnnotation)) {
-                components.push(dep);
-            }
-            else if (hasAnnotation(dep, DirectiveAnnotation)) {
-                directives.push(dep);
-            }
-            else {
-                // TODO WTF?
-                throw new Error(`I don't recognize what kind of dependency this is: ${dep}`);
+    // TODO optimize this.. too much reflection queries
+    function processDependency(dep: Dependency|Dependency[]): void {
+
+        // Regular angular module
+        if (isString(dep)) {
+            modules.push(dep);
+        }
+        else if (isArray(dep)) {
+            for (let _dep of <Dependency[]> dep) {
+                processDependency(_dep);
             }
         }
+        else if (hasAnnotation(dep, ModuleAnnotation)) {
+            // If the module has alrady been published, we just push it's name
+            // if (publishedAs = Reflect.getOwnMetadata(PUBLISHED_ANNOTATION_KEY, dep)) {
+                // modules.push(publishedAs);
+            // }
+            // else {
+                modules.push(publishModule(<ModuleConstructor> dep).name);
+            // }
+        }
+        else if (dep instanceof ConstantWrapper) {
+            constants.push(dep);
+        }
+        else if (dep instanceof ValueWrapper) {
+            values.push(dep);
+        }
+        else if (hasAnnotation(dep, ServiceAnnotation)) {
+            services.push(dep);
+        }
+        else if (hasAnnotation(dep, DecoratorAnnotation)) {
+            decorators.push(dep);
+        }
+        else if (hasAnnotation(dep, FilterAnnotation)) {
+            filters.push(dep);
+        }
+        else if (hasAnnotation(dep, AnimationAnnotation)) {
+            animations.push(dep);
+        }
+        else if (hasAnnotation(dep, ComponentAnnotation)) {
+            components.push(dep);
+        }
+        else if (hasAnnotation(dep, DirectiveAnnotation)) {
+            directives.push(dep);
+        }
+        else {
+            // TODO WTF?
+            throw new Error(`I don't recognize what kind of dependency this is: ${dep}`);
+        }
+
     }
+
+    let allDeps = [].concat(
+        (annotation.dependencies || []),
+        (dependencies || [])
+    );
+
+    allDeps.forEach((dep) => processDependency(dep));
 
     name = name || annotation.name || getNewModuleName();
 
@@ -184,7 +198,9 @@ export function publishModule(moduleClass: ModuleConstructor, name?: string): ng
     var ngModule = angular.module(name, modules);
 
     // Instantiate the module
-    var module = new moduleClass(ngModule);
+    // var module = new moduleClass(ngModule);
+    let module = Object.create(moduleClass.prototype);
+    moduleClass.apply(module, [ngModule].concat(constructorParameters || []))
 
     // Register config functions
     var configFns: Function[] = [];
