@@ -26,15 +26,17 @@ import {assert} from './assert';
 import {getAnnotations, mergeAnnotations} from './reflection';
 import {create} from './utils';
 import {ApplicationConstructor, ApplicationAnnotation} from './application';
-import {ModuleConstructor, ModuleAnnotation, publishModule} from './module';
+import {ModuleConstructor, ModuleAnnotation, publishModule, DependenciesArray} from './module';
 
 /**
  *
  */
-export function bootstrap(applicationClass: ApplicationConstructor): ng.auto.IInjectorService;
-export function bootstrap(moduleClass: ModuleConstructor, element: Element|Document): ng.auto.IInjectorService;
-// export function bootstrap(moduleClass: ModuleConstructor, selector: string): ng.auto.IInjectorService;
-export function bootstrap(moduleClass: ModuleConstructor, element?: Element|Document): ng.auto.IInjectorService {
+export function bootstrap(applicationClass: ApplicationConstructor, element?: Element|Document,
+    dependencies?: DependenciesArray, constructorParameters?: any[]): ng.auto.IInjectorService;
+export function bootstrap(moduleClass: ModuleConstructor, element: Element|Document,
+    dependencies?: DependenciesArray, constructorParameters?: any[]): ng.auto.IInjectorService;
+export function bootstrap(moduleClass: ModuleConstructor, element?: Element|Document,
+    dependencies?: DependenciesArray, constructorParameters?: any[]): ng.auto.IInjectorService {
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
@@ -51,7 +53,7 @@ export function bootstrap(moduleClass: ModuleConstructor, element?: Element|Docu
     // TODO debug only?
     assert(element, 'element must be provided');
 
-    var ngModule = publishModule(moduleClass);
+    var ngModule = publishModule(moduleClass, null, dependencies, constructorParameters);
 
     return angular.bootstrap(<any> element, [ngModule.name]);
 

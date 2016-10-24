@@ -30,7 +30,12 @@ export interface ViewOptions {
     /**
      * TODO
      */
-    styleUrl?: string;
+    styles?: string|string[];
+
+    /**
+     * TODO
+     */
+    // stylesUrls?: string[];
 
 }
 
@@ -41,7 +46,8 @@ export class ViewAnnotation {
 
     template: string|FunctionReturningString = void 0;
     templateUrl: string|FunctionReturningString = void 0;
-    styleUrl: string = void 0;
+    styles: string|string[] = void 0;
+    // stylesUrls: string[] = void 0;
     controllerAs: string = void 0;
 
     constructor(options: ViewOptions) {
