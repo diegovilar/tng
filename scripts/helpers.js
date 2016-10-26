@@ -85,7 +85,7 @@ function _bundle(entryFilePath, requires, destPath, destFileName, continuous, ts
     bundler.plugin('tsify', tsOptions);
 
     // bundler.transform(stringify(['.json', '.html']));
-    bundler.transform('brfs');
+    // bundler.transform('brfs');
 
     if (minify) {
         // bundler.plugin('minifyify', {map: 'tng.js.map', output: './prod/tng.js.map'});

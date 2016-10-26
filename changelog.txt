@@ -1,6 +1,6 @@
-1.1.0-rc.1
+1.1.0
 
-    - Nova opção "styles" em ViewOpttions;
+    - Nova opção "styles" em ViewOptions;
     - ModuleOptions#dependencies: elementos podem ser vetores de dependências;
     - publishModule: novas assinaturas, permitindo informar dependencias adicionais às
       configuradas no módulo e parâmetros e serem passados ao construtor do módulo;
