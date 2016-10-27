@@ -2,14 +2,29 @@
   "name": "tng",
   "version": "1.1.0",
   "description": "Angular 1 on TypeScript",
-  "main": "build/prod/tng.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
   "license": "MIT",
+  "author": "Diego Vilar <diegovilar@gmail.com>",
+  "homepage": "https://github.com/diegovilar/tng",
+  "bugs": "https://github.com/diegovilar/tng/issues",
+  "main": "tng.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/diegovilar/tng.git"
+  },
+  "dependencies": {
+    "angular": "~1.4.0",
+    "reflect-metadata": "^0.1.8"
+  },
+  "peerDependencies": {
+    "angular": "~1.4.0",
+    "reflect-metadata": "^0.1.8"
+  },
+  "optionalDependencies": {
+    "angular-ui-bootstrap": "https://github.com/angular-ui/bootstrap/archive/0.13.3.tar.gz",
+    "angular-ui-router": "https://github.com/angular-ui/ui-router/archive/0.2.18.tar.gz"
+  },
   "devDependencies": {
-    "angular-mocks": "~1.4.14",
+    "angular-mocks": "~1.4.0",
     "angular-ui-bootstrap": "https://github.com/angular-ui/bootstrap/archive/0.13.3.tar.gz",
     "angular-ui-router": "https://github.com/angular-ui/ui-router/archive/0.2.18.tar.gz",
     "browserify": "^10.2.6",
@@ -40,8 +55,5 @@
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.7.0"
-  },
-  "dependencies": {
-    "angular": "~1.4.14"
   }
 }
