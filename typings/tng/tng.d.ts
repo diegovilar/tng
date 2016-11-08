@@ -431,7 +431,51 @@ declare module "tng/directive" {
     /**
      * A decorator to annotate a property as being a binding to the controller
      */
-    function Bind(binding: string): PropertyDecorator;
+    export let Bind: {
+
+        /**
+         * Bind a local scope property to a component's element attribute.
+         *
+         * @param {string} binding
+         * @returns {PropertyDecorator}
+         */
+        (binding: string): PropertyDecorator;
+
+        /**
+         * Bind a local scope property to the value of DOM attribute.
+         *
+         * The result is always a string since DOM attributes are strings.
+         *
+         * Equivalent to Bind("@...")
+         *
+         * @param {string} binding
+         * @returns {PropertyDecorator}
+         */
+        value(binding: string): PropertyDecorator;
+
+        /**
+         * Set up a bidirectional binding between a local scope property and an expression passed via the attribute attr.
+         *
+         * The expression is evaluated in the context of the parent scope.
+         *
+         * Equivalent to Bind("=...")
+         *
+         * @param {string} binding
+         * @returns {PropertyDecorator}
+         */
+        reference(binding: string): PropertyDecorator;
+
+        /**
+         * Provides a way to execute an expression in the context of the parent scope.
+         *
+         * Equivalent to Bind("&...")
+         *
+         * @param {string} binding
+         * @returns {PropertyDecorator}
+         */
+        expression(binding: string): PropertyDecorator;
+
+    }
 
 	export function publishDirective(directiveClass: Function, ngModule: ng.IModule, selector?: string): ng.IModule;
 

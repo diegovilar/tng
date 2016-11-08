@@ -124,8 +124,9 @@ type DirectiveDecorator = (options: DirectiveOptions) => ClassDecorator;
  */
 export var Directive = <DirectiveDecorator> makeDecorator(DirectiveAnnotation);
 
-
 // ---
+
+
 
 // @Bind
 
@@ -136,7 +137,14 @@ export class BindAnnotation {
     }
 }
 
-function bindDecorator(binding: string): PropertyDecorator {
+interface Bind {
+    (binding: string): PropertyDecorator;
+    value(binding: string): PropertyDecorator;
+    reference(binding: string): PropertyDecorator;
+    expression(binding: string): PropertyDecorator;
+}
+
+let bindDecorator: Bind = <any> function bindDecorator(binding: string): PropertyDecorator {
 
     return function(target: any, propertyKey: string) {
 
@@ -146,6 +154,38 @@ function bindDecorator(binding: string): PropertyDecorator {
     }
 
 }
+
+let reBindings = /^(@|&|=)/;
+
+bindDecorator.value = function(binding: string): PropertyDecorator {
+
+    if (reBindings.test(binding)) {
+        throw new Error("Invalid one-way binding: " + binding);
+    }
+
+    return bindDecorator("@" + binding);
+
+};
+
+bindDecorator.reference = function(binding: string): PropertyDecorator {
+
+    if (reBindings.test(binding)) {
+        throw new Error("Invalid two-way reference binding: " + binding);
+    }
+
+    return bindDecorator("=" + binding);
+
+};
+
+bindDecorator.expression = function(binding: string): PropertyDecorator {
+
+    if (reBindings.test(binding)) {
+        throw new Error("Invalid parent expression binding: " + binding);
+    }
+
+    return bindDecorator("&" + binding);
+
+};
 
 export var Bind = bindDecorator;
 
@@ -222,6 +262,12 @@ export function makeCommonDO(directiveClass: DirectiveConstructor): DirectiveDef
     if (isDefined(annotation.compile)) ddo.compile = annotation.compile;
     if (isDefined(annotation.link)) ddo.link = annotation.link;
 
+    // Require
+    ddo.require = isDefined(annotation.require) ? annotation.require.slice(0) : [ddo.imperativeName];
+    if (ddo.require.indexOf(ddo.imperativeName) === -1) {
+        ddo.require.push(ddo.imperativeName);
+    }
+
     // scope
     if (isDefined(annotation.scope)) ddo.scope = annotation.scope;
 
@@ -282,19 +328,21 @@ export function inFactory(ddo: DirectiveDefinitionObject, $injector: ng.auto.IIn
     if (typeof ddo.link === "string") {
         let linkFn = ddo.controller.prototype[<string> ddo.link];
         if (!isAnnotated(linkFn)) {
-            ddo.link = function(scope: any, iElement: any, iAttrs: any, controllers: any, transclude: any) {
-                let controller = angular.isArray(controllers) ? controllers[controllers.lenght - 1] : controllers;
-                linkFn.apply(controller || null, [].slice.call(arguments, 0));
+            ddo.link = function(scope: any, iElement: any, iAttrs: any, controllers: any[], transclude: any) {
+                // let controller = angular.isArray(controllers) ? controllers[controllers.lenght - 1] : controllers;
+                let controller = controllers[controllers.length - 1];
+                linkFn.apply(controller, [].slice.call(arguments, 0));
             }
         }
         else {
-            ddo.link = function(scope: any, iElement: any, iAttrs: any, controllers: any, transclude: any) {
-                let controller = angular.isArray(controllers) ? controllers[controllers.lenght - 1] : controllers;
+            ddo.link = function(scope: any, iElement: any, iAttrs: any, controllers: any[], transclude: any) {
+                // let controller = angular.isArray(controllers) ? controllers[controllers.lenght - 1] : controllers;
+                let controller = controllers[controllers.length - 1];
                 return $injector.invoke(<any> linkFn, controller, {
                     $scope: scope,
                     $element: iElement,
                     $attrs: iAttrs,
-                    $controller: controllers,   // TODO deprecated
+                    $controller: controller,   // TODO deprecated
                     $controllers: controllers,
                     $transclude: transclude
                 });
@@ -303,12 +351,13 @@ export function inFactory(ddo: DirectiveDefinitionObject, $injector: ng.auto.IIn
     }
     else if (isAnnotated(<any> ddo.link)) {
         let linkFn = ddo.link;
-        ddo.link = (scope: any, iElement: any, iAttrs: any, controllers: any, transclude: any) => {
-            return $injector.invoke(<any> linkFn, null, {
+        ddo.link = (scope: any, iElement: any, iAttrs: any, controllers: any[], transclude: any) => {
+            let controller = controllers[controllers.length - 1];
+            return $injector.invoke(<any> linkFn, controller, {
                 $scope: scope,
                 $element: iElement,
                 $attrs: iAttrs,
-                $controller: controllers,   // TODO deprecated
+                $controller: controller,   // TODO deprecated
                 $controllers: controllers,
                 $transclude: transclude
             });

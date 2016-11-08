@@ -134,7 +134,7 @@ export function makeComponentDO(componentClass: ComponentConstructor): Component
 
     if (isDefined(view.template)) cdo.template = view.template;
     else if (isDefined(view.templateUrl)) cdo.templateUrl = view.templateUrl;
-    else throw new Error('Component has no template. Use either template or templateUrl');
+    else cdo.template = "";
 
     return cdo;
 
