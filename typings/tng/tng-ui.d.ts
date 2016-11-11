@@ -1,3 +1,7 @@
+// Type definitions for TNG-JS (Angular-UI addons)
+// Project: http://github.com/diegovilar/tng-js
+// Definitions by: Diego Vilar <http://github.com/diegovilar>
+
 /// <reference path="./tng.d.ts" />
 /// <reference path="../angular-ui-router/angular-ui-router.d.ts" />
 /// <reference path="../angular-ui-bootstrap/angular-ui-bootstrap.d.ts" />

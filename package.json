@@ -1,15 +1,15 @@
 {
-  "name": "tng",
-  "version": "1.2.0-rc.1",
+  "name": "tng-js",
+  "version": "1.2.0",
   "description": "Angular 1 on TypeScript",
   "license": "MIT",
   "author": "Diego Vilar <diegovilar@gmail.com>",
-  "homepage": "https://github.com/diegovilar/tng",
-  "bugs": "https://github.com/diegovilar/tng/issues",
+  "homepage": "https://github.com/diegovilar/tng-js",
+  "bugs": "https://github.com/diegovilar/tng-js/issues",
   "main": "tng.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/diegovilar/tng.git"
+    "url": "https://github.com/diegovilar/tng-js.git"
   },
   "dependencies": {
     "angular": "~1.4.0",
@@ -20,13 +20,15 @@
     "reflect-metadata": "^0.1.8"
   },
   "optionalDependencies": {
-    "angular-ui-bootstrap": "https://github.com/angular-ui/bootstrap/archive/0.13.3.tar.gz",
-    "angular-ui-router": "https://github.com/angular-ui/ui-router/archive/0.2.18.tar.gz"
+    "angular-ui-bootstrap": "https://github.com/diegovilar/bootstrap/releases/download/0.13.4/angular-bootstrap-0.13.4.tar.gz",
+    "angular-ui-router": "https://github.com/angular-ui/ui-router/archive/0.2.18.tar.gz",
+    "bootstrap": "^3.3.7"
   },
   "devDependencies": {
     "angular-mocks": "~1.4.0",
-    "angular-ui-bootstrap": "https://github.com/angular-ui/bootstrap/archive/0.13.3.tar.gz",
+    "angular-ui-bootstrap": "https://github.com/diegovilar/bootstrap/releases/download/0.13.4/angular-bootstrap-0.13.4.tar.gz",
     "angular-ui-router": "https://github.com/angular-ui/ui-router/archive/0.2.18.tar.gz",
+    "bootstrap": "^3.3.7",
     "browserify": "^10.2.6",
     "del": "^1.2.1",
     "eventemitter2": "^0.4.14",
@@ -48,7 +50,6 @@
     "mkdir-p": "0.0.6",
     "mout": "^0.11.1",
     "path": "^0.11.14",
-    "reflect-metadata": "^0.1.8",
     "tsify": "^0.13.2",
     "typescript": "^1.8.10",
     "uglifyjs": "^2.4.10",

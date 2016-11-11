@@ -1,3 +1,7 @@
+// Type definitions for TNG-JS
+// Project: http://github.com/diegovilar/tng-js
+// Definitions by: Diego Vilar <http://github.com/diegovilar>
+
 /// <reference path="../angularjs/angular.d.ts" />
 
 
