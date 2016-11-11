@@ -1,6 +1,6 @@
 {
   "name": "tng",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "dependencies": {
     "accepts": {
       "version": "1.2.13",
@@ -44,22 +44,22 @@
       "dev": true
     },
     "angular-ui-bootstrap": {
-      "version": "0.13.3",
-      "from": "https://github.com/angular-ui/bootstrap/archive/0.13.3.tar.gz",
-      "resolved": "https://github.com/angular-ui/bootstrap/archive/0.13.3.tar.gz",
-      "dev": true
+      "version": "0.13.4",
+      "from": "https://github.com/diegovilar/bootstrap/releases/download/0.13.4/angular-bootstrap-0.13.4.tar.gz",
+      "resolved": "https://github.com/diegovilar/bootstrap/releases/download/0.13.4/angular-bootstrap-0.13.4.tar.gz",
+      "optional": true
     },
     "angular-ui-router": {
       "version": "0.2.18",
       "from": "https://github.com/angular-ui/ui-router/archive/0.2.18.tar.gz",
       "resolved": "https://github.com/angular-ui/ui-router/archive/0.2.18.tar.gz",
-      "dev": true,
+      "optional": true,
       "dependencies": {
         "angular": {
           "version": "1.5.8",
           "from": "angular@>=1.0.8 <2.0.0",
           "resolved": "https://registry.npmjs.org/angular/-/angular-1.5.8.tgz",
-          "dev": true
+          "optional": true
         }
       }
     },
@@ -274,6 +274,12 @@
       "from": "body-parser@>=1.13.3 <1.14.0",
       "resolved": "https://registry.npmjs.org/body-parser/-/body-parser-1.13.3.tgz",
       "dev": true
+    },
+    "bootstrap": {
+      "version": "3.3.7",
+      "from": "bootstrap@>=3.0.0 <4.0.0",
+      "resolved": "https://registry.npmjs.org/bootstrap/-/bootstrap-3.3.7.tgz",
+      "optional": true
     },
     "brace-expansion": {
       "version": "1.1.6",
@@ -2652,8 +2658,7 @@
     "reflect-metadata": {
       "version": "0.1.8",
       "from": "reflect-metadata@0.1.8",
-      "resolved": "https://registry.npmjs.org/reflect-metadata/-/reflect-metadata-0.1.8.tgz",
-      "dev": true
+      "resolved": "https://registry.npmjs.org/reflect-metadata/-/reflect-metadata-0.1.8.tgz"
     },
     "regex-cache": {
       "version": "0.4.3",

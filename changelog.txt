@@ -1,6 +1,6 @@
-1.2.0-rc.1
+1.2.0
 
-    - Novos decoradores: Bind.value, Bind.reference e Bind.parentExpression;
+    - Novos decoradores: Bind.value, Bind.reference e Bind.expression;
     - Component agora sempre define require, no mínimo com o próprio controller. Se usuário definir require e não
       incluir o próprio controller (por que incluiria?), ainda sim ele sempre será incluído na última posição e poderá
       ser injetado na função de link;
