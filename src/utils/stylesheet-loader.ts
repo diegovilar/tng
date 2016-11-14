@@ -1,7 +1,3 @@
-/// <reference path="../_references.ts" />
-
-
-
 // var reCssUrl = /.+\.css($|\?.*$)/i,
 // 	reAbsoluteUrl = /^[a-z]*:\/\/.+/i;
 

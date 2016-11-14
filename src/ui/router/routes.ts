@@ -1,5 +1,3 @@
-/// <reference path="../../_references.ts" />
-
 import {injectable} from '../../di'
 import {makeDecorator, create, Map, forEach} from '../../utils'
 import {getAnnotations, mergeAnnotations} from '../../reflection'
@@ -45,10 +43,10 @@ export function registerRoutes(moduleController: Function, ngModule: ng.IModule)
 
         forEach(routes, (handler, route) => {
             if (route === '?') {
-                $urlRouterProvider.otherwise(handler);
+                $urlRouterProvider.otherwise(<any> handler);
             }
             else {
-                $urlRouterProvider.when(route, handler);
+                $urlRouterProvider.when(route, <any> handler);
             }
         });
 

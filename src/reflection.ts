@@ -1,5 +1,3 @@
-/// <reference path="./_references" />
-
 import {forEach, isDefined} from './utils';
 
 export const ANNOTATIONS_METADATA_KEY = 'tng';

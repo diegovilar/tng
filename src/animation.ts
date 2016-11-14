@@ -1,5 +1,3 @@
-/// <reference path="./_references.ts" />
-
 import {getAnnotations, mergeAnnotations} from './reflection'
 import {injectable} from './di'
 import {makeDecorator, FunctionReturningSomething, setIfInterface} from './utils'

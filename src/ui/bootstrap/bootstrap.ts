@@ -1,5 +1,3 @@
-/// <reference path="../../_references.ts" />
-
 import {Module} from '../../module'
 import {ModalServiceDecorator} from './modal-service-decorator'
 

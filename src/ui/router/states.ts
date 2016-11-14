@@ -1,5 +1,3 @@
-/// <reference path="../../_references.ts" />
-
 // TODO debug only?
 import {assert} from '../../assert'
 

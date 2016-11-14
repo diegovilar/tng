@@ -1,5 +1,3 @@
-/// <reference path="../../_references.ts" />
-
 import {makeDecorator, setIfInterface} from '../../utils'
 import {ViewOptions, ViewAnnotation} from '../../view'
 

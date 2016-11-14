@@ -1,13 +1,11 @@
-/// <reference path="../../_references.ts" />
+import {Inject} from '../../di';
+import {Decorator} from '../../decorator';
+import {getModalHandler} from './modal';
 
-import {Inject} from '../../di'
-import {Decorator} from '../../decorator'
-import {getModalHandler} from './modal'
-
-import IModalService = ng.ui.bootstrap.IModalService
-import IModalSettings = ng.ui.bootstrap.IModalSettings
-import IModalServiceInstance = ng.ui.bootstrap.IModalServiceInstance
-import IInjectorService = ng.auto.IInjectorService
+import IModalService = ng.ui.bootstrap.IModalService;
+import IModalSettings = ng.ui.bootstrap.IModalSettings;
+import IModalServiceInstance = ng.ui.bootstrap.IModalServiceInstance;
+import IInjectorService = ng.auto.IInjectorService;
 
 
 

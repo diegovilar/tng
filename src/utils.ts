@@ -1,5 +1,3 @@
-/// <reference path="./_references.ts" />
-
 import {Reflect, getAnnotations, addAnnotation} from './reflection'
 
 

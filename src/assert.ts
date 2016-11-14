@@ -1,5 +1,3 @@
-/// <reference path="./_references" />
-
 import {isString, isArray} from './utils';
 
 var slice = Array.prototype.slice;
@@ -22,7 +20,7 @@ export interface NotEmptyFunction extends Function {
 	(value: string|Array<any>, error: Error): void;
 }
 
-export interface assert extends AssertFunction {	
+export interface assert extends AssertFunction {
 	notNull: NotNullFunction;
 	notEmpty: NotEmptyFunction;
 }
@@ -38,20 +36,20 @@ export function AssertionError(message?: string) {
     AssertionError.prototype = new (<any>__)();
 })();
 
-function _assert(condition: boolean, errorOrMessage?: any): void {    
+function _assert(condition: boolean, errorOrMessage?: any): void {
     if (!condition) {
         throw (errorOrMessage instanceof Error) ? errorOrMessage :
             new (<any>AssertionError)(errorOrMessage || 'Assertion failed');
-    }    
+    }
 }
 
-function _notNull(value: any, errorOrMessage?: any) {	
+function _notNull(value: any, errorOrMessage?: any) {
 	_assert(value != null, errorOrMessage);
 }
 
 function _notEmpty(value: any, errorOrMessage?: any) {
     _notNull(value, errorOrMessage);
-    
+
     if (isString(value)) {
         _assert(value.trim().length > 0, errorOrMessage);
     }

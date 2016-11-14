@@ -1,5 +1,3 @@
-/// <reference path="./_references.ts" />
-
 import {assert} from './assert'
 import {Inject, injectable, isAnnotated} from './di'
 import {isDefined, isFunction, makeDecorator, Map, setIfInterface} from "./utils";

@@ -1,5 +1,3 @@
-/// <reference path="../../_references.ts" />
-
 import {makeDecorator, isNumber} from '../../utils'
 import {getAnnotations} from '../../reflection'
 import {injectable} from '../../di'

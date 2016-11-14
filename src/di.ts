@@ -1,7 +1,3 @@
-/// <reference path="./_references.ts" />
-
-
-
 /**
  * Annotates a function with information of dependencies to be injected as parameters
  *

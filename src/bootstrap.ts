@@ -1,5 +1,3 @@
-/// <reference path="./_references" />
-
 /*
 Applications must have:
     - Module annotation

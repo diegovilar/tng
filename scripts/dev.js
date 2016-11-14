@@ -24,9 +24,7 @@ function getTsOptions() {
     var tsConfigOptions = { compilerOptions: {} };
 
     try {
-        tsConfigOptions = helpers.parseTypescriptConfig(
-            path.resolve(config.srcDir, 'tsconfig.json')
-        );
+        tsConfigOptions = helpers.parseTypescriptConfig(config.tsConfigPath);
     }
     finally {
         return assign({}, tsConfigOptions.compilerOptions, config.dev.tsOptions);

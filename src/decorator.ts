@@ -1,5 +1,3 @@
-/// <reference path="./_references" />
-
 import {injectable} from './di'
 import {getAnnotations, mergeAnnotations} from './reflection'
 import {makeDecorator, setIfInterface, create, isFunction} from './utils'

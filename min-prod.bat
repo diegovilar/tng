@@ -9,6 +9,6 @@ if [%1] NEQ [] (
 
 cd %PROJECT_PATH%
 
-uglifyjs -cm --screw-ie8 --source-map build\prod\tng.min.js.map --in-source-map build\prod\tng.js.map -o build\prod\tng.min.js build\prod\tng.js
+uglifyjs -cm --screw-ie8 --source-map build\prod\index.min.js.map --in-source-map build\prod\index.js.map -o build\prod\index.min.js build\prod\index.js
 
 cd %OLD_CD%

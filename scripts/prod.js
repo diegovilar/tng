@@ -24,9 +24,7 @@ function getTsOptions() {
     var tsConfigOptions = { compilerOptions: {} };
 
     try {
-        tsConfigOptions = helpers.parseTypescriptConfig(
-            path.resolve(config.srcDir, 'tsconfig.json')
-        );
+        tsConfigOptions = helpers.parseTypescriptConfig(config.tsConfigPath);
     }
     finally {
         return assign({}, tsConfigOptions.compilerOptions, config.prod.tsOptions);
@@ -75,15 +73,15 @@ exports.minifyTask = minifyTask;
 function minifyTask(cb) {
 
     // setTimeout(function () {
-        var result = uglifyjs.minify(config.prod.destDir + '/tng.js', {
-            inSourceMap: config.prod.destDir + '/tng.js.map',
-            outSourceMap: 'tng-min.js.map',
+        var result = uglifyjs.minify(config.prod.destDir + '/index.js', {
+            inSourceMap: config.prod.destDir + '/index.js.map',
+            outSourceMap: 'index.min.js.map',
             mangle: true,
             compress: {}
         });
 
-        fs.writeFileSync(config.prod.destDir + '/tng-min.js', result.code);
-        fs.writeFileSync(config.prod.destDir + '/tng-min.js.map', result.map);
+        fs.writeFileSync(config.prod.destDir + '/index.min.js', result.code);
+        fs.writeFileSync(config.prod.destDir + '/index.min.js.map', result.map);
 
         cb && cb();
     // }, 5000);

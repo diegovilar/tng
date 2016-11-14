@@ -1,5 +1,3 @@
-/// <reference path="./_references" />
-
 // TODO debug only?
 import {assert} from './assert';
 
