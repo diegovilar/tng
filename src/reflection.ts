@@ -2,9 +2,6 @@ import {forEach, isDefined} from './utils';
 
 export const ANNOTATIONS_METADATA_KEY = 'tng';
 
-var _Reflect = Reflect;
-export {_Reflect as Reflect};
-
 const functionPrototype = Object.getPrototypeOf(Function);
 
 function GetPrototypeOf(O: any): Object {

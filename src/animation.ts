@@ -3,8 +3,6 @@ import {injectable} from './di'
 import {makeDecorator, FunctionReturningSomething, setIfInterface} from './utils'
 import {create, isFunction, bindFunctions} from './utils'
 
-
-
 /**
  * Options available when decorating a class as an animation controller
  * TODO document

@@ -3,9 +3,11 @@
         "target": "es5",
         "module": "commonjs",
         "noImplicitAny": true,
+        "noEmitOnError": true,
         "suppressImplicitAnyIndexErrors": false,
         "experimentalDecorators": true,
         "moduleResolution": "node",
+        "sourceMap": true,
         "newLine": "LF",
         "charset": "utf-8",
         "emitBOM": false,
@@ -15,10 +17,6 @@
         ]
     },
     "include": [
-        "src/**/*.ts",
-        "typings/**/*.ts"
-    ],
-    "files": [
-        "node_modules/reflect-metadata/Reflect.d.ts"
+        "src/**/*"
     ]
 }

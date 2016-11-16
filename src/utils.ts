@@ -1,4 +1,5 @@
-import {Reflect, getAnnotations, addAnnotation} from './reflection'
+// import * as angular from "angular";
+import {getAnnotations, addAnnotation} from './reflection';
 
 
 

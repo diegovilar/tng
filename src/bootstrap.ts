@@ -19,8 +19,8 @@ To process a module is to:
 */
 
 // TODO debug only?
+// import * as angular from "angular";
 import {assert} from './assert';
-
 import {getAnnotations, mergeAnnotations} from './reflection';
 import {create} from './utils';
 import {ApplicationConstructor, ApplicationAnnotation} from './application';
