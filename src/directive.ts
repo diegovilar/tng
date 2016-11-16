@@ -310,7 +310,7 @@ export function makeDirectiveDO(directiveClass: DirectiveConstructor): Directive
 /**
  * @internal
  */
-export function inFactory(ddo: DirectiveDefinitionObject, $injector: ng.auto.IInjectorService): DirectiveDefinitionObject {
+export function inFactoryDirective(ddo: DirectiveDefinitionObject, $injector: ng.auto.IInjectorService): DirectiveDefinitionObject {
 
     if (isFunction(ddo.compile)) {
         ddo.compile = !isAnnotated(ddo.compile) ? ddo.compile :
@@ -374,7 +374,7 @@ export function makeDirectiveFactory(directiveClass: DirectiveConstructor) {
     var ddo = makeDirectiveDO(directiveClass);
 
     var factory = injectable(['$injector'], function directiveFactory($injector: ng.auto.IInjectorService): ng.IDirective {
-        return <any> inFactory(ddo, $injector);
+        return <any> inFactoryDirective(ddo, $injector);
     });
 
     return {

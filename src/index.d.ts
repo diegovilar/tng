@@ -1,27 +1,27 @@
 // Type definitions for TNG-JS
-// Project: http://github.com/diegovilar/tng-js
+// Project: http://github.com/diegovilar/tangular
 // Definitions by: Diego Vilar <http://github.com/diegovilar>
 
-declare module "tng-js" {
+declare module "tangular" {
 
-	export {Inject, injectable} from "tng-js/di"
-	export {Value} from "tng-js/value"
-	export {Constant} from "tng-js/constant"
-	export {Filter} from "tng-js/filter"
-	export {Animation} from "tng-js/animation"
-	export {Service} from "tng-js/service"
-	export {Decorator} from "tng-js/decorator"
-	export {View} from "tng-js/view"
-	export {ComponentView, ComponentTemplateNamespace} from "tng-js/component-view"
-	export {Directive, Transclusion, Bind} from "tng-js/directive"
-	export {Component} from "tng-js/component"
-	export {Module, publishModule} from "tng-js/module"
-	export {Application} from "tng-js/application"
-	export {bootstrap} from "tng-js/bootstrap"
+	export {Inject, injectable} from "tangular/di"
+	export {Value} from "tangular/value"
+	export {Constant} from "tangular/constant"
+	export {Filter} from "tangular/filter"
+	export {Animation} from "tangular/animation"
+	export {Service} from "tangular/service"
+	export {Decorator} from "tangular/decorator"
+	export {View} from "tangular/view"
+	export {ComponentView, ComponentTemplateNamespace} from "tangular/component-view"
+	export {Directive, Transclusion, Bind} from "tangular/directive"
+	export {Component} from "tangular/component"
+	export {Module, publishModule} from "tangular/module"
+	export {Application} from "tangular/application"
+	export {bootstrap} from "tangular/bootstrap"
 
 }
 
-declare module "tng-js/di" {
+declare module "tangular/di" {
 
 	/**
 	 * Annotates a function with information of dependencies to be injected as parameters
@@ -63,7 +63,7 @@ declare module "tng-js/di" {
 
 }
 
-declare module "tng-js/value" {
+declare module "tangular/value" {
 
 	/**
 	 * A framework envelope for values
@@ -87,7 +87,7 @@ declare module "tng-js/value" {
 
 }
 
-declare module "tng-js/constant" {
+declare module "tangular/constant" {
 
 	/**
 	 * A framework envelope for constants
@@ -111,7 +111,7 @@ declare module "tng-js/constant" {
 
 }
 
-declare module "tng-js/filter" {
+declare module "tangular/filter" {
 
 	/**
 	 * Options available when decorating a class as a filter
@@ -162,7 +162,7 @@ declare module "tng-js/filter" {
 
 }
 
-declare module "tng-js/animation" {
+declare module "tangular/animation" {
 
 	type endFunction = (isCancelled: boolean) => void;
 
@@ -197,7 +197,7 @@ declare module "tng-js/animation" {
 
 }
 
-declare module "tng-js/service" {
+declare module "tangular/service" {
 
 	/**
 	 * Options available when decorating a class as a service
@@ -248,7 +248,7 @@ declare module "tng-js/service" {
 
 }
 
-declare module "tng-js/decorator" {
+declare module "tangular/decorator" {
 
 	/**
 	 * Options available when decorating a class as a decorator
@@ -294,7 +294,7 @@ declare module "tng-js/decorator" {
 
 }
 
-declare module "tng-js/view" {
+declare module "tangular/view" {
 
 	type FunctionReturningString = {(...args: any[]): string};
 
@@ -338,9 +338,9 @@ declare module "tng-js/view" {
 
 }
 
-declare module "tng-js/component-view" {
+declare module "tangular/component-view" {
 
-	import {ViewOptions} from "tng-js/view";
+	import {ViewOptions} from "tangular/view";
 
 	/**
 	 * TODO document
@@ -375,7 +375,7 @@ declare module "tng-js/component-view" {
 
 }
 
-declare module "tng-js/directive" {
+declare module "tangular/directive" {
 
 	type StringMap = {[key: string]: string};
 	type FunctionReturningNothing = (...args: any[]) => void;
@@ -481,10 +481,10 @@ declare module "tng-js/directive" {
 
 }
 
-declare module "tng-js/component" {
+declare module "tangular/component" {
 
-	import {Directive, CommonDirectiveOptions} from "tng-js/directive";
-	export  {Bind} from "tng-js/directive";
+	import {Directive, CommonDirectiveOptions} from "tangular/directive";
+	export  {Bind} from "tangular/directive";
 
 	/**
 	 * TODO document
@@ -517,10 +517,10 @@ declare module "tng-js/component" {
 
 
 
-declare module "tng-js/module" {
+declare module "tangular/module" {
 
-	import {ConstantWrapper} from "tng-js/constant";
-	import {ValueWrapper} from "tng-js/value";
+	import {ConstantWrapper} from "tangular/constant";
+	import {ValueWrapper} from "tangular/value";
 
 	export type Dependency = (string|Function|ConstantWrapper<any>|ValueWrapper<any>);
     export type DependenciesArray = (Dependency|Dependency[])[];
@@ -591,9 +591,9 @@ declare module "tng-js/module" {
 
 }
 
-declare module "tng-js/application" {
+declare module "tangular/application" {
 
-	import {ModuleOptions, Module} from "tng-js/module";
+	import {ModuleOptions, Module} from "tangular/module";
 
 	/**
 	 * Options available when decorating a class as an application
@@ -618,9 +618,9 @@ declare module "tng-js/application" {
 
 }
 
-declare module "tng-js/bootstrap" {
+declare module "tangular/bootstrap" {
 
-    import {DependenciesArray} from "tng-js/module";
+    import {DependenciesArray} from "tangular/module";
 
 	/**
 	 * TODO document
@@ -645,11 +645,11 @@ declare module "tng-js/bootstrap" {
 // UI-Router
 // ----------------------------------------------------------------------------
 
-declare module "tng-js/ui/router/states" {
+declare module "tangular/ui/router/states" {
 
     type StateConfigMap = { [stateName: string]: StateConfig };
 
-    export {View, ViewOptions} from "tng-js/view";
+    export {View, ViewOptions} from "tangular/view";
 
     /**
      * Enumeration of events related to the transition of states.
@@ -810,7 +810,7 @@ declare module "tng-js/ui/router/states" {
 
 }
 
-declare module "tng-js/ui/router/routes" {
+declare module "tangular/ui/router/routes" {
 
 	type RoutesMap = {[route: string]: string|Function};
 
@@ -843,7 +843,7 @@ declare module "tng-js/ui/router/routes" {
 // UI-Bootstrap
 // ----------------------------------------------------------------------------
 
-declare module "tng-js/ui/bootstrap" {
+declare module "tangular/ui/bootstrap" {
 
 	export class TngUiBootstrapModule {
 
@@ -851,9 +851,9 @@ declare module "tng-js/ui/bootstrap" {
 
 }
 
-declare module "tng-js/ui/bootstrap/modal" {
+declare module "tangular/ui/bootstrap/modal" {
 
-    import {ViewOptions} from "tng-js/view"
+    import {ViewOptions} from "tangular/view"
 	import IModalScope = angular.ui.bootstrap.IModalScope
 	// type StringMap = {[key: string]: string};
 

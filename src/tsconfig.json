@@ -4,6 +4,8 @@
         "module": "commonjs",
         "noImplicitAny": true,
         "noEmitOnError": true,
+        "declaration": true,
+        "stripInternal": true,
         "suppressImplicitAnyIndexErrors": false,
         "experimentalDecorators": true,
         "moduleResolution": "node",
@@ -17,6 +19,6 @@
         ]
     },
     "include": [
-        "src/**/*"
+        "./**/*"
     ]
 }

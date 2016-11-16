@@ -7,7 +7,7 @@ import {ViewAnnotation} from './view'
 import {ComponentViewAnnotation, NAMESPACE_MAP} from './component-view'
 import {CommonDirectiveOptions, CommonDirectiveAnnotation} from './directive'
 import {Directive, DirectiveAnnotation, DirectiveConstructor, Transclusion} from './directive'
-import {makeCommonDO, DirectiveDefinitionObject, inFactory as inFactoryDirective} from './directive'
+import {makeCommonDO, DirectiveDefinitionObject, inFactoryDirective} from './directive'
 
 export {Bind} from './directive';
 
@@ -141,7 +141,7 @@ export function makeComponentDO(componentClass: ComponentConstructor): Component
 /**
  * @internal
  */
-export function inFactory(cdo: ComponentDefinitionObject, $injector: ng.auto.IInjectorService): ComponentDefinitionObject {
+export function inFactoryComponent(cdo: ComponentDefinitionObject, $injector: ng.auto.IInjectorService): ComponentDefinitionObject {
 
     if (isFunction(cdo.template)) {
         cdo.template = !isAnnotated(<any> cdo.template) ? cdo.template : (tElement: any, tAttrs: any) => {
@@ -185,7 +185,7 @@ export function makeComponentFactory(componentClass: ComponentConstructor) {
             // TODO
         // }
 
-        return <any> inFactory(inFactoryDirective(cdo, $injector), $injector);
+        return <any> inFactoryComponent(inFactoryDirective(cdo, $injector), $injector);
     });
 
     return {

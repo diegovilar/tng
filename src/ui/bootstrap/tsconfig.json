@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "noEmitOnError": true,
+        "declaration": true,
+        "stripInternal": true,
+        "suppressImplicitAnyIndexErrors": false,
+        "experimentalDecorators": true,
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "newLine": "LF",
+        "charset": "utf-8",
+        "emitBOM": false,
+        "lib": [
+            "dom",
+            "es5"
+        ],
+        "paths": {
+            "angularts": "../../index.ts"
+        }
+    },
+    "include": [
+        "./**/*"
+    ]
+}
