@@ -1,4 +1,4 @@
-import {Inject, Decorator} from "angularts";
+import {Inject, Decorator} from "angularts.core";
 import {getModalHandler} from './modal';
 
 import IModalService = ng.ui.bootstrap.IModalService;

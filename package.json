@@ -21,7 +21,10 @@
     "reflect-metadata": "^0.1.8"
   },
   "optionalDependencies": {
-    "bootstrap": "^3.3.7"
+    "angular-ui-bootstrap": "https://github.com/diegovilar/bootstrap/releases/download/0.13.4/angular-bootstrap-0.13.4.tar.gz",
+    "angular-ui-router": "https://github.com/angular-ui/ui-router/archive/0.2.18.tar.gz",
+    "bootstrap": "^3.3.7",
+    "jquery": "~2.2.x"
   },
   "devDependencies": {
     "@types/angular": "~1.5.19",
@@ -43,6 +46,7 @@
     "gulp-sourcemaps": "^1.9.0",
     "gulp-util": "^3.0.7",
     "gulp-watch": "^4.3.10",
+    "http-server": "^0.9.0",
     "jasmine-core": "^2.5.2",
     "karma": "^0.12.37",
     "karma-chrome-launcher": "^0.1.12",

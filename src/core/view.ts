@@ -1,6 +1,7 @@
 // TODO debug only?
+import {makeDecorator} from './reflection'
 import {assert} from './assert'
-import {makeDecorator, TFunctionReturningString, setIfInterface} from './utils'
+import {TFunctionReturningString, setIfInterface} from './utils'
 
 
 

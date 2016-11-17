@@ -1,4 +1,4 @@
-import {injectable, __utils__ as utils, __reflection__ as reflection} from 'angularts';
+import {injectable, __utils__ as utils, __reflection__ as reflection} from 'angularts.core';
 
 import Map = utils.Map;
 
@@ -20,7 +20,7 @@ type RoutesDecorator = (routes: Map<string|Function>) => ClassDecorator;
 /**
  * A decorator to annotate a class with states
  */
-export var Routes = <RoutesDecorator> utils.makeDecorator(RoutesAnnotation);
+export var Routes = <RoutesDecorator> reflection.makeDecorator(RoutesAnnotation);
 
 /**
  * @internal

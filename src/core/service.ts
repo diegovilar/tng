@@ -1,8 +1,8 @@
 // TODO debug only?
 import {assert} from './assert';
 
-import {getAnnotations, mergeAnnotations} from './reflection';
-import {makeDecorator, setIfInterface, isFunction} from './utils';
+import {makeDecorator, getAnnotations, mergeAnnotations} from './reflection';
+import {setIfInterface, isFunction} from './utils';
 
 /**
  * Options available when decorating a class as a service

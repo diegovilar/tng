@@ -3,12 +3,11 @@
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
-            "angularts": ["../angularts/index"],
-            "angularts.core": ["../angularts.core/index"]
+            "angularts.core": ["../core/index"]
         }
     },
-    "include": [
+    "files": [
         "../ambient.d.ts",
-        "./**/*"
+        "index.ts"
     ]
 }

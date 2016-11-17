@@ -1,6 +1,6 @@
-import {getAnnotations, mergeAnnotations} from './reflection'
+import {makeDecorator, getAnnotations, mergeAnnotations} from './reflection'
 import {injectable} from './di'
-import {makeDecorator, TFunctionReturningSomething, setIfInterface} from './utils'
+import {TFunctionReturningSomething, setIfInterface} from './utils'
 import {create, isFunction, bindFunctions} from './utils'
 
 /**

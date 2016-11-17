@@ -1,6 +1,7 @@
 // TODO debug only?
 import {assert} from './assert'
-import {makeDecorator, setIfInterface, isElement} from './utils'
+import {makeDecorator} from "./reflection";
+import {setIfInterface, isElement} from './utils'
 import {ModuleOptions, ModuleAnnotation, Module, ModuleConstructor} from './module'
 
 

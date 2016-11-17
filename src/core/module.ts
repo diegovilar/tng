@@ -1,8 +1,8 @@
 // TODO debug only?
 // import * as angular from "angular";
 import {assert} from './assert'
-import {getAnnotations, hasAnnotation, mergeAnnotations} from './reflection'
-import {makeDecorator, setIfInterface, TFunctionReturningNothing} from './utils'
+import {makeDecorator, getAnnotations, hasAnnotation, mergeAnnotations} from './reflection'
+import {setIfInterface, TFunctionReturningNothing} from './utils'
 import {safeBind} from './di'
 import {create, isString, isFunction, isArray} from './utils'
 import {ValueWrapper, publishValue} from './value'

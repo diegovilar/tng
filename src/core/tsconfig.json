@@ -1,7 +1,13 @@
 {
     "extends": "../tsconfig",
-    "include": [
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+
+        }
+    },
+    "files": [
         "../ambient.d.ts",
-        "./**/*"
+        "index.ts"
     ]
 }

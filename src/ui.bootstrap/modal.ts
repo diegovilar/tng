@@ -1,6 +1,5 @@
 // TODO debug only?
-// import * as angular from "angular";
-import {Inject, injectable, __assert__ as assert, __utils__ as utils, __reflection__ as reflection} from 'angularts';
+import {Inject, injectable, __assert__ as assert, __utils__ as utils, __reflection__ as reflection} from 'angularts.core';
 import {ModalViewAnnotation, MODAL_BACKDROP_MAP} from './modal-view'
 
 import IModalServiceInstance = ng.ui.bootstrap.IModalServiceInstance
@@ -11,7 +10,6 @@ import IModalScope = ng.ui.bootstrap.IModalScope
 
 export {ModalView, ModalBackdrop, ModalViewOptions} from './modal-view'
 
-let makeDecorator = utils.makeDecorator;
 let create = utils.create;
 let isDefined = utils.isDefined;
 let isString = utils.isString;
@@ -21,6 +19,7 @@ let forEach = utils.forEach;
 let setIfInterface = utils.setIfInterface;
 import Map = utils.Map;
 
+let makeDecorator = reflection.makeDecorator;
 let hasAnnotation = reflection.hasAnnotation;
 let getAnnotations = reflection.getAnnotations;
 let mergeAnnotations = reflection.mergeAnnotations;

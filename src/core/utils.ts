@@ -1,5 +1,5 @@
 // import * as angular from "angular";
-import {getAnnotations, addAnnotation} from './reflection';
+import {addAnnotation} from './reflection';
 
 
 
@@ -79,49 +79,49 @@ export function setIfInterface(target:any, source:any) {
 
 }
 
-export function makeDecorator<T extends Function>(annotationClass: T) {
+// export function makeDecorator<T extends Function>(annotationClass: T) {
 
-    return function() {
+//     return function() {
 
-        let annotationInstance = Object.create(annotationClass.prototype);
-        annotationClass.apply(annotationInstance, arguments);
+//         let annotationInstance = Object.create(annotationClass.prototype);
+//         annotationClass.apply(annotationInstance, arguments);
 
-        return function(target: T) {
-            addAnnotation(target, annotationInstance);
-            return target;
-        }
+//         return function(target: T) {
+//             addAnnotation(target, annotationInstance);
+//             return target;
+//         }
 
-    }
+//     }
 
-}
+// }
 
-export function makeParamDecorator<T extends Function>(annotationClass: T) {
+// export function makeParamDecorator<T extends Function>(annotationClass: T) {
 
-    return function() {
+//     return function() {
 
-        let annotationInstance = Object.create(annotationClass.prototype);
-        annotationClass.apply(annotationInstance, arguments);
+//         let annotationInstance = Object.create(annotationClass.prototype);
+//         annotationClass.apply(annotationInstance, arguments);
 
-        return function(target: T, unusedKey: string, index: number) {
+//         return function(target: T, unusedKey: string, index: number) {
 
-            let parameters = Reflect.getMetadata('parameters', target);
-            parameters = parameters || [];
+//             let parameters = Reflect.getMetadata('parameters', target);
+//             parameters = parameters || [];
 
-            // there might be gaps if some in between parameters do not have annotations.
-            // we pad with nulls.
-            while (parameters.length <= index) {
-                parameters.push(null);
-            }
+//             // there might be gaps if some in between parameters do not have annotations.
+//             // we pad with nulls.
+//             while (parameters.length <= index) {
+//                 parameters.push(null);
+//             }
 
-            parameters[index] = annotationInstance;
-            Reflect.defineMetadata('parameters', parameters, target);
-            return target;
+//             parameters[index] = annotationInstance;
+//             Reflect.defineMetadata('parameters', parameters, target);
+//             return target;
 
-        }
+//         }
 
-    }
+//     }
 
-}
+// }
 
 export const enum SelectorType {
     Attribute,

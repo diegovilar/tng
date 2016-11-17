@@ -2,9 +2,9 @@
 import {assert} from './assert';
 
 import {Inject, injectable, isAnnotated} from './di'
-import {makeDecorator, Map, setIfInterface, create, isFunction, isDefined} from './utils'
+import {Map, setIfInterface, create, isFunction, isDefined} from './utils'
 import {TFunctionReturningString, TFunctionReturningNothing, parseSelector, SelectorType} from './utils'
-import {hasOwnAnnotation, getAnnotations, mergeAnnotations, addAnnotation} from './reflection'
+import {makeDecorator, hasOwnAnnotation, getAnnotations, mergeAnnotations, addAnnotation} from './reflection'
 
 
 

@@ -1,6 +1,6 @@
-import {ViewOptions, ViewAnnotation, __utils__} from "angularts";
+import {ViewOptions, ViewAnnotation, __utils__, __reflection__} from "angularts.core";
 
-let makeDecorator = __utils__.makeDecorator;
+let makeDecorator = __reflection__.makeDecorator;
 let setIfInterface = __utils__.setIfInterface;
 
 

@@ -1,0 +1,10 @@
+{
+    "extends": "./tsconfig",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "angularts.core": ["../../build/angularts.core/index.d"],
+            "angularts.ui.bootstrap": ["../../build/angularts.ui.bootstrap/index.d"]
+        }
+    }
+}

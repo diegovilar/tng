@@ -1,4 +1,4 @@
-import {injectable, __utils__ as utils, __reflection__ as reflection} from 'angularts';
+import {injectable, __utils__ as utils, __reflection__ as reflection} from 'angularts.core';
 
 
 
@@ -148,7 +148,7 @@ type OnDecorator = (event: StateChangeEvent|ViewLoadEvent|string, handler: Funct
 /**
  * @internal
  */
-export var On = <OnDecorator> utils.makeDecorator(UiRouterEventListenerAnnotation);
+export var On = <OnDecorator> reflection.makeDecorator(UiRouterEventListenerAnnotation);
 
 /**
  * @internal

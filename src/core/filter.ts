@@ -1,5 +1,5 @@
-import {getAnnotations, mergeAnnotations} from './reflection'
-import {makeDecorator, setIfInterface, create, isFunction} from './utils'
+import {makeDecorator, getAnnotations, mergeAnnotations} from './reflection'
+import {setIfInterface, create, isFunction} from './utils'
 import {injectable} from './di'
 
 

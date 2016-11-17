@@ -1,5 +1,5 @@
 // TODO debug only?
-import {ViewAnnotation, View, injectable, safeBind, __utils__ as utils, __reflection__ as reflection, __assert__ as assert} from "angularts";
+import {ViewAnnotation, View, injectable, safeBind, __utils__ as utils, __reflection__ as reflection, __assert__ as assert} from "angularts.core";
 import {getModalHandler} from 'angularts.ui.bootstrap';
 import {On, publishListeners} from './events';
 
@@ -63,7 +63,7 @@ export interface StatesDecorator {
 /**
  * A decorator to annotate a class with states
  */
-export var States = <StatesDecorator> <any> utils.makeDecorator(StatesAnnotation);
+export var States = <StatesDecorator> <any> reflection.makeDecorator(StatesAnnotation);
 States.on = On;
 
 /**

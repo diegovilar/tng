@@ -4,7 +4,7 @@ import commonjs from "rollup-plugin-commonjs";
 
 let banner = `/**
  * @preserve
- * AngularTS (Core) - ${pak.description}
+ * AngularTS (UI Bootstrap) - ${pak.description}
  * Version: ${pak.version} (built on ${(new Date()).toUTCString()})
  * Project: ${pak.homepage}
  * Author:  ${pak.author}
@@ -13,15 +13,20 @@ let banner = `/**
 
 export default {
     banner,
-    entry: "../../build/angularts.core/index.js",
-    dest:  "../../build/angularts.core/bundles/index.js",
+    entry: "../../build/angularts.ui.bootstrap/index.js",
+    dest:  "../../build/angularts.ui.bootstrap/bundles/index.js",
     format: "umd",
-    moduleName: "angularts.core",
+    moduleName: "angularts.ui.bootstrap",
     exports: "named",
     sourceMap: true,
     globals: {
-        angular: "angular"
+        angular: "angular",
+        "angularts.core" : "angularts.core"
     },
+    external: [
+        "angular",
+        "angularts.core"
+    ],
     plugins: [
         sourcemaps(),
         commonjs({

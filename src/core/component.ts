@@ -1,8 +1,8 @@
 import {assert} from './assert'
 import {Inject, injectable, isAnnotated} from './di'
-import {isDefined, isFunction, makeDecorator, Map, setIfInterface} from "./utils";
+import {isDefined, isFunction, Map, setIfInterface} from "./utils";
 import {TFunctionReturningString, TFunctionReturningNothing, parseSelector, SelectorType} from './utils'
-import {hasAnnotation, hasOwnAnnotation, getAnnotations, mergeAnnotations, addAnnotation} from './reflection'
+import {hasAnnotation, hasOwnAnnotation, getAnnotations, mergeAnnotations, addAnnotation, makeDecorator} from './reflection'
 import {ViewAnnotation} from './view'
 import {ComponentViewAnnotation, NAMESPACE_MAP} from './component-view'
 import {CommonDirectiveOptions, CommonDirectiveAnnotation} from './directive'

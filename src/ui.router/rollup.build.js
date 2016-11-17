@@ -20,8 +20,15 @@ export default {
     exports: "named",
     sourceMap: true,
     globals: {
-        angular: "angular"
+        angular: "angular",
+        "angularts.core" : "angularts.core",
+        "angularts.ui.bootstrap" : "angularts.ui.bootstrap",
     },
+    external: [
+        "angular",
+        "angularts.core",
+        "angularts.ui.bootstrap"
+    ],
     plugins: [
         sourcemaps(),
         commonjs({

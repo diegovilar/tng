@@ -6,7 +6,7 @@
         "noImplicitAny": true,
         "noEmitOnError": true,
         "declaration": true,
-        "stripInternal": true,
+        "stripInternal": false,
         "suppressImplicitAnyIndexErrors": false,
         "experimentalDecorators": true,
         "sourceMap": true,
@@ -19,7 +19,7 @@
         ],
         "baseUrl": ".",
         "paths": {
-            "angularts": ["./index"],
+            "angularts": ["./all/index"],
             "angularts.core": ["./core/index"],
             "angularts.ui.bootstrap": ["./ui.bootstrap/index"],
             "angularts.ui.router": ["./ui.router/index"]

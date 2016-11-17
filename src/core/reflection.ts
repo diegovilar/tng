@@ -154,3 +154,47 @@ export function mergeAnnotations(...annotations: any[]): any {
 	return <any> dest;
 
 }
+
+export function makeDecorator<T extends Function>(annotationClass: T) {
+
+    return function() {
+
+        let annotationInstance = Object.create(annotationClass.prototype);
+        annotationClass.apply(annotationInstance, arguments);
+
+        return function(target: T) {
+            addAnnotation(target, annotationInstance);
+            return target;
+        }
+
+    }
+
+}
+
+export function makeParamDecorator<T extends Function>(annotationClass: T) {
+
+    return function() {
+
+        let annotationInstance = Object.create(annotationClass.prototype);
+        annotationClass.apply(annotationInstance, arguments);
+
+        return function(target: T, unusedKey: string, index: number) {
+
+            let parameters = Reflect.getMetadata('parameters', target);
+            parameters = parameters || [];
+
+            // there might be gaps if some in between parameters do not have annotations.
+            // we pad with nulls.
+            while (parameters.length <= index) {
+                parameters.push(null);
+            }
+
+            parameters[index] = annotationInstance;
+            Reflect.defineMetadata('parameters', parameters, target);
+            return target;
+
+        }
+
+    }
+
+}

@@ -1,4 +1,4 @@
-import {Module} from 'angularts';
+import {Module} from 'angularts.core';
 import {ModalServiceDecorator} from './modal-service-decorator'
 
 // export {Modal, ModalOptions} from './modal'

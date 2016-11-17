@@ -1,4 +1,5 @@
-import {makeDecorator, setIfInterface} from './utils'
+import {makeDecorator} from './reflection'
+import {setIfInterface} from './utils'
 import {ViewOptions, ViewAnnotation} from './view'
 
 
