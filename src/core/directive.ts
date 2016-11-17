@@ -3,7 +3,7 @@ import {assert} from './assert';
 
 import {Inject, injectable, isAnnotated} from './di'
 import {makeDecorator, Map, setIfInterface, create, isFunction, isDefined} from './utils'
-import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils'
+import {TFunctionReturningString, TFunctionReturningNothing, parseSelector, SelectorType} from './utils'
 import {hasOwnAnnotation, getAnnotations, mergeAnnotations, addAnnotation} from './reflection'
 
 
@@ -17,12 +17,12 @@ export const enum Transclusion {
 }
 const TRANSCLUSION_MAP = [true, 'element'];
 
-type PrePost = {
-    pre: FunctionReturningNothing,
-    post: FunctionReturningNothing
+export type TPrePost = {
+    pre: TFunctionReturningNothing,
+    post: TFunctionReturningNothing
 };
-type CompileFunction = (...args: any[]) => FunctionReturningNothing;
-type FunctionReturningPrePost = (...args: any[]) => PrePost;
+export type TCompileFunction = (...args: any[]) => TFunctionReturningNothing;
+export type TFunctionReturningPrePost = (...args: any[]) => TPrePost;
 
 /**
  * TODO document
@@ -46,8 +46,8 @@ export interface CommonDirectiveOptions {
     // needs mapping
     transclude?: Transclusion; // Transclusion.Content
 
-    compile?: CompileFunction|FunctionReturningPrePost;
-    link?: FunctionReturningNothing|PrePost|string;
+    compile?: TCompileFunction|TFunctionReturningPrePost;
+    link?: TFunctionReturningNothing|TPrePost|string;
 
 }
 
@@ -61,8 +61,8 @@ export class CommonDirectiveAnnotation {
     bindToController: boolean = void 0;
     require: string[] = void 0;
     transclude: Transclusion = void 0;
-    compile: CompileFunction|FunctionReturningPrePost = void 0;
-    link: FunctionReturningNothing|PrePost|string = void 0;
+    compile: TCompileFunction|TFunctionReturningPrePost = void 0;
+    link: TFunctionReturningNothing|TPrePost|string = void 0;
 
     constructor(options: CommonDirectiveOptions) {
         // TODO debug only?
@@ -120,7 +120,7 @@ type DirectiveDecorator = (options: DirectiveOptions) => ClassDecorator;
 /**
  *
  */
-export var Directive = <DirectiveDecorator> makeDecorator(DirectiveAnnotation);
+export let Directive = <DirectiveDecorator> makeDecorator(DirectiveAnnotation);
 
 // ---
 
@@ -135,7 +135,7 @@ export class BindAnnotation {
     }
 }
 
-interface Bind {
+export interface Bind {
     (binding: string): PropertyDecorator;
     value(binding: string): PropertyDecorator;
     reference(binding: string): PropertyDecorator;
@@ -146,7 +146,7 @@ let bindDecorator: Bind = <any> function bindDecorator(binding: string): Propert
 
     return function(target: any, propertyKey: string) {
 
-        var newBind = new BindAnnotation(propertyKey, binding);
+        let newBind = new BindAnnotation(propertyKey, binding);
         addAnnotation(target.constructor, newBind);
 
     }
@@ -185,7 +185,7 @@ bindDecorator.expression = function(binding: string): PropertyDecorator {
 
 };
 
-export var Bind = bindDecorator;
+export let Bind = bindDecorator;
 
 // ---
 
@@ -196,7 +196,7 @@ export function publishDirective(directiveClass: DirectiveConstructor, ngModule:
     // TODO debug only?
     assert(hasOwnAnnotation(directiveClass, DirectiveAnnotation), 'Did you decorate it with @Directive?');
 
-    var {name, factory} = makeDirectiveFactory(directiveClass);
+    let {name, factory} = makeDirectiveFactory(directiveClass);
 
     // TODO consider provided selector, if any
 
@@ -212,10 +212,10 @@ export function publishDirective(directiveClass: DirectiveConstructor, ngModule:
 //export interface DirectiveDefinitionObject extends ng.IDirective { // bindToController incompatible with current angular.d.ts
 export interface DirectiveDefinitionObject {
     multiElement?: boolean;
-    compile?: CompileFunction|FunctionReturningPrePost;
+    compile?: TCompileFunction|TFunctionReturningPrePost;
     controller?: any;
     bindToController?: boolean|Map<string>;
-    link?: FunctionReturningNothing|PrePost|string;
+    link?: TFunctionReturningNothing|TPrePost|string;
     name?: string;
     priority?: number;
     require?: string[];
@@ -242,14 +242,14 @@ export function makeCommonDO(directiveClass: DirectiveConstructor): DirectiveDef
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    // var aux = getAnnotations(directiveClass, CommonDirectiveAnnotation).reverse();
-    var aux = getAnnotations(directiveClass, CommonDirectiveAnnotation);
-    var annotation = <CommonDirectiveAnnotation> {/*no defaults*/};
+    // let aux = getAnnotations(directiveClass, CommonDirectiveAnnotation).reverse();
+    let aux = getAnnotations(directiveClass, CommonDirectiveAnnotation);
+    let annotation = <CommonDirectiveAnnotation> {/*no defaults*/};
     mergeAnnotations(annotation, ...aux);
 
-    var selectorData = parseSelector(annotation.selector);
+    let selectorData = parseSelector(annotation.selector);
 
-    var ddo: DirectiveDefinitionObject = {
+    let ddo: DirectiveDefinitionObject = {
         semanticName: selectorData.semanticeName,
         imperativeName: selectorData.imperativeName,
         restrict: RESTRICTION_MAP[selectorData.type],
@@ -290,13 +290,13 @@ export function makeCommonDO(directiveClass: DirectiveConstructor): DirectiveDef
  */
 export function makeDirectiveDO(directiveClass: DirectiveConstructor): DirectiveDefinitionObject {
 
-    var ddo = makeCommonDO(<DirectiveConstructor> directiveClass);
+    let ddo = makeCommonDO(<DirectiveConstructor> directiveClass);
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
-    // var aux = getAnnotations(directiveClass, DirectiveAnnotation).reverse();
-    var aux = getAnnotations(directiveClass, DirectiveAnnotation);
-    var annotation = <DirectiveAnnotation> {/*no defaults*/};
+    // let aux = getAnnotations(directiveClass, DirectiveAnnotation).reverse();
+    let aux = getAnnotations(directiveClass, DirectiveAnnotation);
+    let annotation = <DirectiveAnnotation> {/*no defaults*/};
     mergeAnnotations(annotation, ...aux);
 
     if (isDefined(annotation.multiElement)) ddo.multiElement = annotation.multiElement;
@@ -371,9 +371,9 @@ export function inFactoryDirective(ddo: DirectiveDefinitionObject, $injector: ng
  */
 export function makeDirectiveFactory(directiveClass: DirectiveConstructor) {
 
-    var ddo = makeDirectiveDO(directiveClass);
+    let ddo = makeDirectiveDO(directiveClass);
 
-    var factory = injectable(['$injector'], function directiveFactory($injector: ng.auto.IInjectorService): ng.IDirective {
+    let factory = injectable(['$injector'], function directiveFactory($injector: ng.auto.IInjectorService): ng.IDirective {
         return <any> inFactoryDirective(ddo, $injector);
     });
 

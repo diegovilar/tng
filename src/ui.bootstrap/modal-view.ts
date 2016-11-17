@@ -1,6 +1,7 @@
-import {makeDecorator, setIfInterface} from '../../utils'
-import {ViewOptions, ViewAnnotation} from '../../view'
+import {ViewOptions, ViewAnnotation, __utils__} from "angularts";
 
+let makeDecorator = __utils__.makeDecorator;
+let setIfInterface = __utils__.setIfInterface;
 
 
 export enum ModalBackdrop {

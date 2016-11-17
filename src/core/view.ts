@@ -1,6 +1,6 @@
 // TODO debug only?
 import {assert} from './assert'
-import {makeDecorator, FunctionReturningString, setIfInterface} from './utils'
+import {makeDecorator, TFunctionReturningString, setIfInterface} from './utils'
 
 
 
@@ -18,12 +18,12 @@ export interface ViewOptions {
     /**
      *
      */
-    template?: string|FunctionReturningString;
+    template?: string|TFunctionReturningString;
 
     /**
      *
      */
-    templateUrl?: string|FunctionReturningString;
+    templateUrl?: string|TFunctionReturningString;
 
     /**
      * TODO
@@ -42,8 +42,8 @@ export interface ViewOptions {
  */
 export class ViewAnnotation {
 
-    template: string|FunctionReturningString = void 0;
-    templateUrl: string|FunctionReturningString = void 0;
+    template: string|TFunctionReturningString = void 0;
+    templateUrl: string|TFunctionReturningString = void 0;
     styles: string|string[] = void 0;
     // stylesUrls: string[] = void 0;
     controllerAs: string = void 0;

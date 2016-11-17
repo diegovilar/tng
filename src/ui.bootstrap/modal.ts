@@ -1,9 +1,6 @@
 // TODO debug only?
 // import * as angular from "angular";
-import {assert} from '../../assert'
-import {Inject, injectable} from '../../di'
-import {makeDecorator, create, isDefined, isString, isFunction, Map, isArray, forEach, setIfInterface} from '../../utils'
-import {hasAnnotation, getAnnotations, mergeAnnotations} from '../../reflection'
+import {Inject, injectable, __assert__ as assert, __utils__ as utils, __reflection__ as reflection} from 'angularts';
 import {ModalViewAnnotation, MODAL_BACKDROP_MAP} from './modal-view'
 
 import IModalServiceInstance = ng.ui.bootstrap.IModalServiceInstance
@@ -13,6 +10,20 @@ import IModalStackService = ng.ui.bootstrap.IModalStackService
 import IModalScope = ng.ui.bootstrap.IModalScope
 
 export {ModalView, ModalBackdrop, ModalViewOptions} from './modal-view'
+
+let makeDecorator = utils.makeDecorator;
+let create = utils.create;
+let isDefined = utils.isDefined;
+let isString = utils.isString;
+let isFunction = utils.isFunction;
+let isArray = utils.isArray;
+let forEach = utils.forEach;
+let setIfInterface = utils.setIfInterface;
+import Map = utils.Map;
+
+let hasAnnotation = reflection.hasAnnotation;
+let getAnnotations = reflection.getAnnotations;
+let mergeAnnotations = reflection.mergeAnnotations;
 
 
 
@@ -125,8 +136,8 @@ export function getModalHandler(modalClass: Function, scope?: ng.IScope): ModalH
     var viewNotes = getAnnotations(modalClass, ModalViewAnnotation);
 
     // TODO debug only?
-    assert(modalNotes, 'Missing @Modal decoration');
-    assert(viewNotes, 'Missing @ModalView decoration');
+    assert.assert(modalNotes, 'Missing @Modal decoration');
+    assert.assert(viewNotes, 'Missing @ModalView decoration');
 
     var settings: ng.ui.bootstrap.IModalSettings = {
         controller: modalClass

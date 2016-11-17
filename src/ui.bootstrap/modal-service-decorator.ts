@@ -1,5 +1,4 @@
-import {Inject} from '../../di';
-import {Decorator} from '../../decorator';
+import {Inject, Decorator} from "angularts";
 import {getModalHandler} from './modal';
 
 import IModalService = ng.ui.bootstrap.IModalService;

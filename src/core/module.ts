@@ -2,7 +2,7 @@
 // import * as angular from "angular";
 import {assert} from './assert'
 import {getAnnotations, hasAnnotation, mergeAnnotations} from './reflection'
-import {makeDecorator, setIfInterface, FunctionReturningNothing} from './utils'
+import {makeDecorator, setIfInterface, TFunctionReturningNothing} from './utils'
 import {safeBind} from './di'
 import {create, isString, isFunction, isArray} from './utils'
 import {ValueWrapper, publishValue} from './value'
@@ -13,8 +13,8 @@ import {ServiceAnnotation, publishService} from './service'
 import {DecoratorAnnotation, publishDecorator} from './decorator'
 import {DirectiveAnnotation, publishDirective} from './directive'
 import {ComponentAnnotation, publishComponent} from './component'
-import {publishStates} from './ui/router/states'
-import {registerRoutes} from './ui/router/routes'
+// import {publishStates} from './ui/router/states'
+// import {registerRoutes} from './ui/router/routes'
 
 
 
@@ -73,8 +73,8 @@ export class ModuleAnnotation {
  * TODO document
  */
 export interface Module {
-	onConfig?: FunctionReturningNothing;
-	onRun?: FunctionReturningNothing;
+	onConfig?: TFunctionReturningNothing;
+	onRun?: TFunctionReturningNothing;
 }
 
 /**
@@ -219,8 +219,8 @@ export function publishModule(moduleClass: ModuleConstructor, name?: string,
     }
     for (let fn of runFns) ngModule.run(fn);
 
-    publishStates(moduleClass, ngModule);
-    registerRoutes(moduleClass, ngModule);
+    // publishStates(moduleClass, ngModule);
+    // registerRoutes(moduleClass, ngModule);
 
     for (let item of values) publishValue(item, ngModule);
     for (let item of constants) publishConstant(item, ngModule);

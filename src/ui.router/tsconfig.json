@@ -1,0 +1,15 @@
+{
+    "extends": "../tsconfig",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "angularts": ["../index"],
+            "angularts.core": ["../core/index"],
+            "angularts.ui.bootstrap": ["../ui.bootstrap/index"]
+        }
+    },
+    "include": [
+        "../ambient.d.ts",
+        "./**/*"
+    ]
+}

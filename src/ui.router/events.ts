@@ -1,6 +1,4 @@
-import {makeDecorator, isNumber} from '../../utils'
-import {getAnnotations} from '../../reflection'
-import {injectable} from '../../di'
+import {injectable, __utils__ as utils, __reflection__ as reflection} from 'angularts';
 
 
 
@@ -150,7 +148,7 @@ type OnDecorator = (event: StateChangeEvent|ViewLoadEvent|string, handler: Funct
 /**
  * @internal
  */
-export var On = <OnDecorator> makeDecorator(UiRouterEventListenerAnnotation);
+export var On = <OnDecorator> utils.makeDecorator(UiRouterEventListenerAnnotation);
 
 /**
  * @internal
@@ -160,7 +158,7 @@ export function publishListeners(moduleController: Function, ngModule: ng.IModul
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations to ge them on the original order
     // var listenerNotes = <UiRouterEventListenerAnnotation[]> getAnnotations(moduleController, UiRouterEventListenerAnnotation).reverse();
-    var listenerNotes = <UiRouterEventListenerAnnotation[]> getAnnotations(moduleController, UiRouterEventListenerAnnotation);
+    var listenerNotes = <UiRouterEventListenerAnnotation[]> reflection.getAnnotations(moduleController, UiRouterEventListenerAnnotation);
 
     if (listenerNotes.length) {
         ngModule.run(injectable(['$rootScope'], ($rootScope: ng.IRootScopeService) => {
@@ -168,7 +166,7 @@ export function publishListeners(moduleController: Function, ngModule: ng.IModul
             for (let listenerAnnotation of listenerNotes) {
                 let event = <string> listenerAnnotation.event;
 
-                if (isNumber(event)) {
+                if (utils.isNumber(event)) {
                     event = EVENTS_MAP[<number> listenerAnnotation.event];
                 }
 

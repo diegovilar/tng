@@ -1,9 +1,8 @@
-import {Module} from '../../module'
+import {Module} from 'angularts';
 import {ModalServiceDecorator} from './modal-service-decorator'
 
 // export {Modal, ModalOptions} from './modal'
 // export {ModalView, ModalBackdrop, ModalViewOptions} from './modal-view'
-
 
 
 @Module({

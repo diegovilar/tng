@@ -1,6 +1,6 @@
 import {getAnnotations, mergeAnnotations} from './reflection'
 import {injectable} from './di'
-import {makeDecorator, FunctionReturningSomething, setIfInterface} from './utils'
+import {makeDecorator, TFunctionReturningSomething, setIfInterface} from './utils'
 import {create, isFunction, bindFunctions} from './utils'
 
 /**
@@ -28,18 +28,18 @@ export class AnimationAnnotation {
 
 }
 
-type endFunction = (isCancelled: boolean) => void;
+export type TEndFunction = (isCancelled: boolean) => void;
 
 /**
  * Interface animation controllers MAY implement
  * TODO document
  */
 export interface Animation {
-    enter?: (element: ng.IAugmentedJQuery, done: Function) => endFunction;
-    leave?: (element: ng.IAugmentedJQuery, done: Function) => endFunction;
-    move?: (element: ng.IAugmentedJQuery, done: Function) => endFunction;
-    addClass?: (element: ng.IAugmentedJQuery, className: string, done: Function) => endFunction;
-    removeClass?: (element: ng.IAugmentedJQuery, className: string, done: Function) => endFunction;
+    enter?: (element: ng.IAugmentedJQuery, done: Function) => TEndFunction;
+    leave?: (element: ng.IAugmentedJQuery, done: Function) => TEndFunction;
+    move?: (element: ng.IAugmentedJQuery, done: Function) => TEndFunction;
+    addClass?: (element: ng.IAugmentedJQuery, className: string, done: Function) => TEndFunction;
+    removeClass?: (element: ng.IAugmentedJQuery, className: string, done: Function) => TEndFunction;
 }
 
 /**

@@ -1,16 +1,12 @@
 // TODO debug only?
-import {assert} from '../../assert'
+import {ViewAnnotation, View, injectable, safeBind, __utils__ as utils, __reflection__ as reflection, __assert__ as assert} from "angularts";
+import {getModalHandler} from 'angularts.ui.bootstrap';
+import {On, publishListeners} from './events';
 
-import {injectable, safeBind} from '../../di'
-import {makeDecorator, create, isDefined, isString, isFunction, Map, isArray, forEach} from '../../utils'
-import {getAnnotations, mergeAnnotations} from '../../reflection'
-import {ViewAnnotation} from '../../view'
-import {On, publishListeners} from './events'
-import {getModalHandler} from '../bootstrap/modal'
-
-export {View} from '../../view'
-export {StateChangeEvent, ViewLoadEvent} from './events'
-
+import Map = utils.Map;
+let isDefined = utils.isDefined;
+let isString = utils.isString;
+let forEach = utils.forEach;
 
 
 /**
@@ -67,7 +63,7 @@ export interface StatesDecorator {
 /**
  * A decorator to annotate a class with states
  */
-export var States = <StatesDecorator> <any> makeDecorator(StatesAnnotation);
+export var States = <StatesDecorator> <any> utils.makeDecorator(StatesAnnotation);
 States.on = On;
 
 /**
@@ -78,7 +74,7 @@ export function publishStates(moduleController: Function, ngModule: ng.IModule) 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations to ge them on the original order
     // var statesAnnotation = <StatesAnnotation[]> getAnnotations(moduleController, StatesAnnotation).reverse();
-    var statesAnnotation = <StatesAnnotation[]> getAnnotations(moduleController, StatesAnnotation);
+    var statesAnnotation = <StatesAnnotation[]> reflection.getAnnotations(moduleController, StatesAnnotation);
 
     if (statesAnnotation.length) {
         let states: ng.ui.IState[] = [];
@@ -183,13 +179,13 @@ function extractViewData(viewModel: Function) {
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
     // let notes = getAnnotations(viewModel, ViewAnnotation).reverse();
-    let notes = getAnnotations(viewModel, ViewAnnotation);
+    let notes = reflection.getAnnotations(viewModel, ViewAnnotation);
 
     if (!notes.length) {
         throw new Error('Template not defined');
     }
 
-    let template = <ViewAnnotation> mergeAnnotations({}, ...notes);
+    let template = <ViewAnnotation> reflection.mergeAnnotations({}, ...notes);
     let data:any = {};
 
     data.controller = viewModel;

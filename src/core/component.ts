@@ -1,7 +1,7 @@
 import {assert} from './assert'
 import {Inject, injectable, isAnnotated} from './di'
 import {isDefined, isFunction, makeDecorator, Map, setIfInterface} from "./utils";
-import {FunctionReturningString, FunctionReturningNothing, parseSelector, SelectorType} from './utils'
+import {TFunctionReturningString, TFunctionReturningNothing, parseSelector, SelectorType} from './utils'
 import {hasAnnotation, hasOwnAnnotation, getAnnotations, mergeAnnotations, addAnnotation} from './reflection'
 import {ViewAnnotation} from './view'
 import {ComponentViewAnnotation, NAMESPACE_MAP} from './component-view'
@@ -64,7 +64,7 @@ export interface ComponentConstructor extends DirectiveConstructor {
 
 };*/
 
-interface ComponentDecoratorType {
+export interface IComponentDecoratorType {
     (options: ComponentOptions): ClassDecorator;
     // extends: typeof componentDecoratorExtensor;
 }
@@ -74,7 +74,7 @@ type ComponentDecorator = (options: ComponentOptions) => ClassDecorator;
 /**
  * A decorator to annotate a class as being a component controller
  */
-export var Component = <ComponentDecoratorType><any> makeDecorator(ComponentAnnotation);
+export var Component = <IComponentDecoratorType><any> makeDecorator(ComponentAnnotation);
 
 // Component.extends = componentDecoratorExtensor;
 
@@ -83,8 +83,8 @@ export var Component = <ComponentDecoratorType><any> makeDecorator(ComponentAnno
  */
 export interface ComponentDefinitionObject extends DirectiveDefinitionObject {
     controllerAs?: string;
-    template?: string|FunctionReturningString;
-    templateUrl?: string|FunctionReturningString;
+    template?: string|TFunctionReturningString;
+    templateUrl?: string|TFunctionReturningString;
     styles?: string|string[];
     // stylesUrls?: string[];
     templateNamespace?: string;
