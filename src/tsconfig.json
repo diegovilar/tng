@@ -2,13 +2,13 @@
     "compilerOptions": {
         "target": "es5",
         "module": "commonjs",
+        "moduleResolution": "node",
         "noImplicitAny": true,
         "noEmitOnError": true,
         "declaration": true,
         "stripInternal": true,
         "suppressImplicitAnyIndexErrors": false,
         "experimentalDecorators": true,
-        "moduleResolution": "node",
         "sourceMap": true,
         "newLine": "LF",
         "charset": "utf-8",
@@ -16,9 +16,13 @@
         "lib": [
             "dom",
             "es5"
-        ]
-    },
-    "include": [
-        "./**/*"
-    ]
+        ],
+        "baseUrl": ".",
+        "paths": {
+            "angularts": ["./index"],
+            "angularts.core": ["./core/index"],
+            "angularts.ui.bootstrap": ["./ui.bootstrap/index"],
+            "angularts.ui.router": ["./ui.router/index"]
+        }
+    }
 }
