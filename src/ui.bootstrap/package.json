@@ -1,0 +1,24 @@
+{
+    "name": "angularts.ui.bootstrap",
+    "version": "0.0.0-PLACEHOLDER",
+    "description": "Angular 1 on TypeScript (UI Bootstrap Addon)",
+    "license": "MIT",
+    "author": "Diego Vilar <diegovilar@gmail.com>",
+    "homepage": "https://github.com/diegovilar/angularts",
+    "bugs": "https://github.com/diegovilar/angularts/issues",
+    "main": "src/index.js",
+    "module": "src/index.js",
+    "typings": "src/index.d.ts",
+    "browser": {
+        "src/index.js": "bundles/index.umd.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/diegovilar/angularts.git"
+    },
+    "peerDependencies": {
+        "@types/angular-ui-bootstrap": "^0.13.35",
+        "angularts": "^0.0.0-PLACEHOLDER",
+        "angular-ui-bootstrap": "https://github.com/diegovilar/bootstrap/releases/download/0.13.4/angular-bootstrap-0.13.4.tar.gz"
+    }
+}

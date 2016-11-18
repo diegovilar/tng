@@ -1,0 +1,25 @@
+{
+    "name": "angularts.ui.router",
+    "version": "0.0.0-PLACEHOLDER",
+    "description": "Angular 1 on TypeScript (UI Router Addon)",
+    "license": "MIT",
+    "author": "Diego Vilar <diegovilar@gmail.com>",
+    "homepage": "https://github.com/diegovilar/angularts",
+    "bugs": "https://github.com/diegovilar/angularts/issues",
+    "main": "src/index.js",
+    "module": "src/index.js",
+    "typings": "src/index.d.ts",
+    "browser": {
+        "src/index.js": "bundles/index.umd.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/diegovilar/angularts.git"
+    },
+    "peerDependencies": {
+        "@types/angular-ui-router": "^1.1.34",
+        "angularts": "^0.0.0-PLACEHOLDER",
+        "angularts.ui.bootstrap": "^0.0.0-PLACEHOLDER",
+        "angular-ui-router": "https://github.com/angular-ui/ui-router/archive/0.2.18.tar.gz"
+    }
+}

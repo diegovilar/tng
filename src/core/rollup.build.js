@@ -1,36 +1,40 @@
-let pak = require("../../package.json");
-import sourcemaps from "rollup-plugin-sourcemaps";
 import commonjs from "rollup-plugin-commonjs";
+import sourcemaps from "rollup-plugin-sourcemaps";
 
-let banner = `/**
+const VERSION = require("../../package.json").version;
+const PAK = require("./package.json");
+const BUILD_PATH = "../../build/angularts.core";
+
+const BANNER = `/**
  * @preserve
- * AngularTS (Core) - ${pak.description}
- * Version: ${pak.version} (built on ${(new Date()).toUTCString()})
- * Project: ${pak.homepage}
- * Author:  ${pak.author}
- * License: ${pak.license}
+ * ${PAK.name} - ${PAK.description}
+ *
+ * Version:  ${VERSION} (built on ${(new Date()).toUTCString()})
+ * Homepage: ${PAK.homepage}
+ * Author:   ${PAK.author}
+ * License:  ${PAK.license}
  */`;
 
 export default {
-    banner,
-    entry: "../../build/angularts.core/index.js",
-    dest:  "../../build/angularts.core/bundles/index.js",
-    format: "umd",
-    moduleName: "angularts.core",
+    banner : BANNER,
+    entry: `${BUILD_PATH}/src/index.js`,
+    targets: [
+        { dest: `${BUILD_PATH}/bundles/index.umd.js`, format: "umd" },
+        { dest: `${BUILD_PATH}/bundles/index.amd.js`, format: "amd" },
+        { dest: `${BUILD_PATH}/bundles/index.iife.js`, format: "iife" },
+        { dest: `${BUILD_PATH}/bundles/index.cjs.js`, format: "cjs" }
+    ],
+    moduleName: PAK.name,
     exports: "named",
     sourceMap: true,
     globals: {
-        angular: "angular"
+        angular: "angular",
     },
     external: [
-        "angular"
+        "angular",
     ],
     plugins: [
         sourcemaps(),
-        commonjs({
-            exlude: [
-                "../../node_modules/**"
-            ]
-        })
+        commonjs(),
     ]
 };

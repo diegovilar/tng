@@ -19,10 +19,12 @@
         ],
         "baseUrl": ".",
         "paths": {
-            "angularts": ["./all/index"],
             "angularts.core": ["./core/index"],
             "angularts.ui.bootstrap": ["./ui.bootstrap/index"],
             "angularts.ui.router": ["./ui.router/index"]
         }
-    }
+    },
+    "exclude": [
+        "all/*"
+    ]
 }

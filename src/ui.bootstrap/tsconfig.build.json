@@ -3,7 +3,7 @@
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
-            "angularts.core": ["../../build/angularts.core/index.d"]
+            "angularts.core": ["../../build/angularts.core/src/index.d"]
         }
     }
 }

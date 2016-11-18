@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
-PACKAGES=(
-    core
+PACKAGES=(core
     ui.bootstrap
-    ui.router
-    all)
+    ui.router)
 
 function exitWithError() {
     echo
@@ -24,6 +22,8 @@ DEST_ROOT=${PROJECT_PATH}/build
 TSC=${PROJECT_PATH}/node_modules/.bin/tsc
 ROLLUP=${PROJECT_PATH}/node_modules/.bin/rollup
 UGLIFYJS=${PROJECT_PATH}/node_modules/.bin/uglifyjs
+BUILD_ALL=true
+VERSION=`node -e "console.log(require('./package.json').version)"`
 
 for ARG in "$@"; do
   case "$ARG" in
@@ -32,9 +32,6 @@ for ARG in "$@"; do
       PACKAGES=( ${PACKAGES_STR//,/ } )
       BUILD_ALL=false
       ;;
-    --bundle=*)
-      BUNDLE=( "${ARG#--bundle=}" )
-      ;;
     *)
       echo "Unknown option $ARG."
       exitWithError
@@ -42,7 +39,21 @@ for ARG in "$@"; do
   esac
 done
 
+echo
+echo "Building version ${VERSION}"
+
+if [[ ${BUILD_ALL} == true ]]; then
+    echo
+    echo "Cleaning ${DEST_ROOT}..."
+    rm -rf ${DEST_ROOT}/* || { exitWithError; }
+fi
+
 mkdir -p ${DEST_ROOT} || { exitWithError; }
+
+BUNDLES=(umd
+    amd
+    cjs
+    iife)
 
 for PACKAGE in ${PACKAGES[@]}
 do
@@ -63,14 +74,16 @@ do
     echo
     echo "Building package \"${PACKAGE}\" from ${SRC_PATH}:"
 
-    echo
-    echo "Cleaning ${DEST_PATH}..."
-    rm -rf ${DEST_PATH} || { exitWithError; }
+    if [[ ${BUILD_ALL} == false ]]; then
+        echo
+        echo "Cleaning ${DEST_PATH}..."
+        rm -rf ${DEST_PATH} || { exitWithError; }
+    fi
 
     echo
     echo "Transpiling to ${DEST_PATH}..."
     echo "Config: ${TSCONFIG}"
-    $TSC -p $TSCONFIG --outDir $DEST_PATH || { exitWithError; }
+    $TSC -p $TSCONFIG --outDir $DEST_PATH/src || { exitWithError; }
 
     echo
     echo "Rolling up to ${BUNDLE_PATH}..."
@@ -78,9 +91,18 @@ do
     cd $SRC_PATH || { exitWithError; }
     $ROLLUP -c $ROLLUPCONFIG || { exitWithError; }
 
-    echo
-    echo "Minifying from ${BUNDLE_PATH}..."
-    UGLIFYJS -c -m --screw-ie8 --keep-fnames --comments --in-source-map ${BUNDLE_PATH}/index.js.map --source-map ${BUNDLE_PATH}/index.min.js.map --output ${BUNDLE_PATH}/index.min.js --source-map-url index.min.js.map ${BUNDLE_PATH}/index.js || { exitWithError; }
+    for BUNDLE in ${BUNDLES[@]}
+    do
+        INDEX=index.${BUNDLE}
+        BUNDLE_TARGET=${BUNDLE_PATH}/${INDEX}
+        echo
+        echo "Minifying from ${BUNDLE_TARGET}.js..."
+        UGLIFYJS -c -m --screw-ie8 --keep-fnames --comments --in-source-map ${BUNDLE_TARGET}.js.map --source-map ${BUNDLE_TARGET}.min.js.map --output ${BUNDLE_TARGET}.min.js --source-map-url ${INDEX}.min.js.map ${BUNDLE_TARGET}.js || { exitWithError; }
+    done
+
+    PACKAGE_JSON=`cat ${SRC_PATH}/package.json` || { exitWithError; }
+    PACKAGE_JSON="${PACKAGE_JSON//"0.0.0-PLACEHOLDER"/"$VERSION"}" || { exitWithError; }
+    printf "$PACKAGE_JSON" > ${DEST_PATH}/package.json || { exitWithError; }
 done
 
 cd $OLD_PATH
