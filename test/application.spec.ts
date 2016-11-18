@@ -1,3 +1,0 @@
-/*
-Applications are modules. Nothing else to test.
-*/

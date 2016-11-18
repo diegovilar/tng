@@ -1,8 +1,4 @@
-/bower_components
 /node_modules
 /build
-/build-browser
-/dev
-/dist
-desktop.ini
 /yarn-error.log
+desktop.ini
