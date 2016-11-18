@@ -11,6 +11,10 @@
         "type": "git",
         "url": "https://github.com/diegovilar/angularts.git"
     },
+    "scripts": {
+        "build": "build.sh",
+        "watch": "node_modules/.bin/tsc -w -p src/tsconfig.json --noEmit"
+    },
     "dependencies": {
         "angular": "~1.5.x",
         "reflect-metadata": "^0.1.8"
