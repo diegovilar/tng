@@ -1,10 +1,9 @@
+import {Module, ModuleAnnotation, ModuleConstructor, ModuleOptions} from './module'
+import {isElement, setIfInterface} from './utils'
+
 // TODO debug only?
 import {assert} from './assert'
 import {makeDecorator} from "./reflection";
-import {setIfInterface, isElement} from './utils'
-import {ModuleOptions, ModuleAnnotation, Module, ModuleConstructor} from './module'
-
-
 
 /**
  * Options available when decorating a class as an application

@@ -1,13 +1,17 @@
 // TODO debug only?
-import {ViewAnnotation, View, injectable, safeBind, __utils__ as utils, __reflection__ as reflection, __assert__ as assert} from "angularts.core";
-import {getModalHandler} from 'angularts.ui.bootstrap';
-import {On, publishListeners} from './events';
+import {$$assert, $$reflection, $$utils, View, ViewAnnotation, injectable, safeBind} from "angularts.core";
+import {On, publishListeners} from "./events";
 
-import Map = utils.Map;
-let isDefined = utils.isDefined;
-let isString = utils.isString;
-let forEach = utils.forEach;
+import {UIRouterService} from "./router-service";
+import {getModalHandler} from "angularts.ui.bootstrap";
 
+import Map = $$utils.Map;
+let isDefined = $$utils.isDefined;
+let isString = $$utils.isString;
+let forEach = $$utils.forEach;
+
+export const DISMISSED_BY_ROUTER = "DISMISS_BY_ROUTER";
+const LOGID = "angularts.ui.router";
 
 /**
  * Options available when decorating an application controller with states
@@ -18,12 +22,12 @@ export interface StateConfig {
     url: string;
     abstract?: boolean;
     view?: Function;
-    views?: {[outlet:string]: Function};
-    modal?: Function,
+    views?: {[outlet: string]: Function};
+    modal?: Function;
     parent?: StateConfig|string;
     reloadOnSearch?: boolean;
     onEnter?: Function;
-	onExit?: Function;
+    onExit?: Function;
     resolve?: Map<string|Function>;
 
     // TODO
@@ -63,7 +67,7 @@ export interface StatesDecorator {
 /**
  * A decorator to annotate a class with states
  */
-export var States = <StatesDecorator> <any> reflection.makeDecorator(StatesAnnotation);
+export var States = <StatesDecorator> <any> $$reflection.makeDecorator(StatesAnnotation);
 States.on = On;
 
 /**
@@ -74,7 +78,7 @@ export function publishStates(moduleController: Function, ngModule: ng.IModule) 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations to ge them on the original order
     // var statesAnnotation = <StatesAnnotation[]> getAnnotations(moduleController, StatesAnnotation).reverse();
-    var statesAnnotation = <StatesAnnotation[]> reflection.getAnnotations(moduleController, StatesAnnotation);
+    let statesAnnotation = <StatesAnnotation[]> $$reflection.getAnnotations(moduleController, StatesAnnotation);
 
     if (statesAnnotation.length) {
         let states: ng.ui.IState[] = [];
@@ -84,7 +88,7 @@ export function publishStates(moduleController: Function, ngModule: ng.IModule) 
             forEach(note.states, (state) =>
                 states.push(translateToUiState(state))));
 
-        ngModule.config(injectable(['$stateProvider'], ($stateProvider: ng.ui.IStateProvider) => {
+        ngModule.config(injectable(["$stateProvider"], ($stateProvider: ng.ui.IStateProvider) => {
 
             for (let state of states) {
                 $stateProvider.state(state);
@@ -102,7 +106,7 @@ export function publishStates(moduleController: Function, ngModule: ng.IModule) 
  */
 function translateToUiState(state: InternalStateConfig): ng.ui.IState {
 
-    var translatedState: ng.ui.IState = {};
+    let translatedState: ng.ui.IState = {};
 
     if (isDefined(state.name)) translatedState.name = state.name;
     if (isDefined(state.url)) translatedState.url = state.url;
@@ -130,13 +134,13 @@ function translateToUiState(state: InternalStateConfig): ng.ui.IState {
     // }
     // else {
     if (state.view || state.views) {
-        let views = <{[key:string]:any}> {};
+        let views = <{[key: string]: any}> {};
 
         if (state.view) {
-            views[''] = extractViewData(state.view);
+            views[""] = extractViewData(state.view);
         }
         else {
-            forEach(state.views, (controller, outlet) => views[outlet] = extractViewData(controller))
+            forEach(state.views, (controller, outlet) => views[outlet] = extractViewData(controller));
         }
 
         translatedState.views = views;
@@ -144,27 +148,36 @@ function translateToUiState(state: InternalStateConfig): ng.ui.IState {
     else if (state.modal) {
         let handler = getModalHandler(state.modal);
 
-        if (translatedState.onEnter) {
-            let onEnter = <Function> translatedState.onEnter;
-            translatedState.onEnter = injectable(['$injector'], function($injector: ng.auto.IInjectorService) {
-                $injector.invoke(onEnter);
-                $injector.invoke(handler.open, handler);
-            });
-        }
-        else {
-            translatedState.onEnter = safeBind(handler.open, handler);
-        }
+        let onEnter = <Function> translatedState.onEnter;
+        translatedState.onEnter = injectable(["$injector", "$uirouter", "$state"], ($injector: ng.auto.IInjectorService, $uirouter: UIRouterService, $state: any) => {
 
-        if (translatedState.onExit) {
-            let onExit = <Function> translatedState.onExit;
-            translatedState.onExit = injectable(['$injector'], function($injector: ng.auto.IInjectorService) {
-                $injector.invoke(handler.dismiss, handler);
-                $injector.invoke(onExit);
+            if (onEnter) {
+                $injector.invoke(onEnter);
+            }
+
+            console.info(`${LOGID} >> Opening modal for state "${$state.$current.name}"`);
+            let modal = <ng.ui.bootstrap.IModalServiceInstance> $injector.invoke(handler.open, handler, {dismissReason: ""});
+
+            modal.result.finally(() => {
+                if (!$uirouter.isRouting) {
+                    console.info(`${LOGID} >> Routing to parent of state "${$state.$current.name}" after modal closed/dismissed`);
+                    $state.go("^");
+                }
             });
-        }
-        else {
-            translatedState.onExit = safeBind(handler.dismiss, handler);
-        }
+
+        });
+
+        let onExit = <Function> translatedState.onExit;
+        translatedState.onExit = injectable(["$injector", "$state"], ($injector: ng.auto.IInjectorService, $state: any) => {
+
+            console.info(`${LOGID} >> Dismising modal after leaving state "${$state.$current.name}"`);
+            $injector.invoke(handler.dismiss, handler, {reason: DISMISSED_BY_ROUTER});
+
+            if (onExit) {
+                $injector.invoke(onExit);
+            }
+
+        });
     }
 
     return translatedState;
@@ -179,14 +192,14 @@ function extractViewData(viewModel: Function) {
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
     // let notes = getAnnotations(viewModel, ViewAnnotation).reverse();
-    let notes = reflection.getAnnotations(viewModel, ViewAnnotation);
+    let notes = $$reflection.getAnnotations(viewModel, ViewAnnotation);
 
     if (!notes.length) {
-        throw new Error('Template not defined');
+        throw new Error("Template not defined");
     }
 
-    let template = <ViewAnnotation> reflection.mergeAnnotations({}, ...notes);
-    let data:any = {};
+    let template = <ViewAnnotation> $$reflection.mergeAnnotations({}, ...notes);
+    let data: any = {};
 
     data.controller = viewModel;
     if (template.controllerAs) data.controllerAs = template.controllerAs;

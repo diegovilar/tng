@@ -1,0 +1,36 @@
+{
+    // Use IntelliSense to find out which attributes exist for node debugging
+    // Use hover for the description of the existing attributes
+    // For further information visit https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Fix Maps",
+            "type": "node2",
+            "request": "launch",
+            "program": "${workspaceRoot}\\build-helpers\\fix-maps.js",
+            "cwd": "${workspaceRoot}",
+            "args": [
+                "build/angularts.core/bundles/index.umd.js.map",
+                "build/angularts.core/bundles/index.umd.js.map2"
+            ]
+        },
+                {
+            "name": "Rollup",
+            "type": "node2",
+            "request": "launch",
+            "program": "${workspaceRoot}\\node_modules\\rollup\\bin\\rollup",
+            "cwd": "${workspaceRoot}\\src\\core",
+            "args": [
+                "-c",
+                "${workspaceRoot}\\src\\core\\rollup.build.js"
+            ]
+        },
+        {
+            "name": "Attach to Process",
+            "type": "node2",
+            "request": "attach",
+            "port": 9229
+        }
+    ]
+}

@@ -18,7 +18,8 @@
     },
     "peerDependencies": {
         "@types/angular-ui-bootstrap": "^0.13.35",
-        "angularts": "^0.0.0-PLACEHOLDER",
-        "angular-ui-bootstrap": "https://github.com/diegovilar/bootstrap/releases/download/0.13.4/angular-bootstrap-0.13.4.tar.gz"
+        "angularts.core": "^0.0.0-PLACEHOLDER",
+        "angular-ui-bootstrap": "https://github.com/diegovilar/bootstrap/releases/download/0.13.4/angular-bootstrap-0.13.4.tar.gz",
+        "jquery": "~2.2.x"
     }
 }

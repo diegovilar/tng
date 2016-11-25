@@ -1,7 +1,7 @@
-import {ViewOptions, ViewAnnotation, __utils__, __reflection__} from "angularts.core";
+import {$$reflection, $$utils, ViewAnnotation, ViewOptions} from "angularts.core";
 
-let makeDecorator = __reflection__.makeDecorator;
-let setIfInterface = __utils__.setIfInterface;
+let makeDecorator = $$reflection.makeDecorator;
+let setIfInterface = $$utils.setIfInterface;
 
 
 export enum ModalBackdrop {

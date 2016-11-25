@@ -1,24 +1,21 @@
+import {AnimationAnnotation, registerAnimation} from "./animation";
+import {ComponentAnnotation, publishComponent} from "./component";
+import {ConstantWrapper, publishConstant} from "./constant";
+import {DecoratorAnnotation, publishDecorator} from "./decorator";
+import {DirectiveAnnotation, publishDirective} from "./directive";
+import {FilterAnnotation, registerFilter} from "./filter";
+import {ServiceAnnotation, publishService} from "./service";
+import {TFunctionReturningNothing, setIfInterface} from "./utils";
+import {ValueWrapper, publishValue} from "./value";
+import {create, isArray, isFunction, isString} from "./utils";
+import {getAnnotations, hasAnnotation, makeDecorator, mergeAnnotations} from "./reflection";
+
 // TODO debug only?
 // import * as angular from "angular";
-import {assert} from './assert'
-import {makeDecorator, getAnnotations, hasAnnotation, mergeAnnotations} from './reflection'
-import {setIfInterface, TFunctionReturningNothing} from './utils'
-import {safeBind} from './di'
-import {create, isString, isFunction, isArray} from './utils'
-import {ValueWrapper, publishValue} from './value'
-import {ConstantWrapper, publishConstant} from './constant'
-import {FilterAnnotation, registerFilter} from './filter'
-import {AnimationAnnotation, registerAnimation} from './animation'
-import {ServiceAnnotation, publishService} from './service'
-import {DecoratorAnnotation, publishDecorator} from './decorator'
-import {DirectiveAnnotation, publishDirective} from './directive'
-import {ComponentAnnotation, publishComponent} from './component'
-// import {publishStates} from './ui/router/states'
-// import {registerRoutes} from './ui/router/routes'
+import {assert} from "./assert";
+import {safeBind} from "./di";
 
-
-
-const PUBLISHED_ANNOTATION_KEY = 'tng:module-published-as';
+const PUBLISHED_ANNOTATION_KEY = "tng:module-published-as";
 
 export type Dependency = string|Function|ConstantWrapper<any>|ValueWrapper<any>;
 export type DependenciesArray = (Dependency|Dependency[])[];
@@ -28,19 +25,19 @@ export type DependenciesArray = (Dependency|Dependency[])[];
  * TODO document
  */
 export interface ModuleOptions {
-	name?: string;
-	dependencies?: DependenciesArray;
-	config?: Function|Function[];
-	run?: Function|Function[];
+    name?: string;
+    dependencies?: DependenciesArray;
+    config?: Function|Function[];
+    run?: Function|Function[];
 
     // modules?: (string|Function)[];
-	// components?: Function[];
-	// services?: Function[];
-	// filters?: Function[];
-	// decorators?: Function[];
-	// animations?: Function[];
-	// values?: Function[];
-	// constants?: Function[];
+    // components?: Function[];
+    // services?: Function[];
+    // filters?: Function[];
+    // decorators?: Function[];
+    // animations?: Function[];
+    // values?: Function[];
+    // constants?: Function[];
 }
 
 /**
@@ -48,23 +45,23 @@ export interface ModuleOptions {
  */
 export class ModuleAnnotation {
 
-	name: string = void 0;
-	dependencies: DependenciesArray = void 0;
-	config: Function|Function[] = void 0;
-	run: Function|Function[] = void 0;
+    name: string = void 0;
+    dependencies: DependenciesArray = void 0;
+    config: Function|Function[] = void 0;
+    run: Function|Function[] = void 0;
 
-	// modules: (string|Function)[] = void 0;
-	// components: Function[] = void 0;
-	// services: Function[] = void 0;
-	// filters: Function[] = void 0;
-	// decorators: Function[] = void 0;
-	// animations: Function[] = void 0;
-	// values: Function[] = void 0;
-	// constants: Function[] = void 0;
+    // modules: (string|Function)[] = void 0;
+    // components: Function[] = void 0;
+    // services: Function[] = void 0;
+    // filters: Function[] = void 0;
+    // decorators: Function[] = void 0;
+    // animations: Function[] = void 0;
+    // values: Function[] = void 0;
+    // constants: Function[] = void 0;
 
-	constructor(options?: ModuleOptions) {
+    constructor(options?: ModuleOptions) {
         setIfInterface(this, options);
-	}
+    }
 
 }
 
@@ -73,16 +70,16 @@ export class ModuleAnnotation {
  * TODO document
  */
 export interface Module {
-	onConfig?: TFunctionReturningNothing;
-	onRun?: TFunctionReturningNothing;
+    onConfig?: TFunctionReturningNothing;
+    onRun?: TFunctionReturningNothing;
 }
 
 /**
  * @internal
  */
 export interface ModuleConstructor extends Function {
-	new (): Module;
-	new (ngModule: ng.IModule): Module;
+    new (): Module;
+    new (ngModule: ng.IModule): Module;
 }
 
 type ModuleSignature = (options?: ModuleOptions) => ClassDecorator;
@@ -92,7 +89,7 @@ type ModuleSignature = (options?: ModuleOptions) => ClassDecorator;
  */
 export var Module = <ModuleSignature> makeDecorator(ModuleAnnotation);
 
-var moduleCount = 0;
+let moduleCount = 0;
 
 function getNewModuleName() {
 
@@ -104,33 +101,67 @@ function getNewModuleName() {
  * @internal
  */
 export function publishModule(moduleClass: ModuleConstructor, name?: string,
-    dependencies?: DependenciesArray, constructorParameters?: any[]): ng.IModule {
+                              dependencies?: DependenciesArray,
+                              constructorParameters?: any[]): ng.IModule {
 
-    // Reflect.decorate apply decorators reversely, so we need to reverse
-    // the extracted annotations before merging them
-    // var aux = getAnnotations(moduleClass, ModuleAnnotation).reverse();
-    var aux = getAnnotations(moduleClass, ModuleAnnotation);
+    let aux: ModuleAnnotation[] = getAnnotations(moduleClass, ModuleAnnotation);
 
     // TODO debug only?
-    assert.notEmpty(aux, 'Missing @Module decoration');
+    assert.notEmpty(aux, "Missing @Module decoration");
 
     // Has this module already been published?
-    var publishedAs: string;
-    if (publishedAs = Reflect.getOwnMetadata(PUBLISHED_ANNOTATION_KEY, moduleClass)) {
+    let publishedAs = Reflect.getOwnMetadata(PUBLISHED_ANNOTATION_KEY, moduleClass);
+    if (publishedAs) {
         return angular.module(publishedAs);
     }
 
-    var annotation = <ModuleAnnotation> mergeAnnotations(Object.create(null), ...aux);
+    // special merging for dependencies, run and config
+    if (aux.length > 1) {
+        let mergedArrays = new ModuleAnnotation({
+            dependencies: [],
+            run: [],
+            config: [],
+        });
 
-    var constants: any[] = [];
-    var values: any[] = [];
-    var services: any[] = [];
-    var decorators: any[] = [];
-    var filters: any[] = [];
-    var animations: any[] = [];
-    var components: any[] = [];
-    var directives: any[] = [];
-    var modules: any[] = [];
+        for (let module of aux) {
+            if (module.dependencies) {
+                for (let dependency of module.dependencies) {
+                    // We don't repeat dependencies
+                    if (mergedArrays.dependencies.indexOf(dependency) === -1) {
+                        mergedArrays.dependencies.push(dependency);
+                    }
+                }
+            }
+
+            if (module.run) {
+                let _run = isArray(module.run) ? module.run : [module.run];
+                for (let run of _run) {
+                    (<Function[]> mergedArrays.run).push(run);
+                }
+            }
+
+            if (module.config) {
+                let _config = isArray(module.config) ? module.config : [module.config];
+                for (let config of _config) {
+                    (<Function[]> mergedArrays.config).push(config);
+                }
+            }
+        }
+        aux.push(mergedArrays);
+    }
+
+
+    let annotation = mergeAnnotations<ModuleAnnotation>(Object.create(null), ...aux);
+
+    let constants: any[] = [];
+    let values: any[] = [];
+    let services: any[] = [];
+    let decorators: any[] = [];
+    let filters: any[] = [];
+    let animations: any[] = [];
+    let components: any[] = [];
+    let directives: any[] = [];
+    let modules: any[] = [];
 
     // TODO optimize this.. too much reflection queries
     function processDependency(dep: Dependency|Dependency[]): void {
@@ -145,13 +176,7 @@ export function publishModule(moduleClass: ModuleConstructor, name?: string,
             }
         }
         else if (hasAnnotation(dep, ModuleAnnotation)) {
-            // If the module has alrady been published, we just push it's name
-            // if (publishedAs = Reflect.getOwnMetadata(PUBLISHED_ANNOTATION_KEY, dep)) {
-                // modules.push(publishedAs);
-            // }
-            // else {
-                modules.push(publishModule(<ModuleConstructor> dep).name);
-            // }
+            modules.push(publishModule(<ModuleConstructor> dep).name);
         }
         else if (dep instanceof ConstantWrapper) {
             constants.push(dep);
@@ -194,34 +219,32 @@ export function publishModule(moduleClass: ModuleConstructor, name?: string,
     name = name || annotation.name || getNewModuleName();
 
     // Register the module on Angular
-    var ngModule = angular.module(name, modules);
+    let ngModule = angular.module(name, modules);
 
     // Instantiate the module
     // var module = new moduleClass(ngModule);
     let module = Object.create(moduleClass.prototype);
-    moduleClass.apply(module, [ngModule].concat(constructorParameters || []))
+    moduleClass.apply(module, [ngModule].concat(constructorParameters || []));
 
     // Register config functions
-    var configFns: Function[] = [];
+    let configFns: Function[] = [];
     if (isFunction(module.onConfig)) configFns.push(safeBind(module.onConfig, module));
     if (annotation.config) {
         if (isFunction(annotation.config)) configFns.push(<Function> annotation.config);
-        else if (isArray(annotation.config)) configFns = configFns.concat(<Function[]> annotation.config)
+        else if (isArray(annotation.config)) configFns = configFns.concat(<Function[]> annotation.config);
     }
     for (let fn of configFns) ngModule.config(fn);
 
     // Register initialization functions
-    var runFns: Function[] = [];
+    let runFns: Function[] = [];
     if (isFunction(module.onRun)) runFns.push(safeBind(module.onRun, module));
     if (annotation.run) {
         if (isFunction(annotation.run)) runFns.push(<Function> annotation.run);
-        else if (isArray(annotation.run)) runFns = runFns.concat(<Function[]> annotation.run)
+        else if (isArray(annotation.run)) runFns = runFns.concat(<Function[]> annotation.run);
     }
     for (let fn of runFns) ngModule.run(fn);
 
-    // publishStates(moduleClass, ngModule);
-    // registerRoutes(moduleClass, ngModule);
-
+    /* tslint:disable rule:curly */
     for (let item of values) publishValue(item, ngModule);
     for (let item of constants) publishConstant(item, ngModule);
     for (let item of filters) registerFilter(item, ngModule);
@@ -230,6 +253,7 @@ export function publishModule(moduleClass: ModuleConstructor, name?: string,
     for (let item of decorators) publishDecorator(item, ngModule);
     for (let item of components) publishComponent(item, ngModule);
     for (let item of directives) publishDirective(item, ngModule);
+    /* tslint:enable */
 
     Reflect.defineMetadata(PUBLISHED_ANNOTATION_KEY, name, moduleClass);
 

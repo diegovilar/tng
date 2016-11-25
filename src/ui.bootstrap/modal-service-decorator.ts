@@ -1,4 +1,5 @@
-import {Inject, Decorator} from "angularts.core";
+import {Decorator, Inject} from "angularts.core";
+
 import {getModalHandler} from './modal';
 
 import IModalService = ng.ui.bootstrap.IModalService;
@@ -23,7 +24,7 @@ export class ModalServiceDecorator implements Decorator {
 			// Usign @Modal decorator?
 			if (typeof optionsOrModal === 'function') {
 				var handler = getModalHandler(<Function> optionsOrModal, scope);
-				return $injector.invoke(handler.open, handler);
+				return $injector.invoke(handler.open, handler, {dismissReason: ""});
 			}
 			// Using the original IModalSettings object
 			else {

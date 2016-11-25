@@ -1,30 +1,32 @@
 // TODO debug only?
-import {Inject, injectable, __assert__ as assert, __utils__ as utils, __reflection__ as reflection} from 'angularts.core';
-import {ModalViewAnnotation, MODAL_BACKDROP_MAP} from './modal-view'
+import {$$assert, $$reflection, $$utils, Inject, injectable} from "angularts.core";
+import {MODAL_BACKDROP_MAP, ModalViewAnnotation} from "./modal-view";
+export {ModalView, ModalBackdrop, ModalViewOptions} from "./modal-view";
 
-import IModalServiceInstance = ng.ui.bootstrap.IModalServiceInstance
-import IModalService = ng.ui.bootstrap.IModalService
-import IModalSettings = ng.ui.bootstrap.IModalSettings
-import IModalStackService = ng.ui.bootstrap.IModalStackService
-import IModalScope = ng.ui.bootstrap.IModalScope
-
-export {ModalView, ModalBackdrop, ModalViewOptions} from './modal-view'
-
-let create = utils.create;
-let isDefined = utils.isDefined;
-let isString = utils.isString;
-let isFunction = utils.isFunction;
-let isArray = utils.isArray;
-let forEach = utils.forEach;
-let setIfInterface = utils.setIfInterface;
-import Map = utils.Map;
-
-let makeDecorator = reflection.makeDecorator;
-let hasAnnotation = reflection.hasAnnotation;
-let getAnnotations = reflection.getAnnotations;
-let mergeAnnotations = reflection.mergeAnnotations;
+import IModalServiceInstance = ng.ui.bootstrap.IModalServiceInstance;
+import IModalService = ng.ui.bootstrap.IModalService;
+import IModalSettings = ng.ui.bootstrap.IModalSettings;
+import IModalStackService = ng.ui.bootstrap.IModalStackService;
+import IModalScope = ng.ui.bootstrap.IModalScope;
 
 
+let create = $$utils.create;
+let isDefined = $$utils.isDefined;
+let isString = $$utils.isString;
+let isFunction = $$utils.isFunction;
+let isArray = $$utils.isArray;
+let forEach = $$utils.forEach;
+let setIfInterface = $$utils.setIfInterface;
+import Map = $$utils.Map;
+
+let makeDecorator = $$reflection.makeDecorator;
+let hasAnnotation = $$reflection.hasAnnotation;
+let getAnnotations = $$reflection.getAnnotations;
+let mergeAnnotations = $$reflection.mergeAnnotations;
+
+
+export const DISMISSED_BY_NEW_MODAL = "DISMISSED_BY_NEW_MODAL";
+const LOGID = "angularts.ui.bootstrap";
 
 export interface ModalOptions {
 
@@ -78,16 +80,18 @@ export class ModalHandler {
     }
 
     open(
-        @Inject('$injector') $injector: ng.auto.IInjectorService,
-        @Inject('$modal') $modal: IModalService,
-        @Inject('$modalStack') $modalStack: IModalStackService): IModalServiceInstance {
+        @Inject("$injector") $injector: ng.auto.IInjectorService,
+        @Inject("dismissReason") dismissReason: string,
+        @Inject("$modal") $modal: IModalService,
+        @Inject("$modalStack") $modalStack: IModalStackService): IModalServiceInstance {
 
-        var view = this.viewNotes;
-        var modal = this.modalNotes;
-        var calltimeSettings: IModalSettings = angular.copy(this.settings);
+        let view = this.viewNotes;
+        let modal = this.modalNotes;
+        let calltimeSettings: IModalSettings = angular.copy(this.settings);
 
         if (modal.dismissAll) {
-            $modalStack.dismissAll();
+            console.info(`${LOGID} >> Dismissing other modals as requested by current modal`);
+            $modalStack.dismissAll(dismissReason || DISMISSED_BY_NEW_MODAL);
         }
 
         if (isDefined(modal.scope)) {
@@ -113,14 +117,12 @@ export class ModalHandler {
 
     }
 
-    dismiss(@Inject('$modalStack') $modalStack: IModalStackService) {
+    dismiss(
+        @Inject("$modalStack") $modalStack: IModalStackService,
+        @Inject("reason") reason: string) {
 
-        if (this.modalNotes.dismissAll) {
-            $modalStack.dismissAll();
-        }
-        else {
-            this.instance.dismiss();
-        }
+        console.info(`${LOGID} >> Dismissing modal. Reason: `, reason);
+        this.instance.dismiss(reason);
 
     }
 
@@ -131,18 +133,18 @@ export class ModalHandler {
  */
 export function getModalHandler(modalClass: Function, scope?: ng.IScope): ModalHandler {
 
-    var modalNotes = getAnnotations(modalClass, ModalAnnotation);
-    var viewNotes = getAnnotations(modalClass, ModalViewAnnotation);
+    let modalNotes = getAnnotations(modalClass, ModalAnnotation);
+    let viewNotes = getAnnotations(modalClass, ModalViewAnnotation);
 
     // TODO debug only?
-    assert.assert(modalNotes, 'Missing @Modal decoration');
-    assert.assert(viewNotes, 'Missing @ModalView decoration');
+    $$assert.assert(modalNotes, "Missing @Modal decoration");
+    $$assert.assert(viewNotes, "Missing @ModalView decoration");
 
-    var settings: ng.ui.bootstrap.IModalSettings = {
-        controller: modalClass
+    let settings: ng.ui.bootstrap.IModalSettings = {
+        controller: modalClass,
     };
 
-    var modal = <ModalAnnotation> {/*no defaults*/};
+    let modal = <ModalAnnotation> {/*no defaults*/};
     mergeAnnotations(modal, ...modalNotes);
 
     // Deferred to be handled by ModalHandler to allow DI
@@ -165,7 +167,7 @@ export function getModalHandler(modalClass: Function, scope?: ng.IScope): ModalH
         settings.keyboard = modal.keyboard;
     }
 
-    var view = <ModalViewAnnotation> {/*no defaults*/};
+    let view = <ModalViewAnnotation> {/*no defaults*/};
     mergeAnnotations(view, ...viewNotes);
 
     if (isDefined(view.animation)) {

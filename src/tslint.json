@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json.schemastore.org/tslint",
+    "extends": "tslint:latest",
+    "rules": {
+        "eofline": false,
+        "no-reference": false,
+        "object-literal-sort-keys": false,
+        "no-consecutive-blank-lines": [false],
+        "no-string-literal": false,
+        "max-line-length": [true, 160],
+        "indent": [true, "spaces"],
+        "linebreak-style": ["LF"],
+        "ordered-imports": [false],
+        "no-console": [false],
+        "only-arrow-functions": [false],
+        "no-unused-expression": false,
+        "member-access": [false],
+        "no-namespace": [false],
+        "object-literal-key-quotes": [false],
+        "interface-name": [false],
+        "triple-equals": [true, "allow-null-check", "allow-undefined-check"],
+        "variable-name": [true,
+            "ban-keywords",
+            "check-format",
+            "allow-leading-underscore",
+            "allow-pascal-case"
+        ],
+        "one-line": [true,
+            "check-open-brace",
+            "check-whitespace"
+        ]
+    }
+}

@@ -1,7 +1,8 @@
-import {makeDecorator, getAnnotations, mergeAnnotations} from './reflection'
-import {injectable} from './di'
 import {TFunctionReturningSomething, setIfInterface} from './utils'
-import {create, isFunction, bindFunctions} from './utils'
+import {bindFunctions, create, isFunction} from './utils'
+import {getAnnotations, makeDecorator, mergeAnnotations} from './reflection'
+
+import {injectable} from './di'
 
 /**
  * Options available when decorating a class as an animation controller

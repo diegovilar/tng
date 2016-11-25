@@ -8,18 +8,21 @@
  * @param dependencies Names of the dependencies to be injected, in order
  * @returns The provided function
  */
-export function injectable<T extends Function>(dependencies: string[], func: T): T {
+export function injectable<T extends Function>(dependencies: string[], func: T, context?: any): T {
 
-	// TODO warn about overriding annotation
-	// TODO warn about mismatching number of parameters and dependencies
+    // TODO warn about overriding annotation
+    // TODO warn about mismatching number of parameters and dependencies
 
+    if (context) {
+        func = func.bind(context);
+    }
     func.$inject = dependencies.slice();
-	return func;
+    return func;
 
 }
 
 /**
- * Binds a function to a context and preservers it's annotated dependencies
+ * Binds a function to a context and preserves its annotated dependencies
  *
  * @param func The function to be bound
  * @param context The object to which bind the funcion
@@ -27,11 +30,11 @@ export function injectable<T extends Function>(dependencies: string[], func: T):
  */
 export function safeBind<T extends Function>(func: T, context: any): T {
 
-    var bound = func.bind(context);
+    let bound = func.bind(context);
 
-	if (func.$inject) {
-		bound.$inject = func.$inject;
-	}
+    if (func.$inject) {
+        bound.$inject = func.$inject;
+    }
 
     return bound;
 
@@ -47,22 +50,22 @@ export function safeBind<T extends Function>(func: T, context: any): T {
  */
 export function Inject(dependency: string): ParameterDecorator {
 
-	return (target: Function, propertyKey: string|symbol, parameterIndex: number) => {
+    return (target: Function, propertyKey: string|symbol, parameterIndex: number) => {
 
-		// TODO warn about overriding annotation
-		// TODO warn about mismatching number of parameters and dependencies
+        // TODO warn about overriding annotation
+        // TODO warn about mismatching number of parameters and dependencies
 
         // If propertyKey is defined, we're decorating a parameter of a method
         // If not, we're decorating a parameter of class constructor
-		target = (typeof propertyKey == 'undefined') ? target : target = (<any>target)[propertyKey];
+        target = (typeof propertyKey === "undefined") ? target : target = (<any> target)[propertyKey];
 
-		// TODO what about missing elements in the $inject array?
-		// ie. annotated the 2nd but not the 1st parameter
+        // TODO what about missing elements in the $inject array?
+        // ie. annotated the 2nd but not the 1st parameter
 
-		var $inject: string[] = (target.$inject = target.$inject || []);
-		$inject[parameterIndex] = dependency;
+        let $inject: string[] = (target.$inject = target.$inject || []);
+        $inject[parameterIndex] = dependency;
 
-	}
+    };
 
 }
 
@@ -73,6 +76,6 @@ export function Inject(dependency: string): ParameterDecorator {
  */
 export function isAnnotated(func: Function): boolean {
 
-	return func && func.hasOwnProperty('$inject');
+    return func && func.hasOwnProperty("$inject");
 
 }

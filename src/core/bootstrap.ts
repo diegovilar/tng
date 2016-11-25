@@ -18,28 +18,22 @@ To process a module is to:
         - Register config and run functions
 */
 
+import {ApplicationAnnotation, ApplicationConstructor} from './application';
+import {DependenciesArray, ModuleAnnotation, ModuleConstructor, publishModule} from './module';
+import {getAnnotations, mergeAnnotations} from './reflection';
+
 // TODO debug only?
 // import * as angular from "angular";
 import {assert} from './assert';
-import {getAnnotations, mergeAnnotations} from './reflection';
 import {create} from './utils';
-import {ApplicationConstructor, ApplicationAnnotation} from './application';
-import {ModuleConstructor, ModuleAnnotation, publishModule, DependenciesArray} from './module';
 
-/**
- *
- */
-export function bootstrap(applicationClass: ApplicationConstructor, element?: Element|Document,
-    dependencies?: DependenciesArray, constructorParameters?: any[]): ng.auto.IInjectorService;
-export function bootstrap(moduleClass: ModuleConstructor, element: Element|Document,
-    dependencies?: DependenciesArray, constructorParameters?: any[]): ng.auto.IInjectorService;
-export function bootstrap(moduleClass: ModuleConstructor, element?: Element|Document,
+export function bootstrap(application: Function, element?: Element|Document,
     dependencies?: DependenciesArray, constructorParameters?: any[]): ng.auto.IInjectorService {
 
     // Reflect.decorate apply decorators reversely, so we need to reverse
     // the extracted annotations before merging them
     // var aux = getAnnotations(moduleClass, ModuleAnnotation).reverse();
-    var aux = getAnnotations(moduleClass, ModuleAnnotation);
+    var aux = getAnnotations(application, ModuleAnnotation);
 
     // TODO debug only?
     assert.notEmpty(aux, 'Missing @Application or @Module decoration');
@@ -51,7 +45,7 @@ export function bootstrap(moduleClass: ModuleConstructor, element?: Element|Docu
     // TODO debug only?
     assert(element, 'element must be provided');
 
-    var ngModule = publishModule(moduleClass, null, dependencies, constructorParameters);
+    var ngModule = publishModule(<ModuleConstructor> application, null, dependencies, constructorParameters);
 
     return angular.bootstrap(<any> element, [ngModule.name]);
 

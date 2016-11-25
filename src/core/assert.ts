@@ -1,4 +1,4 @@
-import {isString, isArray} from './utils';
+import {isArray, isString} from './utils';
 
 var slice = Array.prototype.slice;
 

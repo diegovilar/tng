@@ -18,7 +18,7 @@
     },
     "peerDependencies": {
         "@types/angular-ui-router": "^1.1.34",
-        "angularts": "^0.0.0-PLACEHOLDER",
+        "angularts.core": "^0.0.0-PLACEHOLDER",
         "angularts.ui.bootstrap": "^0.0.0-PLACEHOLDER",
         "angular-ui-router": "https://github.com/angular-ui/ui-router/archive/0.2.18.tar.gz"
     }

@@ -13,12 +13,12 @@ export * from "./service";
 export * from "./value";
 export * from "./view";
 
-import * as __utils__ from "./utils";
-import * as __assert__ from "./assert";
-import * as __reflection__ from "./reflection";
+import * as $$assert from "./assert";
+import * as $$reflection from "./reflection";
+import * as $$utils from "./utils";
 
 export {
-    __utils__,
-    __assert__,
-    __reflection__
+    $$utils,
+    $$assert,
+    $$reflection
 }

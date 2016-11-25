@@ -1,5 +1,5 @@
 {
-    "name": "angularts",
+    "name": "angularts.core",
     "version": "0.0.0-PLACEHOLDER",
     "description": "Angular 1 on TypeScript",
     "license": "MIT",
@@ -21,5 +21,8 @@
         "@types/angular-animate": "~1.5.5",
         "angular": "~1.5.x",
         "reflect-metadata": "^0.1.8"
+    },
+    "optionalDependencies": {
+        "angular-animate": "~1.5.x"
     }
 }
